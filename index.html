@@ -141,14 +141,14 @@ header{background:#000;border-bottom:1px solid var(--line);padding:12px 22px}
 <section id="profileSetup" class="panel hidden"><h2>Configurar nombre de jugador</h2><p>Elige el nombre que aparecerá junto a tus respuestas en C.A.T.S.</p><label for="profileNameInput">Nombre de jugador</label><input id="profileNameInput" maxlength="32" placeholder="Tu nombre"><div class="actions"><button class="primary" id="saveProfile">Guardar nombre</button></div><div id="profileMessage" class="error" role="alert"></div></section>
 <section id="home">
  <nav class="home-tabs" role="tablist" aria-label="Secciones principales">
-  <button type="button" class="home-tab" id="tabWanted" role="tab" aria-selected="false" aria-controls="homeTabWanted">¿Qué quieres jugar?</button>
-  <button type="button" class="home-tab active" id="tabRooms" role="tab" aria-selected="true" aria-controls="homeTabRooms">Herramientas</button>
+  <button type="button" class="home-tab active" id="tabWanted" role="tab" aria-selected="true" aria-controls="homeTabWanted">¿Qué quieres jugar?</button>
+  <button type="button" class="home-tab" id="tabRooms" role="tab" aria-selected="false" aria-controls="homeTabRooms">Herramientas</button>
   <button type="button" class="home-tab" id="tabEvents" role="tab" aria-selected="false" aria-controls="homeTabEvents">Eventos</button>
   <button type="button" class="home-tab" id="tabCommunities" role="tab" aria-selected="false" aria-controls="homeTabCommunities">Comunidades</button>
   <button type="button" class="home-tab" id="tabFreeRpg" role="tab" aria-selected="false" aria-controls="homeTabFreeRpg">¡Rol gratis!</button>
   <button type="button" class="home-tab" id="tabAbout" role="tab" aria-selected="false" aria-controls="homeTabAbout">¿Quiénes somos?</button>
  </nav>
- <div id="homeTabRooms" class="home-tab-panel" role="tabpanel" aria-labelledby="tabRooms">
+ <div id="homeTabRooms" class="home-tab-panel hidden" role="tabpanel" aria-labelledby="tabRooms">
  <section id="homeCreatePanel" class="panel">
   <h2>¿Qué es C.A.T.S.?</h2><p>C.A.T.S. es una herramienta colaborativa para preparar una partida de rol: permite acordar el <strong>Concepto</strong>, la <strong>Acción u objetivo</strong>, el <strong>Tono</strong> y la <strong>Temática</strong>, además de establecer límites mediante líneas y velos. Pulsa <strong>Ocupar C.A.T.S.</strong> para iniciar un espacio de preparación, indica tu nombre y el juego, y comparte el enlace o el código que se genera. Los demás jugadores podrán entrar desde sus dispositivos, responder el cuestionario y ponerse de acuerdo contigo antes de jugar.</p>
   <div class="actions"><button class="primary" id="createRoom">Ocupar C.A.T.S.</button></div><div class="join-room-box"><label for="roomCodeInput">Entrar a C.A.T.S. con código</label><div class="actions"><input id="roomCodeInput" maxlength="6" autocomplete="off" placeholder="Código de 6 caracteres" aria-label="Código de C.A.T.S."><button id="joinRoomCode" type="button">Unirse</button></div></div>
@@ -160,7 +160,7 @@ header{background:#000;border-bottom:1px solid var(--line);padding:12px 22px}
  </section>
  <div id="homeError" class="error" role="alert"></div>
  </div>
- <div id="homeTabWanted" class="home-tab-panel hidden" role="tabpanel" aria-labelledby="tabWanted">
+ <div id="homeTabWanted" class="home-tab-panel" role="tabpanel" aria-labelledby="tabWanted">
  <section class="panel" id="wantedBoard">
   <div class="section-toggle"><div><h2>¿Qué quieres jugar?</h2><p>En esta sección puedes compartir qué juego te gustaría jugar, buscar un grupo que quiera lo mismo que tú o encontrar jugadores para organizar una partida. Publica tu propuesta indicando si buscas una mesa como jugador o si quieres reunir jugadores como DJ. ¡Así podrás conectar con personas que comparten tus mismos intereses!</p></div></div>
   <div id="wantedHomeView">
@@ -1080,6 +1080,7 @@ buildOptions();
 // El sitio es público: no se crea ninguna cuenta para los visitantes.
 let authInitialized=false;
 async function initializePublicSite(){
+ setHomeTab("wanted");
  const current=await sb.auth.getSession();if(current.error)throw current.error;
  authSession=current.data.session;authUser=current.data.session?.user||null;
  profileName="";
