@@ -46,7 +46,17 @@ footer{text-align:center;color:#707987;font-size:11px;padding:15px}
 <body>
 <header><h1>C.A.T.S.</h1><p>Una herramienta para construir juntos el concepto de una partida de rol.</p></header>
 <main>
-<section id="home">
+<section id="authPanel" class="panel">
+ <h2>Acceso a C.A.T.S.</h2>
+ <p>Inicia sesión o crea una cuenta para crear salas y participar. El generador aleatorio sigue disponible sin cuenta.</p>
+ <label for="authName">Nombre de jugador (para el registro)</label><input id="authName" maxlength="32" placeholder="Tu nombre">
+ <label for="authEmail">Correo electrónico</label><input id="authEmail" type="email" autocomplete="email" placeholder="nombre@correo.com">
+ <label for="authPassword">Contraseña</label><input id="authPassword" type="password" autocomplete="current-password" minlength="8" placeholder="Mínimo 8 caracteres">
+ <div class="actions"><button class="primary" id="signIn">Iniciar sesión</button><button id="signUp">Crear cuenta</button></div>
+ <div id="authMessage" class="muted" aria-live="polite"></div>
+</section>
+<section id="accountBar" class="panel hidden"><div class="row"><div><b id="accountEmail"></b><p>Sesión iniciada</p></div><button id="signOut" class="danger">Cerrar sesión</button></div></section>
+<section id="home" class="hidden">
  <div class="panel"><h2>Preparar una partida</h2><p>Crea una sala e invita a tus jugadores con un código, o entra a una sala existente.</p></div>
  <div class="home-grid">
   <section class="panel"><h3>Crear una sala</h3><label for="createName">Tu nombre</label><input id="createName" maxlength="32" placeholder="Nombre del jugador"><div class="actions"><button class="primary" id="createRoom">Crear sala</button></div></section>
@@ -87,6 +97,8 @@ const SUPABASE_URL="https://mvbbqgiakysxyacfkarh.supabase.co";
 const SUPABASE_KEY="sb_publishable_5T4XYf4LS3MsHVKEYdLQ1Q_TwUWGVUC";
 const API=SUPABASE_URL+"/functions/v1/cats-room";
 const STORAGE_KEY="cats_room_session_v1";
+const sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+let authSession=null, authUser=null;
 let session=null, roomState=null, refreshTimer=null;
 const $=id=>document.getElementById(id);
 const optionSets={
@@ -96,8 +108,64 @@ const optionSets={
  S:["Traición","Venganza","Corrupción","Amistad","Guerra","Descubrimiento","Supervivencia","Conspiraciones","Sacrificio","Misterios sobrenaturales","Lealtad","Libertad"]
 };
 function showError(el,msg){$(el).textContent=msg||""}
+
+function setAuthUI(){
+ const logged=!!authUser;
+ $("authPanel").classList.toggle("hidden",logged);
+ $("accountBar").classList.toggle("hidden",!logged);
+ $("home").classList.toggle("hidden",!logged);
+ $("roomView").classList.toggle("hidden",!logged||!session);
+ $("accountEmail").textContent=authUser?.email||"";
+ if(!logged){if(refreshTimer)clearInterval(refreshTimer);refreshTimer=null;session=null;roomState=null;}
+}
+async function signIn(){
+ $("authMessage").textContent="Iniciando sesión...";
+ const email=$("authEmail").value.trim(),password=$("authPassword").value;
+ const {data,error}=await sb.auth.signInWithPassword({email,password});
+ if(error){$("authMessage").textContent=error.message;return;}
+ authSession=data.session;authUser=data.user;$("authMessage").textContent="";
+ setAuthUI();restoreRoomSession();
+}
+async function signUp(){
+ const email=$("authEmail").value.trim(),password=$("authPassword").value,name=$("authName").value.trim();
+ if(!name){$("authMessage").textContent="Escribe tu nombre para crear la cuenta.";return;}
+ if(password.length<8){$("authMessage").textContent="La contraseña debe tener al menos 8 caracteres.";return;}
+ $("authMessage").textContent="Creando cuenta...";
+ const {data,error}=await sb.auth.signUp({email,password});
+ if(error){$("authMessage").textContent=error.message;return;}
+ if(data.session){
+  authSession=data.session;authUser=data.user;
+  const {error:profileError}=await sb.from("cats_profiles").upsert({id:authUser.id,display_name:name},{onConflict:"id"});
+  if(profileError){$("authMessage").textContent="Cuenta creada, pero no se pudo guardar el perfil: "+profileError.message;return;}
+  $("authMessage").textContent="Cuenta creada.";
+  setAuthUI();
+ }else{
+  $("authMessage").textContent="Cuenta creada. Revisa tu correo para confirmar la dirección y luego inicia sesión.";
+ }
+}
+async function signOut(){
+ if(session){try{await api("leave",{roomId:session.roomId,token:session.token});}catch{}}
+ clearSession();
+ await sb.auth.signOut();
+ authSession=null;authUser=null;
+ $("answerC").dataset.loaded="";
+ setAuthUI();
+}
+function restoreRoomSession(){
+ try{
+  const stored=JSON.parse(localStorage.getItem(STORAGE_KEY)||"null");
+  if(stored&&stored.roomId&&stored.token){
+   session=stored;$("roomCode").textContent=stored.code;$("roomTitle").textContent="Sala "+stored.code;
+   $("home").classList.add("hidden");$("roomView").classList.remove("hidden");
+   loadDraft();refreshRoom();if(refreshTimer)clearInterval(refreshTimer);refreshTimer=setInterval(refreshRoom,4500);
+  }
+ }catch{clearSession()}
+}
+$("signIn").onclick=signIn;$("signUp").onclick=signUp;$("signOut").onclick=signOut;
+
 async function api(action,data={}){
- const res=await fetch(API,{method:"POST",headers:{"Content-Type":"application/json","apikey":SUPABASE_KEY},body:JSON.stringify({action,...data})});
+ if(!authSession?.access_token)throw new Error("Debes iniciar sesión para usar las salas C.A.T.S.");
+ const res=await fetch(API,{method:"POST",headers:{"Content-Type":"application/json","apikey":SUPABASE_KEY,"Authorization":"Bearer "+authSession.access_token},body:JSON.stringify({action,...data})});
  const json=await res.json().catch(()=>({error:"Respuesta no válida del servidor."}));
  if(!res.ok)throw new Error(json.error||"No se pudo completar la operación.");
  return json;
@@ -184,7 +252,17 @@ $("createRoom").onclick=createRoom;$("joinRoom").onclick=joinRoom;$("joinCode").
 $("copyCode").onclick=async()=>{try{await navigator.clipboard.writeText(session.code);$("copyCode").textContent="Copiado"}catch{$("copyCode").textContent="No se pudo copiar"}setTimeout(()=>$("copyCode").textContent="Copiar código",1600)};
 $("leaveRoom").onclick=leaveRoom;$("saveAnswers").onclick=saveAnswers;$("refreshRoom").onclick=refreshRoom;
 buildOptions();
-try{const stored=JSON.parse(localStorage.getItem(STORAGE_KEY)||"null");if(stored&&stored.roomId&&stored.token){session=stored;$("home").classList.add("hidden");$("roomView").classList.remove("hidden");$("roomCode").textContent=stored.code;$("roomTitle").textContent="Sala "+stored.code;loadDraft();refreshRoom();refreshTimer=setInterval(refreshRoom,4500)}}catch{clearSession()}
+setAuthUI();
+sb.auth.getSession().then(({data})=>{
+ authSession=data.session;authUser=data.session?.user||null;
+ setAuthUI();
+ if(authUser)restoreRoomSession();
+});
+sb.auth.onAuthStateChange((_event,newSession)=>{
+ authSession=newSession;authUser=newSession?.user||null;
+ setAuthUI();
+ if(authUser&&!session)restoreRoomSession();
+});
 
 // Generador aleatorio auxiliar
 const tables=[
