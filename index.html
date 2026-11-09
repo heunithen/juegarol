@@ -311,7 +311,7 @@ function renderWantedPosts(data){
  if(!data.posts?.length){postsBox.textContent="Todavía no hay publicaciones. Sé el primero en buscar una mesa o reunir jugadores.";return}
  const grid=document.createElement("div");grid.className="wanted-posts";
  data.posts.forEach(post=>{
-  const card=document.createElement("article");card.className="wanted-post";
+  const card=document.createElement("article");card.className="wanted-post"+(post.mine?" owned":"");
   const title=document.createElement("h4");title.textContent=post.game;
   const role=document.createElement("span");role.className="wanted-tag";role.textContent=post.search_type==="busco_jugadores"?"DJ":"JUGADOR";
   const type=document.createElement("span");type.className="wanted-tag";type.textContent=post.search_type==="busco_mesa"?"BUSCA UNA MESA":"BUSCA JUGADORES";
@@ -319,7 +319,7 @@ function renderWantedPosts(data){
   const author=document.createElement("p");author.textContent="Publicado por "+post.display_name+" · "+new Date(post.created_at).toLocaleDateString("es-CL");
   const location=document.createElement("p");location.textContent="📍 "+post.commune+", "+post.region;
   const contact=document.createElement("p");contact.className="wanted-contact";contact.textContent="Contacto ("+post.contact_method+"): "+post.contact_value;
-  card.append(title,role,type,mode,author,location,contact);
+  card.append(title,role,type,mode);\n  if(post.mine){const own=document.createElement("span");own.className="wanted-own-tag";own.textContent="TU PROPUESTA";card.appendChild(own)}\n  card.append(author,location,contact);
   if(post.notes){const notes=document.createElement("p");notes.textContent="Notas: "+post.notes;card.appendChild(notes)}
   if(post.mine){
    const actions=document.createElement("div");actions.className="actions";
