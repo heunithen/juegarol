@@ -40,6 +40,10 @@ button.danger{border-color:#794848;color:#f0b0b0}button.small{padding:5px 8px;fo
 th,td{padding:10px;text-align:left;vertical-align:top;border-right:1px solid var(--line);border-bottom:1px solid var(--line)}th{background:#303744;color:var(--gold);font:700 13px Georgia,serif}td{font-size:12px;color:#e1e4e9}tr:last-child td{border-bottom:0}td:last-child,th:last-child{border-right:0}
 .num{display:inline-grid;place-items:center;min-width:22px;height:22px;margin-right:5px;border-radius:50%;background:#3b4350;color:var(--gold);font-size:11px;font-weight:700}.cell-head{display:flex;justify-content:space-between;align-items:center;gap:5px;margin-bottom:6px}
 footer{text-align:center;color:#707987;font-size:11px;padding:15px}
+.my-rooms{margin-top:18px}.my-rooms-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:12px}
+.my-room-card{display:flex;justify-content:space-between;align-items:center;gap:12px;background:#191e26;border:1px solid var(--line);border-radius:10px;padding:13px}
+.my-room-card h3{margin:0 0 4px}.my-room-card p{font-size:12px;margin:2px 0}.my-room-card .room-actions{flex-shrink:0}.my-room-card.closed{opacity:.65}
+@media(max-width:700px){.my-rooms-list{grid-template-columns:1fr}.my-room-card{align-items:flex-start;flex-direction:column}.my-room-card .room-actions{width:100%}.my-room-card .room-actions button{width:100%}}
 .room-layout{display:grid;grid-template-columns:minmax(0,1fr) 280px;gap:16px;align-items:stretch}.chat-panel{display:flex;flex-direction:column;min-height:390px}.chat-messages{height:300px;overflow-y:auto;display:flex;flex-direction:column;gap:9px;padding:12px;background:#171c23;border:1px solid var(--line);border-radius:9px}.chat-message{max-width:90%;padding:8px 11px;border-radius:10px;background:#2b3340;align-self:flex-start;overflow-wrap:anywhere}.chat-message.mine{align-self:flex-end;background:#3a3325}.chat-message b{display:block;color:var(--gold);font-size:12px;margin-bottom:2px}.chat-message small{display:block;color:var(--muted);font-size:10px;text-align:right;margin-top:4px}.chat-compose{display:flex;gap:8px;margin-top:10px}.chat-compose input{min-width:0}.online-dot,.offline-dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:7px}.online-dot{background:#76c58a}.offline-dot{background:#737d8a}.cats-launch{margin-top:16px}#catsScreen{position:fixed;inset:0;z-index:50;background:var(--bg);overflow-y:auto;padding:20px}.question-shell{max-width:760px;min-height:calc(100vh - 40px);margin:auto;display:flex;flex-direction:column;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:clamp(16px,4vw,32px)}.question-top,.question-bottom{display:flex;justify-content:space-between;align-items:center;gap:12px}.question-progress{height:5px;background:#171c23;border-radius:9px;margin:22px 0 30px;overflow:hidden}#questionProgressBar{height:100%;width:25%;background:var(--gold);transition:width .2s}.question-body{flex:1}.question-body h2{margin:0}.question-hint{margin:24px 0 12px}.question-options .option{font-size:14px;padding:9px 12px}.question-options .option.selected{background:#4a3d23;border-color:var(--gold);color:var(--gold)}#questionText{min-height:120px}#questionSaveStatus{margin-top:10px;font-size:12px}.question-bottom{margin-top:28px;padding-top:18px;border-top:1px solid var(--line)}@media(max-width:700px){.room-layout{grid-template-columns:1fr}.chat-panel{min-height:350px}.chat-messages{height:240px}#catsScreen{padding:8px}.question-shell{min-height:calc(100vh - 16px);padding:16px}}
 
 @media(max-width:700px){main{padding:16px 10px 40px}.home-grid,.review-grid{grid-template-columns:1fr}.panel{padding:15px}.row>*{flex:1 1 100%}.room-head{align-items:flex-start}}
@@ -62,14 +66,16 @@ footer{text-align:center;color:#707987;font-size:11px;padding:15px}
 <section id="home" class="hidden">
  <div class="panel"><h2>Preparar una partida</h2><p>Crea una sala y comparte su enlace de invitación. Quienes tengan el enlace podrán unirse.</p></div>
  <div class="home-grid">
-  <section class="panel"><h3>Crear una sala</h3><p>Primero crea la sala. Después podrás indicar tu nombre y el juego desde su interior.</p><div class="actions"><button class="primary" id="createRoom">Crear sala</button></div></section>
-  <section class="panel"><h3>Unirse a una sala</h3><p>Para entrar, abre el enlace de invitación que te compartió el anfitrión. La sala se abrirá automáticamente con tu nombre de jugador.</p></section>
- </div><div id="homeError" class="error" role="alert"></div>
+  <section class="panel"><h3>Crear una sala</h3><p>Primero crea la sala. Después podrás indicar tu nombre y el juego desde su interior.</p><div class="actions"><button class="primary" id="createRoom">Crear una sala</button></div></section>
+  <section class="panel"><h3>Unirse a una sala</h3><p>Para entrar, abre el enlace de invitación que te compartió el anfitrión. La sala se abrirá automáticamente.</p></section>
+ </div>
+ <section class="panel my-rooms"><div class="section-toggle"><div><h2>Mis salas</h2><p>Salas en las que participas como anfitrión o jugador.</p></div><button class="small" id="refreshMyRooms">Actualizar</button></div><div id="myRoomsList" class="my-rooms-list"><p>Cargando tus salas...</p></div></section>
+ <div id="homeError" class="error" role="alert"></div>
 </section>
 
 <section id="roomView" class="hidden">
  <div class="panel">
-  <div class="room-head"><div><div class="room-meta"><span class="badge">SALA DE JUEGO</span><span id="hostBadge" class="badge host hidden">ANFITRIÓN</span></div><h2 id="roomTitle" style="margin:8px 0 0">Partida</h2><p id="roomGame" style="margin:5px 0 0;color:var(--gold)">Juego</p></div><div><div class="muted" style="font-size:11px">ENLACE PARA INVITAR</div><div id="inviteUrl" style="max-width:320px;overflow-wrap:anywhere;color:var(--muted);font-size:12px;margin:6px 0">Enlace de la sala</div><button class="small" id="copyInvite">Copiar enlace</button></div></div>
+  <div class="room-head"><div><div class="room-meta"><span class="badge">SALA DE JUEGO</span><span id="hostBadge" class="badge host hidden">ANFITRIÓN</span></div><h2 id="roomTitle" style="margin:8px 0 0">Partida</h2><p id="roomGame" style="margin:5px 0 0;color:var(--gold)">Juego</p></div><div><div class="muted" style="font-size:11px">ENLACE PARA INVITAR</div><div id="inviteUrl" style="max-width:320px;overflow-wrap:anywhere;color:var(--muted);font-size:12px;margin:6px 0">Enlace de la sala</div><div class="actions"><button class="small" id="copyInvite">Copiar enlace</button><button class="small" id="backToRooms">Mis salas</button></div></div></div>
   <p id="roomStatus">Comparte el enlace para invitar a los demás jugadores.</p>
   <div id="roomSetup" class="cats-card hidden"></div>
  </div>
@@ -128,7 +134,7 @@ async function signIn(){
  if(error){$("authMessage").textContent=error.message;return;}
  authSession=data.session;authUser=data.user;$("authMessage").textContent="";
  await ensureProfile();setAuthUI();
- if(profileName){restoreRoomSession();await enterFromInviteIfPresent();}
+ await restoreRoomSession();await enterFromInviteIfPresent();
 }
 async function ensureProfile(){
  if(!authUser){profileName="";return "";}
@@ -156,7 +162,7 @@ async function saveProfile(){
   const {error}=await sb.from("cats_profiles").upsert({id:authUser.id,display_name:name},{onConflict:"id"});
   if(error)throw error;
   profileName=name;$("profileMessage").textContent="";
-  setAuthUI();restoreRoomSession();await enterFromInviteIfPresent();
+  setAuthUI();await restoreRoomSession();await enterFromInviteIfPresent();
  }catch(e){$("profileMessage").textContent="No se pudo guardar el perfil: "+e.message;}
  finally{$("saveProfile").disabled=false;}
 }
@@ -185,16 +191,7 @@ async function signOut(){
  
  setAuthUI();
 }
-function restoreRoomSession(){
- try{
-  const stored=JSON.parse(localStorage.getItem(STORAGE_KEY)||"null");
-  if(stored&&stored.roomId&&stored.token){
-   session=stored;$("inviteUrl").textContent=inviteLink(stored.code);
-   $("home").classList.add("hidden");$("roomView").classList.remove("hidden");
-   loadDraft();refreshRoom();if(refreshTimer)clearInterval(refreshTimer);refreshTimer=setInterval(refreshRoom,4500);
-  }
- }catch{clearSession()}
-}
+async function restoreRoomSession(){await loadMyRooms()}
 $("signIn").onclick=signIn;$("signUp").onclick=signUp;$("googleSignIn").onclick=signInWithGoogle;$("signOut").onclick=signOut;$("saveProfile").onclick=saveProfile;
 
 async function api(action,data={}){
@@ -203,6 +200,36 @@ async function api(action,data={}){
  const json=await res.json().catch(()=>({error:"Respuesta no válida del servidor."}));
  if(!res.ok)throw new Error(json.error||"No se pudo completar la operación.");
  return json;
+}
+async function loadMyRooms(){
+ const box=$("myRoomsList");if(!box||!authUser)return;
+ box.innerHTML="<p>Cargando tus salas...</p>";
+ try{
+  const data=await api("list_rooms"),rooms=data.rooms||[];box.innerHTML="";
+  if(!rooms.length){box.innerHTML="<p>Aún no participas en ninguna sala. Crea una o entra mediante un enlace de invitación.</p>";return}
+  rooms.forEach(item=>{
+   const room=item.room,p=item.participant,closed=!!room.closed;
+   const card=document.createElement("article");card.className="my-room-card"+(closed?" closed":"");
+   const info=document.createElement("div"),title=document.createElement("h3"),meta=document.createElement("p"),date=document.createElement("p");
+   title.textContent=room.game_name&&room.game_name!=="Juego sin especificar"?room.game_name:(room.room_name||"Sala C.A.T.S.");
+   meta.textContent=(p.is_host?"Anfitrión":"Participante")+" · Código "+room.code+" · "+(closed?"Sala cerrada":"Sala abierta");
+   date.textContent="Te uniste el "+new Date(p.joined_at).toLocaleDateString("es-CL");
+   info.append(title,meta,date);
+   const actions=document.createElement("div");actions.className="room-actions";
+   const button=document.createElement("button");button.className=closed?"":"primary";button.textContent=closed?"Cerrada":"Entrar a la sala";button.disabled=closed;
+   button.onclick=()=>resumeRoom(room.id,button);actions.appendChild(button);
+   card.append(info,actions);box.appendChild(card);
+  });
+ }catch(err){box.innerHTML="";const msg=document.createElement("p");msg.className="error";msg.textContent="No se pudieron cargar tus salas: "+err.message;box.appendChild(msg)}
+}
+async function resumeRoom(roomId,button){
+ if(button)button.disabled=true;
+ try{const data=await api("resume_room",{roomId});enterRoom(data)}
+ catch(err){showError("homeError",err.message);await loadMyRooms()}
+ finally{if(button&&button.isConnected)button.disabled=false}
+}
+function backToMyRooms(){
+ clearSession();$("catsScreen").classList.add("hidden");$("roomView").classList.add("hidden");$("home").classList.remove("hidden");loadMyRooms();
 }
 function saveSession(){localStorage.setItem(STORAGE_KEY,JSON.stringify(session))}
 function draftKey(){return session?"cats_draft_"+session.roomId+"_"+session.participantId:null}
@@ -324,7 +351,7 @@ async function kickPlayer(p){
 async function leaveRoom(){
  if(!confirm("¿Quieres salir de esta sala?"))return;
  try{await api("leave",{roomId:session.roomId,token:session.token})}catch(e){console.warn(e)}
- clearSession();$("catsScreen").classList.add("hidden");$("roomView").classList.add("hidden");$("home").classList.remove("hidden");
+ clearSession();$("catsScreen").classList.add("hidden");$("roomView").classList.add("hidden");$("home").classList.remove("hidden");await loadMyRooms();
 }
 
 const questionDefs=[{key:"C",title:"Concepto",prompt:"¿De qué trata la partida?",options:optionSets.C},{key:"A",title:"Acción / Objetivo",prompt:"¿Qué harán los personajes?",options:optionSets.A},{key:"T",title:"Tono",prompt:"¿Qué ambiente tendrá la partida?",options:optionSets.T},{key:"S",title:"Temática",prompt:"¿Qué temas o elementos serán importantes?",options:optionSets.S}];
@@ -347,7 +374,7 @@ async function goQuestionPrev(){clearTimeout(answerSaveTimer);try{await saveOneA
 async function startForm(){try{await api("start_form",{roomId:session.roomId,token:session.token});openQuestionnaire()}catch(err){$("roomStatus").textContent=err.message}}
 async function saveAnswers(){}
 function buildOptions(){}
-$("createRoom").onclick=createRoom;
+$("createRoom").onclick=createRoom;$("refreshMyRooms").onclick=loadMyRooms;$("backToRooms").onclick=backToMyRooms;
 const inviteFromUrl=new URLSearchParams(window.location.search).get("sala");
 $("copyInvite").onclick=async()=>{try{await navigator.clipboard.writeText(inviteLink(session.code));$("copyInvite").textContent="Enlace copiado"}catch{$("copyInvite").textContent="No se pudo copiar"}setTimeout(()=>$("copyInvite").textContent="Copiar enlace",1600)};
 $("startForm").onclick=startForm;$("closeCats").onclick=closeQuestionnaire;$("questionNext").onclick=goQuestionNext;$("questionPrev").onclick=goQuestionPrev;$("chatForm").onsubmit=sendChatMessage;
@@ -367,7 +394,7 @@ sb.auth.onAuthStateChange((_event,newSession)=>{
  setAuthUI();
  setTimeout(async()=>{
   if(!authUser||authUser.id!==newSession.user.id)return;
-  try{await ensureProfile();setAuthUI();if(profileName&&!session){restoreRoomSession();await enterFromInviteIfPresent();}}
+  try{await ensureProfile();setAuthUI();if(!session){await restoreRoomSession();await enterFromInviteIfPresent();}}
   catch(e){setAuthUI();$("profileMessage").textContent=e.message;}
  },0);
 });
