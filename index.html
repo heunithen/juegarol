@@ -114,7 +114,7 @@ header{background:#000;border-bottom:1px solid var(--line);padding:12px 22px}
 <body>
 <header id="mainBanner" role="button" tabindex="0" aria-label="Volver al portal de inicio">
  <div class="header-layout">
-  <div class="header-brand"><img class="main-banner-image" src="arte/banner.png" alt="Red de Roleros"><span class="site-version">Versión 1.47.6</span></div>
+  <div class="header-brand"><img class="main-banner-image" src="arte/banner.png" alt="Red de Roleros"><span class="site-version">Versión 1.47.7</span></div>
   
  </div>
 </header>
@@ -1102,6 +1102,9 @@ sb.auth.onAuthStateChange((_event,newSession)=>{
 initializePublicSite().catch(error=>{setAuthUI();showError("homeError","No se pudo cargar el sitio: "+(error?.message||"Error desconocido"));authInitialized=true;});
 $("adminAccess").onclick=()=>{adminLoginOpen=true;$("home").classList.add("hidden");$("authPanel").classList.remove("hidden");$("authMessage").textContent="";};
 $("cancelAdminAccess").onclick=()=>{adminLoginOpen=false;$("authPanel").classList.add("hidden");$("home").classList.remove("hidden");};
+
+</script>
+<script>
 // Generador de premisas aleatorias: conserva la estructura de las cuatro tablas originales.
 var originalTables=[
  ["Un individuo poderoso o influyente.","Una organización clandestina.","Una facción militar o fuerza armada.","Una criatura o monstruo.","Una especie o población hostil.","Una entidad sobrenatural.","Una autoridad política o religiosa.","Una civilización o sociedad extranjera.","Un grupo criminal o mercenario.","Una inteligencia artificial o máquina autónoma.","Una fuerza natural o fenómeno ambiental.","Una fuerza desconocida o inexplicable."],
@@ -1575,15 +1578,15 @@ var genreTables={
 };
 
 function rollAll(){
- const genre=$("randomGenre").value.trim(),tone=$("randomTone").value;
- const story=$("story");
+ const genre=document.getElementById("randomGenre").value.trim(),tone=document.getElementById("randomTone").value;
+ const story=document.getElementById("story");
  story.replaceChildren();
- const genreKey=Object.keys(genreTables||{}).find(key=>key.trim().toLocaleLowerCase("es")===genre.toLocaleLowerCase("es"));
+ const genreKey=Object.keys(genreTables).find(key=>key.trim().toLocaleLowerCase("es")===genre.toLocaleLowerCase("es"));
  const tables=genre==="Otro / mezcla"?originalTables:(genreKey?genreTables[genreKey]:null);
  const valid=Array.isArray(tables)&&tables.length===4&&tables.every(table=>Array.isArray(table)&&table.length>0);
  if(!valid){
   const details=Array.isArray(tables)?"Se detectaron "+tables.length+" tablas.":"No se encontró una entrada para este género.";
-  story.textContent="Error en las tablas de «"+genre+"». "+details+" Géneros disponibles: "+Object.keys(genreTables||{}).join(", ")+".";
+  story.textContent="Error en las tablas de «"+genre+"». "+details+" Géneros disponibles: "+Object.keys(genreTables).join(", ")+".";
   console.error("Estructura inválida del generador:",{genre,genreKey,tables});
   return;
  }
