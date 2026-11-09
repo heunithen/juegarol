@@ -56,6 +56,7 @@ footer{text-align:center;color:#707987;font-size:11px;padding:15px}
  <div id="authMessage" class="muted" aria-live="polite"></div>
 </section>
 <section id="accountBar" class="panel hidden"><div class="row"><div><b id="accountEmail"></b><p>Sesión iniciada</p></div><button id="signOut" class="danger">Cerrar sesión</button></div></section>
+<section id="profileSetup" class="panel hidden"><h2>Configurar nombre de jugador</h2><p>Elige el nombre que aparecerá en las salas y junto a tus respuestas.</p><label for="profileNameInput">Nombre de jugador</label><input id="profileNameInput" maxlength="32" placeholder="Tu nombre"><div class="actions"><button class="primary" id="saveProfile">Guardar nombre</button></div><div id="profileMessage" class="error" role="alert"></div></section>
 <section id="home" class="hidden">
  <div class="panel"><h2>Preparar una partida</h2><p>Crea una sala y comparte su enlace de invitación. Quienes tengan el enlace podrán unirse.</p></div>
  <div class="home-grid">
@@ -102,7 +103,7 @@ const SUPABASE_KEY="sb_publishable_5T4XYf4LS3MsHVKEYdLQ1Q_TwUWGVUC";
 const API=SUPABASE_URL+"/functions/v1/cats-room";
 const STORAGE_KEY="cats_room_session_v1";
 const sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
-let authSession=null, authUser=null;
+let authSession=null, authUser=null, profileName="";
 let session=null, roomState=null, refreshTimer=null;
 const $=id=>document.getElementById(id);
 const optionSets={
@@ -117,10 +118,11 @@ function setAuthUI(){
  const logged=!!authUser;
  $("authPanel").classList.toggle("hidden",logged);
  $("accountBar").classList.toggle("hidden",!logged);
- $("home").classList.toggle("hidden",!logged);
- $("roomView").classList.toggle("hidden",!logged||!session);
+ $("profileSetup").classList.toggle("hidden",!logged||!!profileName);
+ $("home").classList.toggle("hidden",!logged||!profileName);
+ $("roomView").classList.toggle("hidden",!logged||!profileName||!session);
  $("accountEmail").textContent=authUser?.email||"";
- if(!logged){if(refreshTimer)clearInterval(refreshTimer);refreshTimer=null;session=null;roomState=null;}
+ if(!logged){profileName="";if(refreshTimer)clearInterval(refreshTimer);refreshTimer=null;session=null;roomState=null;}
 }
 async function signInWithGoogle(){
  $("authMessage").textContent="Conectando con Google...";
@@ -136,19 +138,38 @@ async function signIn(){
  const {data,error}=await sb.auth.signInWithPassword({email,password});
  if(error){$("authMessage").textContent=error.message;return;}
  authSession=data.session;authUser=data.user;$("authMessage").textContent="";
- setAuthUI();await ensureProfile();restoreRoomSession();await enterFromInviteIfPresent();
+ await ensureProfile();setAuthUI();
+ if(profileName){restoreRoomSession();await enterFromInviteIfPresent();}
 }
 async function ensureProfile(){
- if(!authUser)return "";
+ if(!authUser){profileName="";return "";}
  const {data,error}=await sb.from("cats_profiles").select("display_name").eq("id",authUser.id).maybeSingle();
  if(error)throw error;
  const existing=(data?.display_name||"").trim();
- if(existing)return existing;
- const fallback=(authUser.user_metadata?.display_name||"").trim();
- if(!fallback)throw new Error("Esta cuenta no tiene un nombre de jugador configurado. Contacta con el administrador para completar tu perfil.");
- const {error:saveError}=await sb.from("cats_profiles").upsert({id:authUser.id,display_name:fallback},{onConflict:"id"});
- if(saveError)throw saveError;
- return fallback;
+ if(existing){profileName=existing;return existing;}
+ const fallback=(authUser.user_metadata?.display_name||"").trim().slice(0,32);
+ if(fallback){
+  const {error:saveError}=await sb.from("cats_profiles").upsert({id:authUser.id,display_name:fallback},{onConflict:"id"});
+  if(saveError)throw saveError;
+  profileName=fallback;
+ }else{
+  profileName="";
+  $("profileNameInput").value="";
+ }
+ setAuthUI();
+ return profileName;
+}
+async function saveProfile(){
+ const name=$("profileNameInput").value.trim().replace(/[<>]/g,"").slice(0,32);
+ if(!name){$("profileMessage").textContent="Escribe un nombre de jugador.";return;}
+ $("saveProfile").disabled=true;$("profileMessage").textContent="Guardando...";
+ try{
+  const {error}=await sb.from("cats_profiles").upsert({id:authUser.id,display_name:name},{onConflict:"id"});
+  if(error)throw error;
+  profileName=name;$("profileMessage").textContent="";
+  setAuthUI();restoreRoomSession();await enterFromInviteIfPresent();
+ }catch(e){$("profileMessage").textContent="No se pudo guardar el perfil: "+e.message;}
+ finally{$("saveProfile").disabled=false;}
 }
 async function signUp(){
  const email=$("authEmail").value.trim(),password=$("authPassword").value,name=$("authName").value.trim();
@@ -161,7 +182,7 @@ async function signUp(){
   authSession=data.session;authUser=data.user;
   const {error:profileError}=await sb.from("cats_profiles").upsert({id:authUser.id,display_name:name},{onConflict:"id"});
   if(profileError){$("authMessage").textContent="Cuenta creada, pero no se pudo guardar el perfil: "+profileError.message;return;}
-  $("authMessage").textContent="Cuenta creada.";
+  profileName=name;$("authMessage").textContent="Cuenta creada.";
   setAuthUI();await enterFromInviteIfPresent();
  }else{
   $("authMessage").textContent="Cuenta creada. Revisa tu correo para confirmar la dirección y luego inicia sesión.";
@@ -171,7 +192,7 @@ async function signOut(){
  if(session){try{await api("leave",{roomId:session.roomId,token:session.token});}catch{}}
  clearSession();
  await sb.auth.signOut();
- authSession=null;authUser=null;
+ authSession=null;authUser=null;profileName="";
  $("answerC").dataset.loaded="";
  setAuthUI();
 }
@@ -185,7 +206,7 @@ function restoreRoomSession(){
   }
  }catch{clearSession()}
 }
-$("signIn").onclick=signIn;$("signUp").onclick=signUp;$("googleSignIn").onclick=signInWithGoogle;$("signOut").onclick=signOut;
+$("signIn").onclick=signIn;$("signUp").onclick=signUp;$("googleSignIn").onclick=signInWithGoogle;$("signOut").onclick=signOut;$("saveProfile").onclick=saveProfile;
 
 async function api(action,data={}){
  if(!authSession?.access_token)throw new Error("Debes iniciar sesión para usar las salas C.A.T.S.");
@@ -320,15 +341,22 @@ $("startForm").onclick=startForm;
 $("leaveRoom").onclick=leaveRoom;$("saveAnswers").onclick=saveAnswers;$("refreshRoom").onclick=refreshRoom;
 buildOptions();
 setAuthUI();
-sb.auth.getSession().then(({data})=>{
+sb.auth.getSession().then(async({data})=>{
  authSession=data.session;authUser=data.session?.user||null;
- setAuthUI();
- if(authUser){restoreRoomSession();ensureProfile().then(enterFromInviteIfPresent).catch(e=>showError("homeError",e.message));}
+ if(authUser){
+  try{await ensureProfile();setAuthUI();if(profileName){restoreRoomSession();await enterFromInviteIfPresent();}}
+  catch(e){setAuthUI();$("profileMessage").textContent=e.message;}
+ }else setAuthUI();
 });
 sb.auth.onAuthStateChange((_event,newSession)=>{
- authSession=newSession;authUser=newSession?.user||null;
+ authSession=newSession;authUser=newSession?.user||null;profileName="";
+ if(!authUser){setAuthUI();return;}
  setAuthUI();
- if(authUser&&!session){restoreRoomSession();ensureProfile().then(enterFromInviteIfPresent).catch(e=>showError("homeError",e.message));}
+ setTimeout(async()=>{
+  if(!authUser||authUser.id!==newSession.user.id)return;
+  try{await ensureProfile();setAuthUI();if(profileName&&!session){restoreRoomSession();await enterFromInviteIfPresent();}}
+  catch(e){setAuthUI();$("profileMessage").textContent=e.message;}
+ },0);
 });
 
 // Generador aleatorio auxiliar
