@@ -1,169 +1,202 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#171a20">
-<title>Generador de aventuras</title>
+<title>C.A.T.S. — Preparación de partidas</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.119.0"></script>
 <style>
-:root{color-scheme:dark;--bg:#171a20;--panel:#222731;--panel2:#292f3a;--line:#414957;--gold:#e2b65d;--text:#f1eee7;--muted:#aeb6c2;--green:#9bc7a5}
+:root{color-scheme:dark;--bg:#171a20;--panel:#222731;--panel2:#292f3a;--line:#414957;--gold:#e2b65d;--text:#f1eee7;--muted:#aeb6c2;--green:#9bc7a5;--red:#d98282}
 *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:15px/1.5 system-ui,-apple-system,Segoe UI,sans-serif}
-header{padding:34px 22px 24px;text-align:center;background:linear-gradient(140deg,#252b35,#171a20);border-bottom:1px solid var(--line)}
-h1{margin:0;color:var(--gold);font:700 clamp(27px,4vw,42px)/1.15 Georgia,serif;letter-spacing:.04em}
-header p{margin:10px auto 0;color:var(--muted);max-width:760px}
-main{max-width:1600px;margin:auto;padding:24px 18px 60px}
-.actions{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin:0 0 22px}
+header{padding:30px 20px 22px;text-align:center;background:linear-gradient(140deg,#252b35,#171a20);border-bottom:1px solid var(--line)}
+h1{margin:0;color:var(--gold);font:700 clamp(30px,5vw,46px)/1.1 Georgia,serif;letter-spacing:.1em}
+header p{margin:9px auto 0;color:var(--muted);max-width:720px}
+main{max-width:1100px;margin:auto;padding:24px 16px 60px}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:13px;padding:21px;margin-bottom:18px}
+h2{font:700 22px Georgia,serif;color:var(--gold);margin:0 0 13px}h3{font:700 17px Georgia,serif;color:var(--gold);margin:0 0 9px}
+p{margin:7px 0;color:var(--muted)}
+label{display:block;color:var(--muted);font-size:13px;margin:12px 0 5px}
+input,textarea{width:100%;background:#171c23;border:1px solid var(--line);border-radius:8px;color:var(--text);font:15px system-ui;padding:11px 12px;outline:none}
+input:focus,textarea:focus{border-color:var(--gold)}textarea{min-height:90px;resize:vertical}
 button{border:1px solid var(--line);border-radius:8px;padding:10px 15px;background:var(--panel2);color:var(--text);font:600 14px system-ui;cursor:pointer;transition:.15s}
-button:hover{border-color:var(--gold);transform:translateY(-1px)}
+button:hover{border-color:var(--gold);transform:translateY(-1px)}button:disabled{opacity:.45;cursor:not-allowed;transform:none}
 button.primary{background:var(--gold);border-color:var(--gold);color:#211b10}
-button.small{padding:6px 9px;font-size:12px}
-.result{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:20px;margin-bottom:24px}
-.result h2,.table-title{font:700 21px Georgia,serif;color:var(--gold);margin:0 0 14px}
-.story{font:17px/1.65 Georgia,serif;min-height:55px;white-space:pre-line}
-.rolls{display:flex;flex-wrap:wrap;gap:8px;margin-top:15px}
-.roll-chip{background:#171c23;border:1px solid var(--line);border-radius:7px;padding:6px 9px;color:var(--muted);font-size:12px}
-.roll-chip b{color:var(--gold)}
-.table-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:10px;background:var(--panel)}
-table{border-collapse:collapse;width:100%;min-width:1320px;table-layout:fixed}
-th,td{padding:12px 11px;text-align:left;vertical-align:top;border-right:1px solid var(--line);border-bottom:1px solid var(--line)}
-th{background:#303744;color:var(--gold);font:700 14px Georgia,serif;position:sticky;top:0;z-index:1}
-th span{display:block;color:var(--muted);font:12px system-ui;margin-top:3px}
-td{font-size:13px;color:#e1e4e9}
-tr:last-child td{border-bottom:0}td:last-child,th:last-child{border-right:0}
-tbody tr:hover{background:#2b323e}
-.num{display:inline-flex;align-items:center;justify-content:center;min-width:23px;height:23px;margin-right:5px;border-radius:50%;background:#3b4350;color:var(--gold);font-size:11px;font-weight:700}
-.cell-head{display:flex;justify-content:space-between;align-items:center;gap:5px;margin-bottom:7px}
-.cell-head button{flex:none}
-.empty{color:#68717e;text-align:center}
-.hint{color:var(--muted);font-size:13px;margin:12px 2px 0}
-@media(max-width:700px){main{padding:16px 10px 40px}.result{padding:15px}.story{font-size:16px}}
+button.danger{border-color:#794848;color:#f0b0b0}button.small{padding:5px 8px;font-size:12px}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}.row>*{flex:1}
+.home-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}.home-grid .panel{margin:0}
+.hidden{display:none!important}.muted{color:var(--muted)}.error{color:#f0a0a0;margin-top:10px}.success{color:var(--green)}
+.code{font:700 30px/1.2 ui-monospace,monospace;letter-spacing:.18em;color:var(--gold);padding:8px 0}
+.room-head{display:flex;justify-content:space-between;gap:14px;align-items:center;flex-wrap:wrap}
+.room-meta{display:flex;gap:9px;flex-wrap:wrap;align-items:center}.badge{font-size:11px;border:1px solid var(--line);border-radius:20px;padding:3px 8px;color:var(--muted)}.badge.host{color:var(--gold);border-color:#8b713e}
+.participants{display:flex;flex-direction:column;gap:8px}.person{display:flex;justify-content:space-between;align-items:center;gap:10px;background:#191e26;border:1px solid var(--line);border-radius:8px;padding:9px 11px}.person-name{font-weight:600}.person-status{font-size:12px;color:var(--muted)}
+.cats-card{margin:14px 0;padding:17px;border:1px solid var(--line);border-radius:10px;background:#1b2028}.cats-title{display:flex;gap:10px;align-items:center}.letter{display:grid;place-items:center;flex:0 0 35px;height:35px;border-radius:8px;background:#3a3325;color:var(--gold);font-weight:800;font-size:19px}
+.options{display:flex;flex-wrap:wrap;gap:7px;margin:10px 0}.option{font-size:12px;padding:7px 10px;font-weight:500}.option.selected{border-color:var(--gold);background:#3a3325;color:var(--gold)}
+.review-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.review-person{background:#191e26;border:1px solid var(--line);border-radius:10px;padding:14px}.answer-line{padding:9px 0;border-top:1px solid #353d49}.answer-line b{display:block;color:var(--gold);font-size:12px;letter-spacing:.04em}.answer-line span{white-space:pre-wrap;overflow-wrap:anywhere}
+.section-toggle{display:flex;justify-content:space-between;align-items:center;gap:12px}
+#tableTools{margin-top:12px}.actions{display:flex;gap:9px;flex-wrap:wrap;margin:12px 0}
+.story{font:17px/1.65 Georgia,serif;white-space:pre-line;min-height:45px;color:var(--text)}
+.rolls{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}.roll-chip{background:#171c23;border:1px solid var(--line);border-radius:7px;padding:6px 9px;color:var(--muted);font-size:12px}.roll-chip b{color:var(--gold)}
+.table-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:10px;background:var(--panel)}table{border-collapse:collapse;width:100%;min-width:900px;table-layout:fixed}
+th,td{padding:10px;text-align:left;vertical-align:top;border-right:1px solid var(--line);border-bottom:1px solid var(--line)}th{background:#303744;color:var(--gold);font:700 13px Georgia,serif}td{font-size:12px;color:#e1e4e9}tr:last-child td{border-bottom:0}td:last-child,th:last-child{border-right:0}
+.num{display:inline-grid;place-items:center;min-width:22px;height:22px;margin-right:5px;border-radius:50%;background:#3b4350;color:var(--gold);font-size:11px;font-weight:700}.cell-head{display:flex;justify-content:space-between;align-items:center;gap:5px;margin-bottom:6px}
+footer{text-align:center;color:#707987;font-size:11px;padding:15px}
+@media(max-width:700px){main{padding:16px 10px 40px}.home-grid,.review-grid{grid-template-columns:1fr}.panel{padding:15px}.row>*{flex:1 1 100%}.room-head{align-items:flex-start}}
 </style>
 </head>
 <body>
-<header>
-<h1>Generador de aventuras</h1>
-<p>Combina cuatro elementos generales para crear el punto de partida de una aventura. Lanza cada dado por separado o genera una combinación completa.</p>
-</header>
+<header><h1>C.A.T.S.</h1><p>Una herramienta para construir juntos el concepto de una partida de rol.</p></header>
 <main>
-<section class="result" aria-live="polite">
-<h2>Aventura generada</h2>
-<div id="story" class="story">Pulsa «Generar aventura» para generar un conflicto.</div>
-<div id="rolls" class="rolls"></div>
+<section id="home">
+ <div class="panel"><h2>Preparar una partida</h2><p>Crea una sala e invita a tus jugadores con un código, o entra a una sala existente.</p></div>
+ <div class="home-grid">
+  <section class="panel"><h3>Crear una sala</h3><label for="createName">Tu nombre</label><input id="createName" maxlength="32" placeholder="Nombre del jugador"><div class="actions"><button class="primary" id="createRoom">Crear sala</button></div></section>
+  <section class="panel"><h3>Unirse a una sala</h3><label for="joinName">Tu nombre</label><input id="joinName" maxlength="32" placeholder="Nombre del jugador"><label for="joinCode">Código de invitación</label><input id="joinCode" maxlength="6" placeholder="ABC123" style="text-transform:uppercase"><div class="actions"><button class="primary" id="joinRoom">Entrar a la sala</button></div></section>
+ </div><div id="homeError" class="error" role="alert"></div>
 </section>
-<div class="actions">
-<button class="primary" id="generate">⚄ Generar aventura</button>
-<button id="reroll">↻ Volver a generar</button>
-<button id="reset">Limpiar resultados</button>
-</div>
-<h2 class="table-title">Tabla única de generación</h2>
-<div class="table-wrap">
-<table>
-<thead><tr>
-<th style="width:25%">1. Una amenaza...<span>1d12</span></th>
-<th style="width:25%">2. Que quiere...<span>1d12</span></th>
-<th style="width:25%">3. Para conseguirlo...<span>1d12</span></th>
-<th style="width:25%">4. Lo que podría...<span>1d12</span></th>
-</tr></thead>
-<tbody id="rows"></tbody>
-</table>
-</div>
-<p class="hint">Los cuatro resultados plantean una amenaza, su motivación, lo que necesita y las posibles consecuencias. Interpreta y conecta las ideas libremente.</p>
-</main>
+
+<section id="roomView" class="hidden">
+ <div class="panel">
+  <div class="room-head"><div><div class="room-meta"><span class="badge">SALA DE JUEGO</span><span id="hostBadge" class="badge host hidden">ANFITRIÓN</span></div><h2 id="roomTitle" style="margin:8px 0 0">Sala</h2></div><div><div class="muted" style="font-size:11px">CÓDIGO DE INVITACIÓN</div><div id="roomCode" class="code">------</div><button class="small" id="copyCode">Copiar código</button></div></div>
+  <p id="roomStatus">Comparte el código para invitar a los demás jugadores.</p>
+ </div>
+ <div class="panel"><div class="section-toggle"><h2>Participantes</h2><span id="participantCount" class="badge">0/12</span></div><div id="participants" class="participants"></div><div class="actions"><button id="leaveRoom" class="danger">Salir de la sala</button></div></div>
+ <section class="panel">
+  <h2>Tu formulario C.A.T.S.</h2><p>Responde a tu ritmo. Puedes empezar inmediatamente y guardar tus respuestas cuando completes los cuatro apartados.</p>
+  <div id="catsForm">
+   <div class="cats-card"><div class="cats-title"><span class="letter">C</span><div><h3>Concepto</h3><p>¿De qué trata la partida?</p></div></div><div id="optsC" class="options"></div><label for="answerC">Tu concepto</label><textarea id="answerC" maxlength="600" placeholder="Describe el tipo de mundo, género o premisa que te gustaría jugar..."></textarea></div>
+   <div class="cats-card"><div class="cats-title"><span class="letter">A</span><div><h3>Acción / Objetivo</h3><p>¿Qué harán los personajes?</p></div></div><div id="optsA" class="options"></div><label for="answerA">Tu objetivo</label><textarea id="answerA" maxlength="600" placeholder="¿Qué tipo de actividades, misiones o desafíos protagonizarán?"></textarea></div>
+   <div class="cats-card"><div class="cats-title"><span class="letter">T</span><div><h3>Tono</h3><p>¿Qué ambiente tendrá la partida?</p></div></div><div id="optsT" class="options"></div><label for="answerT">El tono</label><textarea id="answerT" maxlength="600" placeholder="Describe el ambiente y el estilo narrativo..."></textarea></div>
+   <div class="cats-card"><div class="cats-title"><span class="letter">S</span><div><h3>Temática</h3><p>¿Qué temas o elementos serán importantes?</p></div></div><div id="optsS" class="options"></div><label for="answerS">Los temas</label><textarea id="answerS" maxlength="600" placeholder="¿Qué temas, conflictos o ideas te gustaría explorar?"></textarea></div>
+   <div class="actions"><button class="primary" id="saveAnswers">Guardar mis respuestas</button></div><div id="saveMessage" class="muted" aria-live="polite"></div>
+  </div>
+ </section>
+ <section class="panel"><div class="section-toggle"><div><h2>Respuestas de la sala</h2><p>Las respuestas aparecen aquí cuando cada jugador las guarda.</p></div><button class="small" id="refreshRoom">Actualizar</button></div><div id="review" class="review-grid"></div></section>
+</section>
+
+<section class="panel" id="randomTools">
+ <div class="section-toggle"><div><h2>Generador aleatorio</h2><p>Una herramienta adicional para cuando el grupo no sabe qué jugar.</p></div><button id="toggleTable">Mostrar herramienta</button></div>
+ <div id="tableTools" class="hidden">
+  <div class="panel" style="margin-top:12px"><h3>Aventura generada</h3><div id="story" class="story">Pulsa «Generar propuesta» para obtener una idea.</div><div id="rolls" class="rolls"></div></div>
+  <div class="actions"><button class="primary" id="generate">⚄ Generar propuesta</button><button id="reset">Limpiar</button></div>
+  <div class="table-wrap"><table><thead><tr><th>1. Una amenaza...</th><th>2. Que quiere...</th><th>3. Para conseguirlo...</th><th>4. Lo que podría suceder...</th></tr></thead><tbody id="rows"></tbody></table></div>
+ </div>
+</section>
+</main><footer>C.A.T.S. · Preparación colaborativa de partidas</footer>
 <script>
-const tables = [
-{title:"Una amenaza",die:12,items:[
-"Un individuo poderoso o influyente.",
-"Una organización clandestina.",
-"Una facción militar o fuerza armada.",
-"Una criatura o monstruo.",
-"Una especie o población hostil.",
-"Una entidad sobrenatural.",
-"Una autoridad política o religiosa.",
-"Una civilización o sociedad extranjera.",
-"Un grupo criminal o mercenario.",
-"Una inteligencia artificial o máquina autónoma.",
-"Una fuerza natural o fenómeno ambiental.",
-"Una fuerza desconocida o inexplicable."
-]},
-{title:"Qué quiere",die:12,items:[
-"Obtener algo que no posee.",
-"Recuperar algo que perdió.",
-"Vengarse de alguien.",
-"Destruir o eliminar algo.",
-"Imponer su voluntad sobre otros.",
-"Proteger algo o a alguien.",
-"Escapar de una situación o amenaza.",
-"Cambiar el orden establecido.",
-"Descubrir un secreto o conocimiento.",
-"Conseguir reconocimiento, autoridad o legitimidad.",
-"Expandir su influencia o territorio.",
-"Evitar que algo o alguien alcance su objetivo."
-]},
-{title:"Para conseguirlo",die:12,items:[
-"Una persona específica.",
-"Un grupo de personas o una comunidad.",
-"Un objeto valioso o irreemplazable.",
-"Un arma o herramienta especial.",
-"Un lugar o territorio.",
-"Un recurso natural o material escaso.",
-"Una fuente de energía o poder.",
-"Un conocimiento o secreto.",
-"Un documento, registro o prueba.",
-"Una criatura o ser extraordinario.",
-"Una organización o institución.",
-"Una alianza o acuerdo con alguien."
-]},
-{title:"Lo que podría suceder",die:12,items:[
-"Provocar una catástrofe o destrucción masiva.",
-"Desencadenar una guerra o conflicto armado.",
-"Derrocar un gobierno o autoridad.",
-"Someter a una población o civilización.",
-"Reorganizar el equilibrio de poder entre distintas facciones.",
-"Liberar una amenaza desconocida.",
-"Transformar permanentemente un lugar o entorno.",
-"Provocar el colapso económico de una región.",
-"Obligar a una población a abandonar su hogar.",
-"Alterar las leyes naturales o la realidad.",
-"Desatar una rebelión, persecución o conflicto social.",
-"Cambiar radicalmente el futuro de una sociedad."
-]},
-];
-const labels=["Amenaza","Qué quiere","Qué necesita","Consecuencia"];
-let current=Array(4).fill(null);
-const tbody=document.getElementById("rows");
-function buildTable(){
- tbody.innerHTML="";
- for(let i=0;i<12;i++){
-  const tr=document.createElement("tr");
-  tables.forEach((t,j)=>{
-   const td=document.createElement("td");
-   if(i>=t.items.length){td.className="empty";td.textContent="—";tr.appendChild(td);return;}
-   const wrap=document.createElement("div");wrap.className="cell-head";
-   const n=document.createElement("span");n.className="num";n.textContent=i+1;wrap.appendChild(n);
-   const b=document.createElement("button");b.className="small";b.textContent="Tirar";b.setAttribute("aria-label","Lanzar "+labels[j]);b.onclick=()=>rollOne(j);wrap.appendChild(b);
-   const txt=document.createElement("div");txt.textContent=t.items[i];
-   td.append(wrap,txt);tr.appendChild(td);
-  });
-  tbody.appendChild(tr);
+const SUPABASE_URL="https://mvbbqgiakysxyacfkarh.supabase.co";
+const SUPABASE_KEY="sb_publishable_5T4XYf4LS3MsHVKEYdLQ1Q_TwUWGVUC";
+const API=SUPABASE_URL+"/functions/v1/cats-room";
+const STORAGE_KEY="cats_room_session_v1";
+let session=null, roomState=null, refreshTimer=null;
+const $=id=>document.getElementById(id);
+const optionSets={
+ C:["Fantasía medieval","Ciencia ficción","Terror","Supervivencia","Misterio e investigación","Exploración y descubrimiento","Postapocalíptico","Western","Superhéroes","Fantasía urbana","Aventura histórica","Intriga política"],
+ A:["Explorar lugares desconocidos","Resolver misterios","Sobrevivir a una amenaza","Cumplir misiones","Derrotar enemigos","Proteger a alguien o algo","Conseguir poder o riquezas","Investigar una conspiración","Viajar y descubrir el mundo","Construir una comunidad","Escapar de un peligro","Cambiar el destino de una sociedad"],
+ T:["Heroico","Oscuro","Cómico","Dramático","Realista","Épico","Aventurero","Terrorífico","Optimista","Trágico","Misterioso","Desenfadado"],
+ S:["Traición","Venganza","Corrupción","Amistad","Guerra","Descubrimiento","Supervivencia","Conspiraciones","Sacrificio","Misterios sobrenaturales","Lealtad","Libertad"]
+};
+function showError(el,msg){$(el).textContent=msg||""}
+async function api(action,data={}){
+ const res=await fetch(API,{method:"POST",headers:{"Content-Type":"application/json","apikey":SUPABASE_KEY},body:JSON.stringify({action,...data})});
+ const json=await res.json().catch(()=>({error:"Respuesta no válida del servidor."}));
+ if(!res.ok)throw new Error(json.error||"No se pudo completar la operación.");
+ return json;
+}
+function saveSession(){localStorage.setItem(STORAGE_KEY,JSON.stringify(session))}
+function clearSession(){localStorage.removeItem(STORAGE_KEY);session=null;roomState=null;if(refreshTimer)clearInterval(refreshTimer);refreshTimer=null}
+function enterRoom(data){
+ session={roomId:data.room.id,code:data.room.code,participantId:data.participant.id,token:data.token};
+ saveSession();$("home").classList.add("hidden");$("roomView").classList.remove("hidden");$("roomCode").textContent=data.room.code;$("roomTitle").textContent="Sala "+data.room.code;
+ $("answerC").value="";$("answerA").value="";$("answerT").value="";$("answerS").value="";
+ refreshRoom();if(refreshTimer)clearInterval(refreshTimer);refreshTimer=setInterval(refreshRoom,4500);
+}
+async function createRoom(){
+ showError("homeError","");try{const d=await api("create",{name:$("createName").value});enterRoom(d)}catch(e){showError("homeError",e.message)}
+}
+async function joinRoom(){
+ showError("homeError","");try{const d=await api("join",{name:$("joinName").value,code:$("joinCode").value});enterRoom(d)}catch(e){showError("homeError",e.message)}
+}
+async function refreshRoom(){
+ if(!session)return;
+ try{
+  const d=await api("get",{roomId:session.roomId,token:session.token});roomState=d;
+  $("roomCode").textContent=d.room.code;$("hostBadge").classList.toggle("hidden",!d.me.is_host);
+  $("roomStatus").textContent=d.room.closed?"La sala está cerrada.":"Comparte el código para que se unan más jugadores. Cada participante puede responder cuando quiera.";
+  $("participantCount").textContent=d.participants.length+"/12";
+  renderParticipants(d);renderReview(d);
+  const mine=d.participants.find(p=>p.id===session.participantId);
+  if(mine&&mine.submitted&&!$("answerC").dataset.loaded){
+   $("answerC").value=mine.answers.C||"";$("answerA").value=mine.answers.A||"";$("answerT").value=mine.answers.T||"";$("answerS").value=mine.answers.S||"";$("answerC").dataset.loaded="1";
+  }
+  if(mine&&mine.submitted)$("saveMessage").textContent="Tus respuestas están guardadas. Puedes modificarlas y volver a guardarlas.";
+ }catch(e){
+  if(/acceso|sesión|disponible/i.test(e.message)){clearSession();$("roomView").classList.add("hidden");$("home").classList.remove("hidden");showError("homeError","Ya no perteneces a esa sala.");}
+  else $("roomStatus").textContent=e.message;
  }
 }
-function rollOne(j){current[j]=Math.floor(Math.random()*tables[j].die)+1;render();}
-function rollAll(){current=tables.map(t=>Math.floor(Math.random()*t.die)+1);render();}
-function render(){
- const out=document.getElementById("rolls");out.innerHTML="";
- current.forEach((v,i)=>{if(v===null)return;const chip=document.createElement("span");chip.className="roll-chip";chip.innerHTML="<b>"+labels[i]+" "+v+"/"+tables[i].die+"</b>";out.appendChild(chip);});
- const s=document.getElementById("story");
- if(current.every(v=>v!==null)){
-  const v=current.map((n,i)=>tables[i].items[n-1]);
-  s.textContent="El conflicto gira en torno a "+v[0]+". El objetivo es "+v[1]+". Para alcanzarlo, hace falta "+v[2]+". Si se consigue, podría "+v[3];
- }else if(current.some(v=>v!==null)){
-  s.textContent="Resultados parciales. Lanza los dados que faltan o genera una aventura.";
- }else{s.textContent="Pulsa «Generar aventura» para generar un conflicto.";}
+function renderParticipants(d){
+ const box=$("participants");box.innerHTML="";
+ d.participants.forEach(p=>{
+  const item=document.createElement("div");item.className="person";
+  const left=document.createElement("div");const name=document.createElement("span");name.className="person-name";name.textContent=p.display_name;left.appendChild(name);
+  const host=document.createElement("span");host.className="badge host";host.textContent="Anfitrión";if(p.is_host)left.append(" ",host);
+  const status=document.createElement("div");status.className="person-status";status.textContent=p.submitted?"C.A.T.S. completado":"Aún no ha respondido";left.appendChild(status);item.appendChild(left);
+  if(d.me.is_host&&!p.is_host){const kick=document.createElement("button");kick.className="danger small";kick.textContent="Expulsar";kick.onclick=()=>kickPlayer(p);item.appendChild(kick)}
+  box.appendChild(item);
+ });
 }
-document.getElementById("generate").onclick=rollAll;
-document.getElementById("reroll").onclick=rollAll;
-document.getElementById("reset").onclick=()=>{current=Array(4).fill(null);render();};
+function renderReview(d){
+ const box=$("review");box.innerHTML="";
+ const labels={C:"CONCEPTO",A:"ACCIÓN / OBJETIVO",T:"TONO",S:"TEMÁTICA"};
+ const submitted=d.participants.filter(p=>p.submitted);
+ if(!submitted.length){box.innerHTML='<p class="muted">Todavía no hay respuestas guardadas.</p>';return}
+ submitted.forEach(p=>{
+  const card=document.createElement("article");card.className="review-person";const h=document.createElement("h3");h.textContent=p.display_name;card.appendChild(h);
+  ["C","A","T","S"].forEach(k=>{const line=document.createElement("div");line.className="answer-line";const b=document.createElement("b");b.textContent=labels[k];const span=document.createElement("span");span.textContent=p.answers[k]||"—";line.append(b,span);card.appendChild(line)});
+  box.appendChild(card);
+ });
+}
+async function kickPlayer(p){
+ if(!confirm("¿Expulsar a "+p.display_name+" de la sala?"))return;
+ try{await api("kick",{roomId:session.roomId,token:session.token,participantId:p.id});await refreshRoom()}catch(e){alert(e.message)}
+}
+async function leaveRoom(){
+ if(!confirm("¿Quieres salir de esta sala?"))return;
+ try{await api("leave",{roomId:session.roomId,token:session.token})}catch(e){console.warn(e)}
+ clearSession();$("roomView").classList.add("hidden");$("home").classList.remove("hidden");$("answerC").dataset.loaded="";
+}
+async function saveAnswers(){
+ const answers={C:$("answerC").value.trim(),A:$("answerA").value.trim(),T:$("answerT").value.trim(),S:$("answerS").value.trim()};
+ if(Object.values(answers).some(v=>!v)){ $("saveMessage").textContent="Completa los cuatro apartados antes de guardar.";return}
+ $("saveMessage").textContent="Guardando...";
+ try{await api("submit",{roomId:session.roomId,token:session.token,answers});$("saveMessage").textContent="Respuestas guardadas. Ya puedes revisar las de los demás jugadores.";await refreshRoom()}catch(e){$("saveMessage").textContent=e.message}
+}
+function buildOptions(){
+ Object.entries(optionSets).forEach(([key,items])=>{
+  const box=$("opts"+key),textarea=$("answer"+key);
+  items.forEach(item=>{const b=document.createElement("button");b.type="button";b.className="option";b.textContent=item;b.onclick=()=>{textarea.value=item;[...box.children].forEach(x=>x.classList.remove("selected"));b.classList.add("selected")};box.appendChild(b)});
+ });
+}
+$("createRoom").onclick=createRoom;$("joinRoom").onclick=joinRoom;$("joinCode").addEventListener("input",e=>e.target.value=e.target.value.toUpperCase().replace(/[^A-Z0-9]/g,"").slice(0,6));
+$("copyCode").onclick=async()=>{try{await navigator.clipboard.writeText(session.code);$("copyCode").textContent="Copiado"}catch{$("copyCode").textContent="No se pudo copiar"}setTimeout(()=>$("copyCode").textContent="Copiar código",1600)};
+$("leaveRoom").onclick=leaveRoom;$("saveAnswers").onclick=saveAnswers;$("refreshRoom").onclick=refreshRoom;
+buildOptions();
+try{const stored=JSON.parse(localStorage.getItem(STORAGE_KEY)||"null");if(stored&&stored.roomId&&stored.token){session=stored;$("home").classList.add("hidden");$("roomView").classList.remove("hidden");$("roomCode").textContent=stored.code;$("roomTitle").textContent="Sala "+stored.code;refreshRoom();refreshTimer=setInterval(refreshRoom,4500)}}catch{clearSession()}
+
+// Generador aleatorio auxiliar
+const tables=[
+{items:["Un individuo poderoso o influyente.","Una organización clandestina.","Una facción militar o fuerza armada.","Una criatura o monstruo.","Una especie o población hostil.","Una entidad sobrenatural.","Una autoridad política o religiosa.","Una civilización o sociedad extranjera.","Un grupo criminal o mercenario.","Una inteligencia artificial o máquina autónoma.","Una fuerza natural o fenómeno ambiental.","Una fuerza desconocida o inexplicable."]},
+{items:["Obtener algo que no posee.","Recuperar algo que perdió.","Vengarse de alguien.","Destruir o eliminar algo.","Imponer su voluntad sobre otros.","Proteger algo o a alguien.","Escapar de una situación o amenaza.","Cambiar el orden establecido.","Descubrir un secreto o conocimiento.","Conseguir reconocimiento, autoridad o legitimidad.","Expandir su influencia o territorio.","Evitar que algo o alguien alcance su objetivo."]},
+{items:["Una persona específica.","Un grupo de personas o una comunidad.","Un objeto valioso o irreemplazable.","Un arma o herramienta especial.","Un lugar o territorio.","Un recurso natural o material escaso.","Una fuente de energía o poder.","Un conocimiento o secreto.","Un documento, registro o prueba.","Una criatura o ser extraordinario.","Una organización o institución.","Una alianza o acuerdo con alguien."]},
+{items:["Provocar una catástrofe o destrucción masiva.","Desencadenar una guerra o conflicto armado.","Derrocar un gobierno o autoridad.","Someter a una población o civilización.","Reorganizar el equilibrio de poder entre distintas facciones.","Liberar una amenaza desconocida.","Transformar permanentemente un lugar o entorno.","Provocar el colapso económico de una región.","Obligar a una población a abandonar su hogar.","Alterar las leyes naturales o la realidad.","Desatar una rebelión, persecución o conflicto social.","Cambiar radicalmente el futuro de una sociedad."]}
+];
+const labels=["Amenaza","Qué quiere","Qué necesita","Consecuencia"];let current=Array(4).fill(null);
+function buildTable(){const body=$("rows");for(let i=0;i<12;i++){const tr=document.createElement("tr");tables.forEach((t,j)=>{const td=document.createElement("td"),head=document.createElement("div");head.className="cell-head";const n=document.createElement("span");n.className="num";n.textContent=i+1;const b=document.createElement("button");b.className="small";b.textContent="Tirar";b.onclick=()=>rollOne(j);head.append(n,b);td.append(head,document.createTextNode(t.items[i]));tr.appendChild(td)});body.appendChild(tr)}}
+function rollOne(j){current[j]=Math.floor(Math.random()*12)+1;renderRandom()}
+function rollAll(){current=tables.map(()=>Math.floor(Math.random()*12)+1);renderRandom()}
+function renderRandom(){$("rolls").innerHTML="";current.forEach((v,i)=>{if(v){const x=document.createElement("span");x.className="roll-chip";x.innerHTML="<b>"+labels[i]+" "+v+"/12</b>";$("rolls").appendChild(x)}});if(current.every(Boolean)){const v=current.map((n,i)=>tables[i].items[n-1]);$("story").textContent="El conflicto gira en torno a "+v[0]+" El objetivo es "+v[1]+" Para alcanzarlo, hace falta "+v[2]+" Si se consigue, podría "+v[3]}else{$("story").textContent=current.some(Boolean)?"Resultados parciales. Lanza los dados que faltan o genera una propuesta.":"Pulsa «Generar propuesta» para obtener una idea."}}
+$("generate").onclick=rollAll;$("reset").onclick=()=>{current=Array(4).fill(null);renderRandom()};
+$("toggleTable").onclick=()=>{$("tableTools").classList.toggle("hidden");$("toggleTable").textContent=$("tableTools").classList.contains("hidden")?"Mostrar herramienta":"Ocultar herramienta"};
 buildTable();
 </script>
-</body>
-</html>
+</body></html>
