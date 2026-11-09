@@ -108,23 +108,24 @@ header{background:#000;border-bottom:1px solid var(--line);padding:12px 22px}
 @media(max-width:760px){.account-header{transform:translateY(2px)}}
 
 
+ .join-room-box{margin-top:18px;padding-top:14px;border-top:1px solid var(--line)}.join-room-box .actions{align-items:center}.join-room-box input{max-width:230px}.text-button{background:none;border:0;padding:0;color:var(--gold);text-decoration:underline;font:inherit;cursor:pointer}
 </style>
 </head>
 <body>
 <header id="mainBanner" role="button" tabindex="0" aria-label="Volver al portal de inicio">
  <div class="header-layout">
-  <div class="header-brand"><img class="main-banner-image" src="arte/banner.png" alt="Red de Roleros"><span class="site-version">Versión 1.46.8</span></div>
+  <div class="header-brand"><img class="main-banner-image" src="arte/banner.png" alt="Red de Roleros"><span class="site-version">Versión 1.47.0</span></div>
   
  </div>
 </header>
 <main>
 <section id="authPanel" class="panel">
- <h2>Acceso a Red de Roleros</h2>
- <p>Inicia sesión o crea una cuenta para crear salas, participar y utilizar el generador de partidas con IA.</p>
+ <h2>Acceso de administración</h2>
+ <p>El acceso de jugadores es público y no requiere registro.</p>
  <div id="authNameField" class="hidden"><label for="authName">Nombre de jugador</label><input id="authName" maxlength="32" autocomplete="nickname" placeholder="El nombre que verán los demás"></div>
  <label for="authEmail">Correo electrónico</label><input id="authEmail" type="email" autocomplete="email" placeholder="nombre@correo.com">
  <label for="authPassword">Contraseña</label><input id="authPassword" type="password" autocomplete="current-password" minlength="8" placeholder="Tu contraseña">
- <div class="actions"><button class="primary" id="signIn">Iniciar sesión</button><button id="signUp">Crear cuenta</button><button id="cancelSignUp" class="hidden" type="button">Volver</button><button id="googleSignIn">Continuar con Google</button></div>
+ <div class="actions"><button class="primary" id="signIn">Iniciar sesión</button><button id="signUp" class="hidden" type="button">Crear cuenta</button><button id="cancelSignUp" class="hidden" type="button">Volver</button><button id="googleSignIn" class="hidden" type="button">Continuar con Google</button><button id="cancelAdminAccess" type="button">Volver al sitio</button></div>
  <button type="button" id="forgotPassword" class="small" style="margin-top:10px">Olvidé mi contraseña</button>
  <div id="authMessage" class="muted" aria-live="polite"></div>
 </section>
@@ -149,12 +150,8 @@ header{background:#000;border-bottom:1px solid var(--line);padding:12px 22px}
  </nav>
  <div id="homeTabRooms" class="home-tab-panel" role="tabpanel" aria-labelledby="tabRooms">
  <section id="homeCreatePanel" class="panel">
-  <h2>Crear una sala</h2><p>Crea una sala donde puedas ponerte de acuerdo con otros jugadores sobre qué jugar, cómo y cuándo, en tiempo real y mediante un chat. Propongan ideas con el cuestionario de partida y definan sus límites y preferencias utilizando herramientas de seguridad como líneas y velos. Llegar a estos acuerdos antes de la sesión 0 puede ayudar a prevenir malos ratos durante la partida.</p>
-  <div class="actions"><button class="primary" id="createRoom">Crear una sala</button></div>
- </section>
- <section id="homeRoomsPanel" class="panel my-rooms">
-  <div class="section-toggle"><div><h2>Mis salas</h2><p>Salas en las que participas como anfitrión o jugador.</p></div><button class="small" id="refreshMyRooms">Actualizar</button></div>
-  <div id="myRoomsList" class="my-rooms-list"><p>Cargando tus salas...</p></div>
+  <h2>Crear una sala</h2><p>Crea una sala donde puedas ponerte de acuerdo con otros jugadores sobre qué jugar, cómo y cuándo, en tiempo real y mediante un cuestionario colaborativo. Propongan ideas con el cuestionario de partida y definan sus límites y preferencias utilizando herramientas de seguridad como líneas y velos. Llegar a estos acuerdos antes de la sesión 0 puede ayudar a prevenir malos ratos durante la partida.</p>
+  <div class="actions"><button class="primary" id="createRoom">Crear una sala</button></div><div class="join-room-box"><label for="roomCodeInput">Unirse a una sala con código</label><div class="actions"><input id="roomCodeInput" maxlength="6" autocomplete="off" placeholder="Código de 6 caracteres" aria-label="Código de sala"><button id="joinRoomCode" type="button">Unirse</button></div></div>
  </section>
  <section class="panel" id="randomTools">
   <div><h2>Generador aleatorio</h2><p>¿El grupo no sabe qué jugar o se quedaron sin ideas? Utiliza el generador aleatorio para encontrar inspiración y descubrir nuevas posibilidades para tu próxima partida.</p></div>
@@ -315,24 +312,24 @@ header{background:#000;border-bottom:1px solid var(--line);padding:12px 22px}
 
 <section id="roomView" class="hidden">
  <div class="panel">
-  <div class="room-head"><div><div class="room-meta"><span class="badge">SALA DE JUEGO</span><span id="hostBadge" class="badge host hidden">ANFITRIÓN</span></div><h2 id="roomTitle" style="margin:8px 0 0">Partida</h2><p id="roomGame" style="margin:5px 0 0;color:var(--gold)">Juego</p></div><div><div class="muted" style="font-size:11px">ENLACE PARA INVITAR</div><div id="inviteUrl" style="max-width:320px;overflow-wrap:anywhere;color:var(--muted);font-size:12px;margin:6px 0">Enlace de la sala</div><div class="actions"><button class="small" id="copyInvite">Copiar enlace</button><button class="small" id="backToRooms">Mis salas</button></div></div></div>
+  <div class="room-head"><div><div class="room-meta"><span class="badge">SALA DE JUEGO</span><span id="hostBadge" class="badge host hidden">ANFITRIÓN</span></div><h2 id="roomTitle" style="margin:8px 0 0">Partida</h2><p id="roomGame" style="margin:5px 0 0;color:var(--gold)">Juego</p></div><div><div class="muted" style="font-size:11px">ENLACE PARA INVITAR</div><div id="inviteUrl" style="max-width:320px;overflow-wrap:anywhere;color:var(--muted);font-size:12px;margin:6px 0">Enlace de la sala</div><div class="actions"><button class="small" id="copyInvite">Copiar enlace</button><button class="small" id="backToRooms">Volver al portal</button></div></div></div>
   <p id="roomStatus">Comparte el enlace para invitar a los demás jugadores.</p>
-  <div id="hostRoomControls" class="actions hidden" style="margin:10px 0"><button id="toggleRoomClosed" class="danger small" type="button">Cerrar sala</button><span class="muted">Solo el anfitrión puede gestionar el acceso y los mensajes.</span></div>
+  <div id="hostRoomControls" class="actions hidden" style="margin:10px 0"><button id="toggleRoomClosed" class="danger small" type="button">Cerrar sala</button><span class="muted">Solo el anfitrión puede gestionar el acceso a la sala.</span></div>
   <div id="roomSetup" class="cats-card hidden"></div>
  </div>
  <div id="roomContent" class="hidden">
- <div class="room-layout"><section class="panel chat-panel"><div class="section-toggle"><div><h2>Chat de la sala</h2><p>Conversación compartida de la partida.</p></div><span class="badge" id="chatCount">0 conectados</span></div><div class="cats-pin" id="catsPinned"><div class="cats-pin-head"><span class="pin-icon">📌</span><span>MENSAJE FIJADO</span><button class="cats-pin-close" id="closePinned" type="button" aria-label="Ocultar mensaje fijado">×</button></div><div class="cats-pin-content"><div><strong>Cuestionario de partida</strong><p>Responde los cuatro apartados de la partida. Puedes volver cuando quieras para consultar o modificar tus respuestas.</p><span id="formProgress" class="cats-pin-progress">0 de 4 apartados respondidos</span></div><button class="cats-pin-button" id="startForm" type="button">Abrir cuestionario</button></div></div><div id="chatMessages" class="chat-messages" aria-live="polite"></div><form id="chatForm" class="chat-compose"><input id="chatInput" maxlength="500" autocomplete="off" placeholder="Mensaje o /roll 3d6" aria-label="Mensaje"><button class="primary" type="submit">Enviar</button></form><p class="chat-help">Para tirar dados escribe <b>/roll 3d6</b>. También puedes usar /roll d20 o cualquier cantidad y número de caras (por ejemplo, /roll 2d13).</p><div id="chatStatus" class="muted" aria-live="polite"></div></section><aside class="panel"><div class="section-toggle"><h2>Conectados</h2><span id="participantCount" class="badge">0/12</span></div><div id="participants" class="participants"></div><div class="actions"><button id="leaveRoom" class="danger">Salir de la sala</button></div></aside></div>
+ <div class="cats-pin" id="catsPinned"><div class="cats-pin-head"><span class="pin-icon">📌</span><span>CUESTIONARIO DE PARTIDA</span><button class="cats-pin-close" id="closePinned" type="button" aria-label="Ocultar cuestionario">×</button></div><div class="cats-pin-content"><div><strong>Cuestionario de partida</strong><p>Responde los cuatro apartados y define líneas y velos. Puedes volver cuando quieras para consultar o modificar tus respuestas.</p><span id="formProgress" class="cats-pin-progress">0 de 4 apartados respondidos</span></div><button class="cats-pin-button" id="startForm" type="button">Abrir cuestionario</button></div></div><div class="room-layout"><aside class="panel"><div class="section-toggle"><h2>Participantes</h2><span id="participantCount" class="badge">0/12</span></div><div id="participants" class="participants"></div><div class="actions"><button id="leaveRoom" class="danger">Salir de la sala</button></div></aside></div>
  <section class="panel"><div class="section-toggle"><div><h2>Respuestas de la sala</h2><p>Las respuestas aparecen aquí cuando cada jugador las guarda.</p></div><button class="small" id="refreshRoom">Actualizar</button></div><div id="review" class="review-grid"></div><div id="matches" class="match-summary"></div></section>
   </div>
 </section><section id="catsScreen" class="hidden"><div class="question-shell"><div class="question-top"><button id="closeCats" type="button">← Volver a la sala</button><span id="questionCounter" class="badge">Pregunta 1 de 4</span></div><div class="question-progress"><div id="questionProgressBar"></div></div><div class="question-body"><div class="cats-title"><span id="questionLetter" class="letter">C</span><div><h2 id="questionTitle">Concepto</h2><p id="questionPrompt">¿De qué trata la partida?</p></div></div><div id="standardQuestionFields"><p class="question-hint">Puedes elegir varias opciones y añadir una descripción propia.</p><div id="questionOptions" class="options question-options"></div><label for="questionText">Otra idea o detalle (opcional)</label><textarea id="questionText" maxlength="600" placeholder="Escribe aquí una respuesta propia..."></textarea></div><div id="safetyFields" class="hidden"><p>Antes de jugar, cada persona puede indicar contenidos que quiere excluir o tratar de forma indirecta. Estas respuestas se comparten con todo el grupo.</p><section class="cats-card"><h3>Líneas</h3><p>Son límites absolutos: contenidos que no deben aparecer en la partida, ni siquiera mencionados o representados.</p><div class="chat-compose"><input id="lineInput" maxlength="200" placeholder="Añadir una línea..."><button class="primary" id="addLine" type="button">+</button></div><ul id="linesList"></ul></section><section class="cats-card"><h3>Velos</h3><p>Son contenidos que pueden existir en la ficción, pero no se describen ni representan explícitamente; quedan fuera de escena.</p><div class="chat-compose"><input id="veilInput" maxlength="200" placeholder="Añadir un velo..."><button class="primary" id="addVeil" type="button">+</button></div><ul id="veilsList"></ul></section></div><div id="questionSaveStatus" class="muted" aria-live="polite">Los cambios se guardan automáticamente.</div></div><div class="question-bottom"><button id="questionPrev" type="button">Anterior</button><button class="primary" id="questionNext" type="button">Siguiente</button></div></div></section>
-</main><section id="accountBar" class="account-header hidden"><button id="signOut" type="button" aria-label="Desconectarse">Desconectarse</button></section><footer>Red de Roleros · Comunidad y preparación colaborativa de partidas</footer>
+</main><section id="accountBar" class="account-header hidden"><button id="signOut" type="button" aria-label="Cerrar sesión de administración">Cerrar sesión de administración</button></section><footer>Red de Roleros · Comunidad y preparación colaborativa de partidas · <button id="adminAccess" type="button" class="text-button">Acceso de administración</button></footer>
 <script>
 const SUPABASE_URL="https://mvbbqgiakysxyacfkarh.supabase.co";
 const SUPABASE_KEY="sb_publishable_5T4XYf4LS3MsHVKEYdLQ1Q_TwUWGVUC";
 const API=SUPABASE_URL+"/functions/v1/cats-room";
 const STORAGE_KEY="cats_room_session_v1";
 const sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY,{auth:{autoRefreshToken:true,persistSession:true,detectSessionInUrl:true,storage:window.localStorage,storageKey:"cats_room_auth_v2"}});
-let authSession=null, authUser=null, profileName="";
+let authSession=null, authUser=null, profileName="", adminLoginOpen=false;
 let session=null, roomState=null, refreshTimer=null;
 const $=id=>document.getElementById(id);
 const optionSets={
@@ -344,19 +341,18 @@ const optionSets={
 function showError(el,msg){$(el).textContent=msg||""}
 
 function setAuthUI(){
- const logged=!!authUser;
- $("authPanel").classList.toggle("hidden",logged);
- $("accountBar").classList.toggle("hidden",!logged);
+ const adminAccount=!!authUser&&!authUser.is_anonymous;
+ $("authPanel").classList.toggle("hidden",!adminLoginOpen);
+ $("accountBar").classList.toggle("hidden",!adminAccount);
  $("profileSetup").classList.add("hidden");
- $("home").classList.toggle("hidden",logged&&!!session);
- $("homeCreatePanel").classList.toggle("hidden",!logged);
- $("homeRoomsPanel").classList.toggle("hidden",!logged);
+ $("home").classList.toggle("hidden",!!session);
+ $("homeCreatePanel").classList.remove("hidden");
  updateWantedFormAccess();
- $("roomView").classList.toggle("hidden",!logged||!session);
+ $("roomView").classList.toggle("hidden",!session);
  $("accountEmail").textContent=profileName||authUser?.user_metadata?.display_name||authUser?.email||"";
- $("accountEmailSecondary").textContent=authUser?.email||"Sesión iniciada";
-
- if(!logged){profileName="";if(refreshTimer)clearInterval(refreshTimer);refreshTimer=null;session=null;roomState=null;}
+ $("accountEmailSecondary").textContent=authUser?.email||"";
+ if(adminAccount)adminLoginOpen=false;
+ if(!authUser){profileName="";if(refreshTimer)clearInterval(refreshTimer);refreshTimer=null;session=null;roomState=null;}
 }
 function showPasswordRecovery(){
  $("passwordRecovery").classList.remove("hidden");
@@ -493,15 +489,19 @@ async function signUp(){
  finally{$("signUp").disabled=false;}
 }
 async function signOut(){
- if(session){try{await api("leave",{roomId:session.roomId,token:session.token});}catch{}}
- clearSession();
- await sb.auth.signOut();
- authSession=null;authUser=null;profileName="";
- 
- setAuthUI();
+ await sb.auth.signOut();authSession=null;authUser=null;profileName="";session=null;roomState=null;adminLoginOpen=false;clearSession();setAuthUI();
+ try{const created=await sb.auth.signInAnonymously();if(created.error)throw created.error;authSession=created.data.session;authUser=created.data.user;await ensureProfile();setAuthUI();await loadWantedPosts();await loadEvents();}
+ catch(e){showError("homeError","No se pudo volver al acceso público: "+e.message)}
 }
-async function restoreRoomSession(){await loadMyRooms()}
-$("signIn").onclick=signIn;$("signUp").onclick=()=>{if(!signUpMode)setSignUpMode(true);else signUp();};$("cancelSignUp").onclick=()=>setSignUpMode(false);$("googleSignIn").onclick=signInWithGoogle;$("forgotPassword").onclick=sendPasswordRecovery;$("saveNewPassword").onclick=saveNewPassword;$("signOut").onclick=signOut;$("saveProfile").onclick=saveProfile;
+async function restoreRoomSession(){
+ const raw=localStorage.getItem(STORAGE_KEY);if(!raw)return;
+ try{const saved=JSON.parse(raw);if(!saved?.roomId||!saved?.token)throw new Error("Sesión incompleta");
+ const d=await api("get",{roomId:saved.roomId,token:saved.token});
+ const participant=(d.participants||[]).find(p=>p.id===saved.participantId);if(!participant)throw new Error("Participante no encontrado");
+ enterRoom({room:d.room,participant,token:saved.token});
+ }catch(e){clearSession();console.warn("No se pudo restaurar la sala:",e.message)}
+}
+$("signIn").onclick=signIn;$("signUp").onclick=()=>{if(!signUpMode)setSignUpMode(true);else signUp();};$("cancelSignUp").onclick=()=>setSignUpMode(false);$("googleSignIn").onclick=signInWithGoogle;$("forgotPassword").onclick=sendPasswordRecovery;$("saveNewPassword").onclick=saveNewPassword;$("signOut").onclick=signOut;$("saveProfile").onclick=saveProfile;$("joinRoomCode").onclick=joinRoomByCode;
 
 async function publicApi(action,data={}){
  const headers={"Content-Type":"application/json","apikey":SUPABASE_KEY};
@@ -513,7 +513,7 @@ async function publicApi(action,data={}){
 }
 function updateWantedFormAccess(){
  const gate=$("wantedFormGate");
- gate.textContent=authUser?"":"Para subir una propuesta debes iniciar sesión o crear una cuenta. Puedes revisar las propuestas sin iniciar sesión.";
+ gate.textContent="Publica y revisa propuestas sin crear una cuenta."; $("wantedForm").classList.remove("hidden");
 }
 
 function eventDateLabel(value){const d=new Date(value+"T12:00:00");return d.toLocaleDateString("es-CL",{day:"numeric",month:"long",year:"numeric"})}
@@ -546,9 +546,8 @@ async function loadEvents(){
   result.events.forEach(ev=>list.appendChild(makeEventCard(ev)));
  }catch(e){$("eventsPublicMessage").textContent="No se pudieron cargar los eventos: "+e.message}
  const form=$("eventForm");
- if(authUser){$("eventAccessMessage").textContent="Completa los datos y envía tu propuesta para revisión."; $("eventOrganizer").value=$("eventOrganizer").value||profileName}
- else{form.classList.add("hidden");$("eventAccessMessage").textContent="Inicia sesión para proponer un evento."}
- if(!authUser){$("myEventsList").textContent="Inicia sesión para consultar tus propuestas."; $("eventAdminPanel").classList.add("hidden");return}
+ form.classList.remove("hidden");$("eventAccessMessage").textContent="Puedes proponer eventos sin crear una cuenta. Las propuestas serán revisadas antes de publicarse."; $("eventOrganizer").value=$("eventOrganizer").value||profileName||"";
+ if(!authUser){$("myEventsList").textContent=""; $("eventAdminPanel").classList.add("hidden");return}
  try{
   const mine=await publicApi("list_my_events");const target=$("myEventsList");target.innerHTML="";
   if(!mine.events.length)target.textContent="Todavía no has enviado propuestas.";
@@ -762,7 +761,7 @@ function resetWantedEditor(){
 }
 async function publishWantedPost(ev){
  ev.preventDefault();
- if(!authUser){$("wantedFormMessage").textContent="Inicia sesión para publicar.";return}
+ 
  const game=$("wantedGame").value,customGame=$("wantedCustomGame").value.trim();
  const payload={game,customGame,searchType:$("wantedSearchType").value,modality:$("wantedModality").value,region:$("wantedRegion").value,commune:$("wantedCommune").value,contactMethod:$("wantedContactMethod").value,contactValue:$("wantedContactValue").value,notes:$("wantedNotes").value};
  const postId=$("wantedEditPostId").value;
@@ -802,7 +801,7 @@ async function loadAdminSuggestions(){
  }catch(err){box.textContent=err.message;}
 }
 async function api(action,data={}){
- if(!authSession?.access_token)throw new Error("Debes iniciar sesión para usar las salas de Red de Roleros");
+ if(!authSession?.access_token)throw new Error("No se pudo activar la sesión pública. Recarga la página e inténtalo nuevamente.");
  const res=await fetch(API,{method:"POST",headers:{"Content-Type":"application/json","apikey":SUPABASE_KEY,"Authorization":"Bearer "+authSession.access_token},body:JSON.stringify({action,...data})});
  const json=await res.json().catch(()=>({error:"Respuesta no válida del servidor."}));
  if(!res.ok)throw new Error(json.error||"No se pudo completar la operación.");
@@ -845,7 +844,7 @@ async function removeRoomFromList(roomId,isHost,button){
   if(session?.roomId===roomId){
    clearSession();$("catsScreen").classList.add("hidden");$("roomView").classList.add("hidden");$("home").classList.remove("hidden");
   }
-  await loadMyRooms();
+  
  }catch(err){
   showError("homeError",err.message);
   if(button&&button.isConnected)button.disabled=false;
@@ -858,14 +857,13 @@ async function resumeRoom(roomId,button){
  finally{if(button&&button.isConnected)button.disabled=false}
 }
 function backToMyRooms(){
- clearSession();$("catsScreen").classList.add("hidden");$("roomView").classList.add("hidden");$("home").classList.remove("hidden");setHomeTab("rooms");loadMyRooms();
+ clearSession();$("catsScreen").classList.add("hidden");$("roomView").classList.add("hidden");$("home").classList.remove("hidden");setHomeTab("rooms");
 }
 async function returnToPortal(){
- if(!authUser)return;
  if(session&&!$("catsScreen").classList.contains("hidden")){
   try{await saveCurrentQuestion()}catch(err){$("questionSaveStatus").textContent="No se pudo guardar. No se volvió al portal: "+err.message;return}
  }
- clearSession();$("catsScreen").classList.add("hidden");$("roomView").classList.add("hidden");$("home").classList.remove("hidden");resetWantedEditor();setHomeTab("rooms");showWantedView("home");setHomeTab("rooms");await loadMyRooms();
+ clearSession();$("catsScreen").classList.add("hidden");$("roomView").classList.add("hidden");$("home").classList.remove("hidden");resetWantedEditor();setHomeTab("rooms");showWantedView("home");setHomeTab("rooms");
 }
 function saveSession(){localStorage.setItem(STORAGE_KEY,JSON.stringify(session))}
 function draftKey(){return session?"cats_draft_"+session.roomId+"_"+session.participantId:null}
@@ -927,7 +925,7 @@ function getInviteCode(value){
 let joiningInvite=false;
 async function enterFromInviteIfPresent(){
  const code=new URLSearchParams(window.location.search).get("sala");
- if(!authUser||!code||joiningInvite)return;
+ if(!code||joiningInvite)return;
  if(session&&session.code===code)return;
  joiningInvite=true;showError("homeError","");
  try{
@@ -936,10 +934,14 @@ async function enterFromInviteIfPresent(){
  }catch(e){showError("homeError",e.message)}
  finally{joiningInvite=false}
 }
-async function joinRoom(){
- await enterFromInviteIfPresent();
- if(!session)showError("homeError","Abre el enlace de invitación para entrar a la sala.");
+async function joinRoomByCode(){
+ const code=$("roomCodeInput").value.trim().toUpperCase().replace(/[^A-Z0-9]/g,"").slice(0,6);
+ if(code.length!==6){showError("homeError","Escribe un código válido de 6 caracteres.");return;}
+ try{const d=await api("join",{code});$("roomCodeInput").value="";showError("homeError","");enterRoom(d)}
+ catch(e){showError("homeError",e.message)}
 }
+async function joinRoom(){await enterFromInviteIfPresent();if(!session)showError("homeError","Abre el enlace de invitación o escribe el código de la sala.");}
+
 async function refreshRoom(){
  if(!session)return;
  try{
@@ -950,7 +952,7 @@ async function refreshRoom(){
   $("toggleRoomClosed").textContent=d.room.closed?"Reabrir sala":"Cerrar sala";
   $("toggleRoomClosed").classList.toggle("danger",!d.room.closed);
   $("participantCount").textContent=d.participants.length+"/12";
-  renderParticipants(d);renderReview(d);renderChat(d);
+  renderParticipants(d);renderReview(d);
   const mine=d.participants.find(p=>p.id===session.participantId);
   if($("catsScreen").classList.contains("hidden"))questionAnswers={C:normalizeAnswer(mine?.answers?.C),A:normalizeAnswer(mine?.answers?.A),T:normalizeAnswer(mine?.answers?.T),S:normalizeAnswer(mine?.answers?.S),lines:normalizeEntries(mine?.answers?.lines),veils:normalizeEntries(mine?.answers?.veils)};
   $("startForm").textContent=mine?.form_started?"Continuar cuestionario":"Abrir cuestionario";updateFormProgress();
@@ -1084,52 +1086,27 @@ $("tabEvents").onclick=()=>{setHomeTab("events");loadEvents()};
 $("createRoom").onclick=createRoom;$("refreshMyRooms").onclick=loadMyRooms;$("backToRooms").onclick=backToMyRooms;$("mainBanner").onclick=returnToPortal;$("mainBanner").onkeydown=ev=>{if(ev.key==="Enter"||ev.key===" "){ev.preventDefault();returnToPortal()}};
 const inviteFromUrl=new URLSearchParams(window.location.search).get("sala");
 $("copyInvite").onclick=async()=>{try{await navigator.clipboard.writeText(inviteLink(session.code));$("copyInvite").textContent="Enlace copiado"}catch{$("copyInvite").textContent="No se pudo copiar"}setTimeout(()=>$("copyInvite").textContent="Copiar enlace",1600)};
-$("startForm").onclick=startForm;$("closePinned").onclick=()=>{$("catsPinned").classList.add("hidden")};$("closeCats").onclick=closeQuestionnaire;$("questionNext").onclick=goQuestionNext;$("questionPrev").onclick=goQuestionPrev;$("chatForm").onsubmit=sendChatMessage;
+$("startForm").onclick=startForm;$("closePinned").onclick=()=>{$("catsPinned").classList.add("hidden")};$("closeCats").onclick=closeQuestionnaire;$("questionNext").onclick=goQuestionNext;$("questionPrev").onclick=goQuestionPrev;
 $("leaveRoom").onclick=leaveRoom;$("refreshRoom").onclick=refreshRoom;$("toggleRoomClosed").onclick=toggleRoomClosed;
 buildOptions();
-// La interfaz no se declara desconectada hasta terminar la recuperación de la sesión persistida.
+// Sesión anónima automática: no se solicita correo ni contraseña a los jugadores.
 let authInitialized=false;
+async function ensurePublicSession(){
+ const current=await sb.auth.getSession();if(current.error)throw current.error;
+ authSession=current.data.session;authUser=current.data.session?.user||null;
+ if(!authUser){const created=await sb.auth.signInAnonymously();if(created.error)throw created.error;authSession=created.data.session;authUser=created.data.user;}
+ await ensureProfile();setAuthUI();await restoreRoomSession();await enterFromInviteIfPresent();await loadWantedPosts();await loadEvents();authInitialized=true;
+}
 sb.auth.onAuthStateChange((_event,newSession)=>{
- if(_event==="INITIAL_SESSION")return; // getSession() es la única fuente de inicialización.
- authSession=newSession;authUser=newSession?.user||null;profileName="";
- if(_event==="PASSWORD_RECOVERY"||new URLSearchParams(window.location.search).get("password_recovery")==="1"){
-  if(authSession)showPasswordRecovery();
-  return;
- }
- if(!authUser){setAuthUI();return;}
+ if(_event==="INITIAL_SESSION")return;
+ authSession=newSession;authUser=newSession?.user||null;
+ if(!authUser){profileName="";setAuthUI();return;}
  setAuthUI();
- setTimeout(async()=>{
-  if(!authUser||authUser.id!==newSession.user.id)return;
-  try{await ensureProfile();setAuthUI();await loadWantedPosts();await loadEvents();if(!session){await restoreRoomSession();await enterFromInviteIfPresent();}}
-  catch(e){setAuthUI();$("profileMessage").textContent=e.message;}
- },0);
+ if(_event==="SIGNED_IN")setTimeout(async()=>{try{await ensureProfile();setAuthUI();await loadWantedPosts();await loadEvents();if(!session){await restoreRoomSession();await enterFromInviteIfPresent();}}catch(e){showError("homeError",e.message)}},0);
 });
-sb.auth.getSession().then(async({data,error})=>{
- if(error)throw error;
- authSession=data.session;authUser=data.session?.user||null;
- if(new URLSearchParams(window.location.search).get("password_recovery")==="1"){
-  if(authSession){showPasswordRecovery();}
-  else{
-   $("recoveryMessage").textContent="No se pudo validar el enlace. Solicita uno nuevo e inténtalo otra vez.";
-   $("passwordRecovery").classList.remove("hidden");
-   $("authPanel").classList.add("hidden");
-  }
-  authInitialized=true;
-  return;
- }
- if(authUser){
-  try{await ensureProfile();setAuthUI();await restoreRoomSession();await enterFromInviteIfPresent();}
-  catch(e){setAuthUI();$("profileMessage").textContent=e.message;}
- }else setAuthUI();
- await loadWantedPosts();
- await loadEvents();
- authInitialized=true;
-}).catch(error=>{
- authSession=null;authUser=null;setAuthUI();
- $("profileMessage").textContent="No se pudo restaurar la sesión: "+(error?.message||"Error desconocido");
- loadWantedPosts();loadEvents();
- authInitialized=true;
-});
+ensurePublicSession().catch(error=>{authSession=null;authUser=null;setAuthUI();showError("homeError","No se pudo activar el acceso público: "+(error?.message||"Error desconocido")+". Comprueba que estén habilitados los inicios de sesión anónimos en Supabase.");authInitialized=true;});
+$("adminAccess").onclick=()=>{adminLoginOpen=true;$("home").classList.add("hidden");$("authPanel").classList.remove("hidden");$("authMessage").textContent="";};
+$("cancelAdminAccess").onclick=()=>{adminLoginOpen=false;$("authPanel").classList.add("hidden");$("home").classList.remove("hidden");};
 // Generador aleatorio auxiliar
 const tables=[
 {items:["Un individuo poderoso o influyente.","Una organización clandestina.","Una facción militar o fuerza armada.","Una criatura o monstruo.","Una especie o población hostil.","Una entidad sobrenatural.","Una autoridad política o religiosa.","Una civilización o sociedad extranjera.","Un grupo criminal o mercenario.","Una inteligencia artificial o máquina autónoma.","Una fuerza natural o fenómeno ambiental.","Una fuerza desconocida o inexplicable."]},
