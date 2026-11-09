@@ -492,9 +492,7 @@ async function signUp(){
  finally{$("signUp").disabled=false;}
 }
 async function signOut(){
- await sb.auth.signOut();authSession=null;authUser=null;profileName="";session=null;roomState=null;adminLoginOpen=false;clearSession();setAuthUI();
- try{const created=await sb.auth.signInAnonymously();if(created.error)throw created.error;authSession=created.data.session;authUser=created.data.user;await ensureProfile();setAuthUI();await loadWantedPosts();await loadEvents();}
- catch(e){showError("homeError","No se pudo volver al acceso público: "+e.message)}
+ await sb.auth.signOut();authSession=null;authUser=null;profileName="";adminLoginOpen=false;setAuthUI();await loadWantedPosts();await loadEvents();
 }
 async function restoreRoomSession(){
  const raw=localStorage.getItem(STORAGE_KEY);if(!raw)return;
@@ -550,7 +548,6 @@ async function loadEvents(){
  }catch(e){$("eventsPublicMessage").textContent="No se pudieron cargar los eventos: "+e.message}
  const form=$("eventForm");
  form.classList.remove("hidden");$("eventAccessMessage").textContent="Puedes proponer eventos sin crear una cuenta. Las propuestas serán revisadas antes de publicarse."; $("eventOrganizer").value=$("eventOrganizer").value||profileName||"";
- if(!authUser){$("myEventsList").textContent=""; $("eventAdminPanel").classList.add("hidden");return}
  try{
   const mine=await publicApi("list_my_events");const target=$("myEventsList");target.innerHTML="";
   if(!mine.events.length)target.textContent="Todavía no has enviado propuestas.";
@@ -766,7 +763,7 @@ async function publishWantedPost(ev){
  ev.preventDefault();
  
  const game=$("wantedGame").value,customGame=$("wantedCustomGame").value.trim();
- const payload={game,customGame,searchType:$("wantedSearchType").value,modality:$("wantedModality").value,region:$("wantedRegion").value,commune:$("wantedCommune").value,contactMethod:$("wantedContactMethod").value,contactValue:$("wantedContactValue").value,notes:$("wantedNotes").value};
+ const payload={displayName,game,customGame,searchType:$("wantedSearchType").value,modality:$("wantedModality").value,region:$("wantedRegion").value,commune:$("wantedCommune").value,contactMethod:$("wantedContactMethod").value,contactValue:$("wantedContactValue").value,notes:$("wantedNotes").value};
  const postId=$("wantedEditPostId").value;
  const button=$("publishWanted");button.disabled=true;$("wantedFormMessage").textContent=postId?"Guardando cambios...":"Publicando...";
  try{
@@ -804,8 +801,9 @@ async function loadAdminSuggestions(){
  }catch(err){box.textContent=err.message;}
 }
 async function api(action,data={}){
- if(!authSession?.access_token)throw new Error("No se pudo activar la sesión pública. Recarga la página e inténtalo nuevamente.");
- const res=await fetch(API,{method:"POST",headers:{"Content-Type":"application/json","apikey":SUPABASE_KEY,"Authorization":"Bearer "+authSession.access_token},body:JSON.stringify({action,...data,ownerToken:publicOwnerToken})});
+ const headers={"Content-Type":"application/json","apikey":SUPABASE_KEY};
+ if(authSession?.access_token)headers.Authorization="Bearer "+authSession.access_token;
+ const res=await fetch(API,{method:"POST",headers,body:JSON.stringify({action,...data,ownerToken:publicOwnerToken})});
  const json=await res.json().catch(()=>({error:"Respuesta no válida del servidor."}));
  if(!res.ok)throw new Error(json.error||"No se pudo completar la operación.");
  return json;
@@ -1083,22 +1081,22 @@ $("copyInvite").onclick=async()=>{try{await navigator.clipboard.writeText(invite
 $("startForm").onclick=startForm;$("closePinned").onclick=()=>{$("catsPinned").classList.add("hidden")};$("closeCats").onclick=closeQuestionnaire;$("questionNext").onclick=goQuestionNext;$("questionPrev").onclick=goQuestionPrev;
 $("leaveRoom").onclick=leaveRoom;$("refreshRoom").onclick=refreshRoom;$("toggleRoomClosed").onclick=toggleRoomClosed;
 buildOptions();
-// Sesión anónima automática: no se solicita correo ni contraseña a los jugadores.
+// El sitio es público: no se crea ninguna cuenta para los visitantes.
 let authInitialized=false;
-async function ensurePublicSession(){
+async function initializePublicSite(){
  const current=await sb.auth.getSession();if(current.error)throw current.error;
  authSession=current.data.session;authUser=current.data.session?.user||null;
- if(!authUser){const created=await sb.auth.signInAnonymously();if(created.error)throw created.error;authSession=created.data.session;authUser=created.data.user;}
- await ensureProfile();setAuthUI();await restoreRoomSession();await enterFromInviteIfPresent();await loadWantedPosts();await loadEvents();authInitialized=true;
+ profileName="";
+ if(authUser)await ensureProfile();
+ setAuthUI();await restoreRoomSession();await enterFromInviteIfPresent();await loadWantedPosts();await loadEvents();authInitialized=true;
 }
 sb.auth.onAuthStateChange((_event,newSession)=>{
  if(_event==="INITIAL_SESSION")return;
- authSession=newSession;authUser=newSession?.user||null;
- if(!authUser){profileName="";setAuthUI();return;}
- setAuthUI();
- if(_event==="SIGNED_IN")setTimeout(async()=>{try{await ensureProfile();setAuthUI();await loadWantedPosts();await loadEvents();if(!session){await restoreRoomSession();await enterFromInviteIfPresent();}}catch(e){showError("homeError",e.message)}},0);
+ authSession=newSession;authUser=newSession?.user||null;profileName="";
+ if(authUser)ensureProfile().then(()=>{setAuthUI();loadWantedPosts();loadEvents();}).catch(e=>showError("homeError",e.message));
+ else{setAuthUI();loadWantedPosts();loadEvents();}
 });
-ensurePublicSession().catch(error=>{authSession=null;authUser=null;setAuthUI();showError("homeError","No se pudo activar el acceso público: "+(error?.message||"Error desconocido")+". Comprueba que estén habilitados los inicios de sesión anónimos en Supabase.");authInitialized=true;});
+initializePublicSite().catch(error=>{setAuthUI();showError("homeError","No se pudo cargar el sitio: "+(error?.message||"Error desconocido"));authInitialized=true;});
 $("adminAccess").onclick=()=>{adminLoginOpen=true;$("home").classList.add("hidden");$("authPanel").classList.remove("hidden");$("authMessage").textContent="";};
 $("cancelAdminAccess").onclick=()=>{adminLoginOpen=false;$("authPanel").classList.add("hidden");$("home").classList.remove("hidden");};
 // Generador aleatorio auxiliar
