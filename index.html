@@ -332,6 +332,9 @@ const sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY,{auth:{autoRefre
 let authSession=null, authUser=null, profileName="", adminLoginOpen=false;
 let session=null, roomState=null, refreshTimer=null;
 const $=id=>document.getElementById(id);
+const PUBLIC_OWNER_STORAGE_KEY="red_de_roleros_owner_v1";
+const publicOwnerToken=(()=>{let value=localStorage.getItem(PUBLIC_OWNER_STORAGE_KEY);if(!value){const bytes=crypto.getRandomValues(new Uint8Array(32));value=Array.from(bytes,b=>b.toString(16).padStart(2,"0")).join("");localStorage.setItem(PUBLIC_OWNER_STORAGE_KEY,value)}return value})();
+
 const optionSets={
  C:["Fantasía medieval","Ciencia ficción","Terror","Supervivencia","Misterio e investigación","Exploración y descubrimiento","Postapocalíptico","Western","Superhéroes","Fantasía urbana","Aventura histórica","Intriga política"],
  A:["Explorar lugares desconocidos","Resolver misterios","Sobrevivir a una amenaza","Cumplir misiones","Derrotar enemigos","Proteger a alguien o algo","Conseguir poder o riquezas","Investigar una conspiración","Viajar y descubrir el mundo","Construir una comunidad","Escapar de un peligro","Cambiar el destino de una sociedad"],
@@ -506,7 +509,7 @@ $("signIn").onclick=signIn;$("signUp").onclick=()=>{if(!signUpMode)setSignUpMode
 async function publicApi(action,data={}){
  const headers={"Content-Type":"application/json","apikey":SUPABASE_KEY};
  if(authSession?.access_token)headers.Authorization="Bearer "+authSession.access_token;
- const res=await fetch(API,{method:"POST",headers,body:JSON.stringify({action,...data})});
+ const res=await fetch(API,{method:"POST",headers,body:JSON.stringify({action,...data,ownerToken:publicOwnerToken})});
  const json=await res.json().catch(()=>({error:"Respuesta no válida del servidor."}));
  if(!res.ok)throw new Error(json.error||"No se pudo completar la operación.");
  return json;
