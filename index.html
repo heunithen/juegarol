@@ -232,6 +232,7 @@ footer{text-align:center;color:#707987;font-size:11px;padding:15px}
  <div class="panel">
   <div class="room-head"><div><div class="room-meta"><span class="badge">SALA DE JUEGO</span><span id="hostBadge" class="badge host hidden">ANFITRIÓN</span></div><h2 id="roomTitle" style="margin:8px 0 0">Partida</h2><p id="roomGame" style="margin:5px 0 0;color:var(--gold)">Juego</p></div><div><div class="muted" style="font-size:11px">ENLACE PARA INVITAR</div><div id="inviteUrl" style="max-width:320px;overflow-wrap:anywhere;color:var(--muted);font-size:12px;margin:6px 0">Enlace de la sala</div><div class="actions"><button class="small" id="copyInvite">Copiar enlace</button><button class="small" id="backToRooms">Mis salas</button></div></div></div>
   <p id="roomStatus">Comparte el enlace para invitar a los demás jugadores.</p>
+  <div id="hostRoomControls" class="actions hidden" style="margin:10px 0"><button id="toggleRoomClosed" class="danger small" type="button">Cerrar sala</button><span class="muted">Solo el anfitrión puede gestionar el acceso y los mensajes.</span></div>
   <div id="roomSetup" class="cats-card hidden"></div>
  </div>
  <div id="roomContent" class="hidden">
@@ -786,7 +787,10 @@ async function refreshRoom(){
  try{
   const d=await api("get",{roomId:session.roomId,token:session.token});roomState=d;
   $("roomTitle").textContent=d.room.room_name||"Partida";$("roomGame").textContent=d.room.game_name||"";$("inviteUrl").textContent=inviteLink(d.room.code);$("hostBadge").classList.toggle("hidden",!d.me.is_host);
-  $("roomStatus").textContent=d.room.closed?"La sala está cerrada.":"Comparte el enlace para invitar a los demás. Cada jugador inicia su cuestionario cuando pulsa el botón.";
+  $("roomStatus").textContent=d.room.closed?"La sala está cerrada: nadie nuevo puede entrar.":"Comparte el enlace para invitar a los demás. Cada jugador inicia su cuestionario cuando pulsa el botón.";
+  $("hostRoomControls").classList.toggle("hidden",!d.me.is_host);
+  $("toggleRoomClosed").textContent=d.room.closed?"Reabrir sala":"Cerrar sala";
+  $("toggleRoomClosed").classList.toggle("danger",!d.room.closed);
   $("participantCount").textContent=d.participants.length+"/12";
   renderParticipants(d);renderReview(d);renderChat(d);
   const mine=d.participants.find(p=>p.id===session.participantId);
@@ -844,12 +848,24 @@ function renderMatches(players){
  const safetyGrid=document.createElement("div");safetyGrid.className="match-grid";
  [["Líneas del grupo","lines"],["Velos del grupo","veils"]].forEach(([title,key])=>{const card=document.createElement("section");card.className="match-card";const h=document.createElement("h3");h.textContent=title;card.appendChild(h);const entries=[];players.forEach(p=>normalizeEntries(p.answers?.[key]).forEach(value=>entries.push({name:p.display_name,value})));if(!entries.length){const empty=document.createElement("div");empty.className="match-empty";empty.textContent="Todavía no hay entradas.";card.appendChild(empty)}else{const list=document.createElement("ul");entries.forEach(entry=>{const item=document.createElement("li");item.style.margin="7px 0";const value=document.createElement("span");value.textContent=entry.value;const author=document.createElement("small");author.style.display="block";author.style.color="var(--muted)";author.textContent=entry.name;item.append(value,author);list.appendChild(item)});card.appendChild(list)}safetyGrid.appendChild(card)});box.appendChild(safetyGrid);
 }
-function renderChat(d){const box=$("chatMessages"),bottom=box.scrollHeight-box.scrollTop-box.clientHeight<60;box.innerHTML="";(d.messages||[]).forEach(m=>{const item=document.createElement("div");item.className="chat-message"+(m.participant_id===session.participantId?" mine":"");const n=document.createElement("b");n.textContent=m.display_name;const body=document.createElement("div");body.textContent=m.message;const t=document.createElement("small");t.textContent=new Date(m.created_at).toLocaleTimeString("es-CL",{hour:"2-digit",minute:"2-digit"});item.append(n,body,t);box.appendChild(item)});$("chatCount").textContent=(d.participants||[]).filter(p=>p.online).length+" conectados";if(bottom)box.scrollTop=box.scrollHeight}
+function renderChat(d){const box=$("chatMessages"),bottom=box.scrollHeight-box.scrollTop-box.clientHeight<60;box.innerHTML="";(d.messages||[]).forEach(m=>{const item=document.createElement("div");item.className="chat-message"+(m.participant_id===session.participantId?" mine":"");const n=document.createElement("b");n.textContent=m.display_name;const body=document.createElement("div");body.textContent=m.message;const t=document.createElement("small");t.textContent=new Date(m.created_at).toLocaleTimeString("es-CL",{hour:"2-digit",minute:"2-digit"});item.append(n,body,t);
+   if(roomState?.me?.is_host){const remove=document.createElement("button");remove.type="button";remove.className="danger small";remove.textContent="Eliminar";remove.style.marginTop="6px";remove.onclick=()=>deleteRoomMessage(m);item.appendChild(remove)}
+   box.appendChild(item)});$("chatCount").textContent=(d.participants||[]).filter(p=>p.online).length+" conectados";if(bottom)box.scrollTop=box.scrollHeight}
 function generateRandomAdventureMessage(){const rolls=tables.map(table=>Math.floor(Math.random()*table.items.length));const values=rolls.map((roll,index)=>tables[index].items[roll]);return "🎲 PARTIDA ALEATORIA\n\nEl conflicto gira en torno a "+values[0]+" El objetivo es "+values[1]+" Para alcanzarlo, hace falta "+values[2]+" Si se consigue, podría "+values[3]}
 async function sendChatMessage(ev){ev.preventDefault();const input=$("chatInput"),command=input.value.trim();if(!command)return;const message=/^\/aleatorio$/i.test(command)?generateRandomAdventureMessage():command;$("chatStatus").textContent="Enviando...";try{await api("send_message",{roomId:session.roomId,token:session.token,message});input.value="";$("chatStatus").textContent="";await refreshRoom()}catch(err){$("chatStatus").textContent=err.message}}
 async function kickPlayer(p){
- if(!confirm("¿Expulsar a "+p.display_name+" de la sala?"))return;
+ if(!confirm("¿Expulsar a "+p.display_name+" de la sala? No podrá volver a entrar, aunque conserve el enlace."))return;
  try{await api("kick",{roomId:session.roomId,token:session.token,participantId:p.id});await refreshRoom()}catch(e){alert(e.message)}
+}
+async function deleteRoomMessage(m){
+ if(!confirm("¿Eliminar este mensaje del chat?"))return;
+ try{await api("delete_message",{roomId:session.roomId,token:session.token,messageId:m.id});await refreshRoom()}catch(e){alert(e.message)}
+}
+async function toggleRoomClosed(){
+ if(!roomState?.me?.is_host)return;
+ const closing=!roomState.room.closed;
+ if(closing&&!confirm("¿Cerrar la sala? Nadie nuevo podrá entrar con el enlace. Los participantes actuales podrán seguir usando la sala."))return;
+ try{await api("set_room_closed",{roomId:session.roomId,token:session.token,closed:closing});await refreshRoom()}catch(e){alert(e.message)}
 }
 async function leaveRoom(){
  if(!confirm("¿Quieres salir de esta sala?"))return;
@@ -907,7 +923,7 @@ $("createRoom").onclick=createRoom;$("refreshMyRooms").onclick=loadMyRooms;$("ba
 const inviteFromUrl=new URLSearchParams(window.location.search).get("sala");
 $("copyInvite").onclick=async()=>{try{await navigator.clipboard.writeText(inviteLink(session.code));$("copyInvite").textContent="Enlace copiado"}catch{$("copyInvite").textContent="No se pudo copiar"}setTimeout(()=>$("copyInvite").textContent="Copiar enlace",1600)};
 $("startForm").onclick=startForm;$("closePinned").onclick=()=>{$("catsPinned").classList.add("hidden")};$("closeCats").onclick=closeQuestionnaire;$("questionNext").onclick=goQuestionNext;$("questionPrev").onclick=goQuestionPrev;$("chatForm").onsubmit=sendChatMessage;
-$("leaveRoom").onclick=leaveRoom;$("refreshRoom").onclick=refreshRoom;
+$("leaveRoom").onclick=leaveRoom;$("refreshRoom").onclick=refreshRoom;$("toggleRoomClosed").onclick=toggleRoomClosed;
 buildOptions();
 setAuthUI();
 loadWantedPosts();
