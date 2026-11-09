@@ -173,8 +173,12 @@ header{background:#000;border-bottom:1px solid var(--line);padding:12px 22px}
     </select>
     <div class="rpg-music-now"><span class="rpg-music-label">SONANDO</span><span id="rpgMusicTrack" aria-live="polite">Selecciona una lista y pulsa reproducir.</span></div>
     <div class="rpg-music-controls">
+     <button type="button" id="rpgMusicPrev" class="small" aria-label="Canción anterior" title="Canción anterior">⏮</button>
      <button type="button" id="rpgMusicPlay" class="small" aria-label="Reproducir música">▶</button>
      <button type="button" id="rpgMusicPause" class="small" aria-label="Pausar música">Ⅱ</button>
+     <button type="button" id="rpgMusicNext" class="small" aria-label="Canción siguiente" title="Canción siguiente">⏭</button>
+     <label class="rpg-music-volume" for="rpgMusicVolume" title="Volumen">♪</label>
+     <input id="rpgMusicVolume" type="range" min="0" max="100" value="65" aria-label="Volumen de música" title="Volumen">
      <a id="rpgMusicOpen" href="https://www.youtube.com/playlist?list=PLAMGM1hSRIUojpGz2TlXyBesgmgQnV3Hi" target="_blank" rel="noopener noreferrer" title="Abrir lista en YouTube">Abrir lista ↗</a>
     </div>
    </div>
@@ -423,7 +427,7 @@ header{background:#000;border-bottom:1px solid var(--line);padding:12px 22px}
  <section class="panel"><div class="section-toggle"><div><h2>Respuestas de C.A.T.S.</h2><p>Las respuestas aparecen aquí cuando cada jugador las guarda.</p></div><button class="small" id="refreshRoom">Actualizar</button></div><div id="review" class="review-grid"></div><div id="matches" class="match-summary"></div></section>
   </div>
 </section><section id="catsScreen" class="hidden"><div class="question-shell"><div class="question-top"><button id="closeCats" type="button">← Volver a C.A.T.S.</button><span id="questionCounter" class="badge">Pregunta 1 de 4</span></div><div class="question-progress"><div id="questionProgressBar"></div></div><div class="question-body"><div class="cats-title"><span id="questionLetter" class="letter">C</span><div><h2 id="questionTitle">Concepto</h2><p id="questionPrompt">¿De qué trata la partida?</p></div></div><div id="standardQuestionFields"><p class="question-hint">Puedes elegir varias opciones y añadir una descripción propia.</p><div id="questionOptions" class="options question-options"></div><label for="questionText">Otra idea o detalle (opcional)</label><textarea id="questionText" maxlength="600" placeholder="Escribe aquí una respuesta propia..."></textarea></div><div id="safetyFields" class="hidden"><p>Antes de jugar, cada persona puede indicar contenidos que quiere excluir o tratar de forma indirecta. Estas respuestas se comparten con todo el grupo.</p><section class="cats-card"><h3>Líneas</h3><p>Son límites absolutos: contenidos que no deben aparecer en la partida, ni siquiera mencionados o representados.</p><div class="chat-compose"><input id="lineInput" maxlength="200" placeholder="Añadir una línea..."><button class="primary" id="addLine" type="button">+</button></div><ul id="linesList"></ul></section><section class="cats-card"><h3>Velos</h3><p>Son contenidos que pueden existir en la ficción, pero no se describen ni representan explícitamente; quedan fuera de escena.</p><div class="chat-compose"><input id="veilInput" maxlength="200" placeholder="Añadir un velo..."><button class="primary" id="addVeil" type="button">+</button></div><ul id="veilsList"></ul></section></div><div id="questionSaveStatus" class="muted" aria-live="polite">Los cambios se guardan automáticamente.</div></div><div class="question-bottom"><button id="questionPrev" type="button">Anterior</button><button class="primary" id="questionNext" type="button">Siguiente</button></div></div></section>
-</main><section id="accountBar" class="account-header hidden"><button id="signOut" type="button" aria-label="Cerrar sesión de administración">Cerrar sesión de administración</button></section><footer>Red de Roleros · Comunidad y preparación colaborativa de partidas · <button id="adminAccess" type="button" class="text-button" onclick="document.getElementById('home').classList.add('hidden');document.getElementById('roomView').classList.add('hidden');document.getElementById('passwordRecovery').classList.add('hidden');document.getElementById('profileSetup').classList.add('hidden');document.getElementById('accountBar').classList.add('hidden');document.getElementById('authPanel').classList.remove('hidden');document.getElementById('authMessage').textContent='';document.getElementById('authEmail').focus();">Acceso de administración</button><span class="site-version">Versión 1.52.26</span></footer>
+</main><section id="accountBar" class="account-header hidden"><button id="signOut" type="button" aria-label="Cerrar sesión de administración">Cerrar sesión de administración</button></section><footer>Red de Roleros · Comunidad y preparación colaborativa de partidas · <button id="adminAccess" type="button" class="text-button" onclick="document.getElementById('home').classList.add('hidden');document.getElementById('roomView').classList.add('hidden');document.getElementById('passwordRecovery').classList.add('hidden');document.getElementById('profileSetup').classList.add('hidden');document.getElementById('accountBar').classList.add('hidden');document.getElementById('authPanel').classList.remove('hidden');document.getElementById('authMessage').textContent='';document.getElementById('authEmail').focus();">Acceso de administración</button><span class="site-version">Versión 1.52.27</span></footer>
 <script>
 const SUPABASE_URL="https://mvbbqgiakysxyacfkarh.supabase.co";
 const SUPABASE_KEY="sb_publishable_5T4XYf4LS3MsHVKEYdLQ1Q_TwUWGVUC";
@@ -1824,8 +1828,10 @@ function rollAll(){
 #rpgMusic .rpg-music-now{display:flex;align-items:center;gap:6px;min-width:0;margin:0}
 #rpgMusic .rpg-music-label{flex-shrink:0;font-size:8px;letter-spacing:.08em;color:var(--gold);font-weight:700}
 #rpgMusic #rpgMusicTrack{font-size:10px;line-height:1.2;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-#rpgMusic .rpg-music-controls{display:flex;align-items:center;gap:4px;margin:0}
-#rpgMusic .rpg-music-controls button{min-width:25px;height:25px;padding:2px 6px;font-size:11px;line-height:1}
+#rpgMusic .rpg-music-controls{display:flex;align-items:center;gap:3px;margin:0}
+#rpgMusic .rpg-music-controls button{min-width:24px;height:25px;padding:2px 5px;font-size:11px;line-height:1}
+#rpgMusic .rpg-music-volume{display:inline;font-size:11px;color:var(--muted);margin-left:3px}
+#rpgMusic #rpgMusicVolume{width:66px;height:16px;margin:0;accent-color:var(--gold);cursor:pointer}
 #rpgMusic .rpg-music-controls a{font-size:9px;color:var(--muted);margin-left:2px;white-space:nowrap}
 #rpgMusic .rpg-music-frame{position:fixed;left:-10000px;top:0;width:200px;height:200px;overflow:hidden;pointer-events:none;opacity:0}
 #rpgMusic #rpgMusicPlayer{width:200px;height:200px}
@@ -1838,12 +1844,26 @@ function rollAll(){
  const title=document.getElementById('rpgMusicTrack');
  const playBtn=document.getElementById('rpgMusicPlay');
  const pauseBtn=document.getElementById('rpgMusicPause');
+ const prevBtn=document.getElementById('rpgMusicPrev');
+ const nextBtn=document.getElementById('rpgMusicNext');
+ const volume=document.getElementById('rpgMusicVolume');
  const openLink=document.getElementById('rpgMusicOpen');
- let player=null,ready=false;
+ let player=null,ready=false,shuffleTimer=null;
  function updateTitle(){
   if(!player||!ready)return;
   const data=player.getVideoData&&player.getVideoData();
   if(data&&data.title)title.textContent=data.title;
+ }
+ function enableShuffle(){
+  if(!player||!ready)return;
+  try{player.setShuffle(true);}catch(e){}
+ }
+ function queueSelectedPlaylist(){
+  if(!player||!ready)return;
+  title.textContent='Cargando lista aleatoria…';
+  player.cuePlaylist({list:playlist.value,listType:'playlist',index:0});
+  clearTimeout(shuffleTimer);
+  shuffleTimer=setTimeout(enableShuffle,900);
  }
  function updatePlaylistLink(){
   if(openLink)openLink.href='https://www.youtube.com/playlist?list='+playlist.value;
@@ -1856,12 +1876,14 @@ function rollAll(){
    events:{
     onReady:function(){
      ready=true;
-     title.textContent='Lista preparada. Pulsa reproducir.';
-     player.cuePlaylist({list:playlist.value,listType:'playlist',index:0});
+     player.setVolume(Number(volume.value));
+     title.textContent='Lista preparada en modo aleatorio. Pulsa reproducir.';
+     queueSelectedPlaylist();
     },
     onStateChange:function(e){
+     if(e.data===YT.PlayerState.CUED)enableShuffle();
      updateTitle();
-     if(e.data===YT.PlayerState.PLAYING)setTimeout(updateTitle,300);
+     if(e.data===YT.PlayerState.PLAYING)setTimeout(updateTitle,350);
     },
     onError:function(e){
      title.textContent='YouTube no permite reproducir esta lista (código '+e.data+'). Usa «Abrir lista».';
@@ -1879,14 +1901,15 @@ function rollAll(){
   setTimeout(updateTitle,700);
  });
  pauseBtn.addEventListener('click',function(){if(ready)player.pauseVideo();});
+ prevBtn.addEventListener('click',function(){if(ready){player.previousVideo();setTimeout(updateTitle,450);}});
+ nextBtn.addEventListener('click',function(){if(ready){player.nextVideo();setTimeout(updateTitle,450);}});
+ volume.addEventListener('input',function(){if(ready)player.setVolume(Number(volume.value));});
  updatePlaylistLink();
  playlist.addEventListener('change',function(){
   updatePlaylistLink();
-  if(!ready)return;
-  title.textContent='Cargando lista…';
-  player.cuePlaylist({list:playlist.value,listType:'playlist',index:0});
+  queueSelectedPlaylist();
  });
-})();
+})();;
 </script>
 </body></html>
 <style>
@@ -1914,4 +1937,4 @@ function rollAll(){
 @media(max-width:600px){#randomTools .form-grid{grid-template-columns:1fr}}
 </style>
 
-<!-- GitHub Pages redeploy trigger: 1.52.26 -->
+<!-- GitHub Pages redeploy trigger: 1.52.27 -->
