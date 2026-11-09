@@ -114,7 +114,7 @@ header{background:#000;border-bottom:1px solid var(--line);padding:12px 22px}
 <body>
 <header id="mainBanner" role="button" tabindex="0" aria-label="Volver al portal de inicio">
  <div class="header-layout">
-  <div class="header-brand"><img class="main-banner-image" src="arte/banner.png" alt="Red de Roleros"><span class="site-version">Versión 1.47.4</span></div>
+  <div class="header-brand"><img class="main-banner-image" src="arte/banner.png" alt="Red de Roleros"><span class="site-version">Versión 1.47.5</span></div>
   
  </div>
 </header>
@@ -1575,20 +1575,21 @@ var genreTables={
 };
 
 function rollAll(){
- const genre=$("randomGenre").value,tone=$("randomTone").value;
- const fallbackTables=[
-  ["Un individuo poderoso o influyente.","Una organización clandestina.","Una facción militar o fuerza armada.","Una criatura o monstruo."],
-  ["Obtener algo que no posee.","Recuperar algo que perdió.","Vengarse de alguien.","Proteger algo o a alguien."],
-  ["Una persona específica.","Un objeto valioso o irreemplazable.","Un lugar o territorio.","Un conocimiento o secreto."],
-  ["Provocar una catástrofe o destrucción masiva.","Desencadenar una guerra o conflicto armado.","Liberar una amenaza desconocida.","Cambiar radicalmente el futuro de una sociedad."]
- ];
- const selectedGenreTables=typeof genreTables!=="undefined"&&genreTables?genreTables[genre]:null;
- const tables=Array.isArray(selectedGenreTables)?selectedGenreTables:(Array.isArray(originalTables)?originalTables:fallbackTables);
- const safeTables=Array.from({length:4},(_,i)=>Array.isArray(tables[i])&&tables[i].length?tables[i]:fallbackTables[i]);
- const values=safeTables.map(table=>table[Math.floor(Math.random()*table.length)]);
- const story=$("story");story.replaceChildren();
- const style=document.createElement("p");style.className="muted";style.textContent="Género: "+genre+" · Tono: "+tone;
- const premise=document.createElement("p");premise.textContent="El conflicto gira en torno a "+values[0]+". El objetivo es "+values[1]+". Para alcanzarlo, hace falta "+values[2]+". Si se consigue, podría "+values[3]+".";
+ const genre=$("randomGenre").value.trim(),tone=$("randomTone").value;
+ const story=$("story");
+ story.replaceChildren();
+ const tables=genre==="Otro / mezcla"?originalTables:(genreTables&&genreTables[genre]);
+ if(!Array.isArray(tables)||tables.length!==4||tables.some(table=>!Array.isArray(table)||table.length===0)){
+  story.textContent="No se encontraron las cuatro tablas del género seleccionado («"+genre+"»). Recarga la página e inténtalo nuevamente.";
+  console.error("Tablas no disponibles para el género:",genre,Object.keys(genreTables||{}));
+  return;
+ }
+ const values=tables.map(table=>table[Math.floor(Math.random()*table.length)]);
+ const style=document.createElement("p");
+ style.className="muted";
+ style.textContent="Género: "+genre+" · Tono: "+tone+" · Tablas temáticas: "+tables.map(t=>t.length).join(" / ");
+ const premise=document.createElement("p");
+ premise.textContent="El conflicto nace de: "+values[0]+" El propósito es: "+values[1]+" Para lograrlo será necesario: "+values[2]+" Si el conflicto llega a resolverse, sus consecuencias podrían ser: "+values[3];
  story.append(style,premise);
 }
 // El botón se conecta desde un listener aislado al final del documento.
