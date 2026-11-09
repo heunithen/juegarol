@@ -54,10 +54,11 @@ footer{text-align:center;color:#707987;font-size:11px;padding:15px}
 .community-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px;margin-top:18px}.community-card{overflow:hidden;background:#191e26;border:1px solid var(--line);border-radius:10px;min-width:0;display:flex;flex-direction:column}.community-banner{height:112px;display:flex;align-items:center;justify-content:center;padding:10px 18px;background:#000;overflow:hidden}.community-banner img{display:block;width:100%;height:100%;object-fit:contain}.community-banner-text{background:linear-gradient(125deg,#30253f,#4b315e 55%,#242b3b);color:#f4d58d;text-decoration:none;flex-direction:column;gap:4px}.community-banner-text>span{font:900 32px/1 Georgia,serif;letter-spacing:.08em}.community-banner-text>span span{color:#fff}.community-banner-text small{font-size:10px;letter-spacing:.12em;color:#d8c8e8}.community-card-body{padding:12px 14px;display:flex;flex-direction:column;align-items:flex-start;flex:1}.community-card-body strong{font:700 16px Georgia,serif;color:var(--gold)}.community-card-body p{font-size:12px;line-height:1.45;margin:7px 0 10px;color:var(--muted);flex:1}.community-link{color:var(--gold);font-size:12px;text-decoration:none;border:1px solid #806b43;border-radius:6px;padding:5px 9px}.community-link:hover{text-decoration:underline;border-color:var(--gold)}.community-source{margin-top:18px;padding-top:12px;border-top:1px solid var(--line);font-size:11px}.community-source a{color:var(--gold)}@media(max-width:700px){.community-list{grid-template-columns:1fr}.community-banner{height:105px}}
 
 .events-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;margin-top:18px}.event-card{background:#151515;border:1px solid #4b402b;border-radius:12px;overflow:hidden}.event-card img{display:block;width:100%;max-height:240px;object-fit:contain;background:#090909}.event-card-body{padding:16px}.event-meta{display:flex;flex-wrap:wrap;gap:7px;margin:10px 0}.event-meta span{font-size:12px;padding:4px 8px;border:1px solid #51452e;border-radius:20px;color:var(--gold)}.event-form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.event-form-grid .full{grid-column:1/-1}.event-form-grid label{display:block;margin:0 0 5px}.event-form-grid input,.event-form-grid select,.event-form-grid textarea{width:100%;box-sizing:border-box}.event-form-grid textarea{min-height:95px}.event-admin-row{border:1px solid #51452e;border-radius:10px;padding:14px;margin:12px 0}.event-admin-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.event-status{font-size:12px;font-weight:700;color:var(--gold)}@media(max-width:620px){.event-form-grid{grid-template-columns:1fr}.event-form-grid .full{grid-column:auto}}
+.free-rpg-note{padding:11px 13px;border:1px solid #806b43;border-left:4px solid var(--gold);border-radius:8px;background:#302a20;color:#e8d5a9;font-size:12px}.free-rpg-heading{margin:24px 0 12px;padding-bottom:8px;border-bottom:1px solid var(--line)}.free-rpg-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px}.free-rpg-card{overflow:hidden;background:#191e26;border:1px solid var(--line);border-radius:10px;min-width:0}.free-rpg-source{display:flex;align-items:center;gap:9px;padding:9px 12px;background:#303744;border-bottom:1px solid var(--line);color:#e7e2d8;text-decoration:none;font-size:11px;font-weight:700;letter-spacing:.03em}.free-rpg-source img{width:25px;height:25px;object-fit:contain;border-radius:5px;background:#fff;padding:2px}.free-rpg-body{padding:13px}.free-rpg-body h4{margin:0 0 6px;color:var(--gold);font:700 17px Georgia,serif}.free-rpg-body p{font-size:12px;line-height:1.5}.free-rpg-tags{display:flex;flex-wrap:wrap;gap:6px;margin:9px 0}.free-rpg-tags span{border:1px solid #505968;border-radius:20px;padding:3px 7px;color:var(--muted);font-size:10px}.free-rpg-link{display:inline-block;margin-top:5px;color:var(--gold);font-size:12px;text-decoration:none;border:1px solid #806b43;border-radius:6px;padding:6px 9px}.free-rpg-link:hover{border-color:var(--gold);text-decoration:underline}.free-rpg-foot{margin-top:22px;padding-top:12px;border-top:1px solid var(--line);font-size:11px}@media(max-width:700px){.free-rpg-grid{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
-<header id="mainBanner" role="button" tabindex="0" aria-label="Volver al portal de inicio"><img class="main-banner-image" src="arte/banner.png" alt="Red de Roleros"><span class="site-version">Versión 1.31.0</span></header>
+<header id="mainBanner" role="button" tabindex="0" aria-label="Volver al portal de inicio"><img class="main-banner-image" src="arte/banner.png" alt="Red de Roleros"><span class="site-version">Versión 1.32.0</span></header>
 <main>
 <section id="authPanel" class="panel">
  <h2>Acceso a Red de Roleros</h2>
@@ -76,6 +77,7 @@ footer{text-align:center;color:#707987;font-size:11px;padding:15px}
   <button type="button" class="home-tab" id="tabWanted" role="tab" aria-selected="false" aria-controls="homeTabWanted">¿Qué quieres jugar?</button>
   <button type="button" class="home-tab" id="tabEvents" role="tab" aria-selected="false" aria-controls="homeTabEvents">Eventos</button>
   <button type="button" class="home-tab" id="tabCommunities" role="tab" aria-selected="false" aria-controls="homeTabCommunities">Comunidades</button>
+  <button type="button" class="home-tab" id="tabFreeRpg" role="tab" aria-selected="false" aria-controls="homeTabFreeRpg">¡Rol gratis!</button>
  </nav>
  <div id="homeTabRooms" class="home-tab-panel" role="tabpanel" aria-labelledby="tabRooms">
  <section id="homeCreatePanel" class="panel">
@@ -208,6 +210,20 @@ footer{text-align:center;color:#707987;font-size:11px;padding:15px}
     <article class="community-card"><a class="community-banner community-banner-text" href="https://linktr.ee/QuintaROL" target="_blank" rel="noopener noreferrer" aria-label="Visitar redes de QuintaRol"><img src="https://ugc.production.linktr.ee/0e825478-5a7c-480d-be2f-5603001d94db_LOGO-D.png?io=true&size=avatar-v3_0" alt="Logo de QuintaRol" loading="lazy"><small>Comunidad rolera · V Región</small></a><div class="community-card-body"><strong>QuintaRol</strong><p>Comunidad rolera de la Región de Valparaíso. Comparte campañas, artículos, reseñas, módulos, eventos y aventuras originales.</p><a class="community-link" href="https://linktr.ee/QuintaROL" target="_blank" rel="noopener noreferrer">Instagram y redes ↗</a></div></article>
    </div>
    <p class="muted community-source">Directorio elaborado a partir de las organizaciones participantes del <a href="https://censorolero.cl/" target="_blank" rel="noopener noreferrer">Censo Rolero Chile</a>. QuintaRol se incorpora como comunidad adicional. Los perfiles y actividades pueden cambiar con el tiempo.</p>
+  </section>
+ </div>
+ <div id="homeTabFreeRpg" class="home-tab-panel hidden" role="tabpanel" aria-labelledby="tabFreeRpg">
+  <section class="panel">
+   <h2>¡Rol gratis!</h2>
+   <p>Juegos de rol completos que puedes descargar o consultar sin pagar. Priorizamos creadores independientes, proyectos comunitarios y editoriales pequeñas. Los enlaces llevan a la página de sus autores o distribuidores originales.</p>
+   <p class="free-rpg-note">Criterio de selección: reglamento completo y gratuito. No se incluyen demos ni quickstarts de juegos cuyo manual completo sea de pago. Algunas páginas aceptan donaciones voluntarias.</p>
+   <h3 class="free-rpg-heading">En español</h3>
+   <div class="free-rpg-grid" id="freeRpgSpanish"></div>
+   <h3 class="free-rpg-heading">In English</h3>
+   <div class="free-rpg-grid" id="freeRpgEnglish"></div>
+   <h3 class="free-rpg-heading">Español e inglés</h3>
+   <div class="free-rpg-grid" id="freeRpgBilingual"></div>
+   <p class="muted free-rpg-foot">Los juegos pertenecen a sus respectivos autores. Red de Roleros solo reúne y enlaza las páginas de descarga; revisa las condiciones de licencia y uso indicadas por cada creador.</p>
   </section>
  </div>
 </section>
@@ -449,9 +465,50 @@ $("eventForm").onsubmit=async ev=>{
 };
 $("refreshEvents").onclick=loadEvents;
 
+
+const freeRpgGames={
+ spanish:[
+  {name:"FeRoS",desc:"Sistema universal narrativo, ligero y adaptable a cualquier ambientación. Reglamento revisado completo en PDF y licencia Creative Commons Atribución 4.0.",tags:["Universal","Narrativo","CC BY 4.0"],source:"Fedorian · Estudio Fedorian",domain:"fedorian.com",url:"https://fedorian.com/feros/"},
+  {name:"Vieja Escuela: el juego de rol",desc:"Fantasía de aventura inspirada en el rol clásico. Edición revisada completa, de 28 páginas, disponible en PDF.",tags:["Fantasía","OSR","Creative Commons"],source:"Nogarung",domain:"viejaescuela.nogarung.com",url:"https://viejaescuela.nogarung.com/vieja-escuela-el-juego-de-rol-edicion-revisada/"},
+  {name:"Eirendor: el albor de la quinta edad",desc:"Juego de fantasía basado en la tradición d20. Sus autores liberaron el reglamento y materiales para descargar gratuitamente.",tags:["Fantasía","d20","Campañas"],source:"Sinergia del Juego de Rol",domain:"sinergiaderol.com",url:"https://www.sinergiaderol.com/juegosgratuitos/j-eirendor.html"},
+  {name:"Cairn — edición en español",desc:"Aventura de fantasía de exploración, peligrosa y centrada en decisiones. Traducción completa gratuita del reglamento.",tags:["Fantasía","OSR","Exploración"],source:"La Esquina del Rol",domain:"laesquinadelrol.itch.io",url:"https://laesquinadelrol.itch.io/cairn-es"},
+  {name:"Loner — en español",desc:"Juego minimalista de rol en solitario. La descarga incluye las reglas completas para crear historias con ayuda de un oráculo.",tags:["Solitario","Narrativo","CC BY-SA 4.0"],source:"∞d6 · itch.io",domain:"infinitod6.itch.io",url:"https://infinitod6.itch.io/loner-spanish"},
+  {name:"Fate Acelerado",desc:"Sistema genérico y ágil para crear aventuras de cualquier género. Reglamento completo en castellano disponible gratis en PDF.",tags:["Universal","Narrativo","48 páginas"],source:"Nosolorol",domain:"nosolorol.com",url:"https://www.nosolorol.com/indie/fate-acelerado-papel"},
+  {name:"Ertt — Juego de rol",desc:"Juego independiente de supervivencia postapocalíptica. Ofrece el reglamento completo descargable tanto en español como en inglés.",tags:["Postapocalíptico","Supervivencia","Bilingüe"],source:"Ertt RPG",domain:"ertt-rpg.com",url:"https://ertt-rpg.com/"}
+ ],
+ english:[
+  {name:"Ironsworn",desc:"Fantasy quests driven by vows. Complete digital edition with a 259-page rulebook, solo, co-op and guided play, plus playkit and asset cards.",tags:["Fantasy","Solo / Co-op","Complete PDF"],source:"Shawn Tomkin · itch.io",domain:"shawn-tomkin.itch.io",url:"https://shawn-tomkin.itch.io/ironsworn"},
+  {name:"Cairn",desc:"A dark-fantasy adventure game about exploring a mysterious wood. Full rules are free to read online and download; the text is CC BY-SA 4.0.",tags:["Fantasy","OSR","CC BY-SA 4.0"],source:"Cairn RPG",domain:"cairnrpg.com",url:"https://cairnrpg.com/"},
+  {name:"Mausritter",desc:"Play brave mice exploring a dangerous world. The complete rulebook, character sheets, item cards and GM tools are available at no cost.",tags:["Fantasy","Exploration","Complete PDF"],source:"Losing Games · itch.io",domain:"losing-games.itch.io",url:"https://losing-games.itch.io/mausritter"},
+  {name:"One Shot World",desc:"A compact Dungeon World adaptation built for one-shots and short campaigns. Includes core rules, playbooks, playkit and supplements; free of charge.",tags:["Fantasy","PbtA","One-shots"],source:"Cairn Press · itch.io",domain:"cairnpress.itch.io",url:"https://cairnpress.itch.io/oneshotworld"},
+  {name:"Relict RPG",desc:"A setting-agnostic d12 tabletop RPG with character options, equipment, monsters and rules available for free.",tags:["Universal","d12","Complete game"],source:"Houndsong Games",domain:"houndsong-games.itch.io",url:"https://houndsong-games.itch.io/relict"},
+  {name:"Basic Fantasy RPG",desc:"An open, community-built fantasy roleplaying game inspired by classic B/X games. Core rules and a large library of supplements are free PDFs.",tags:["Fantasy","Old-school","Open source"],source:"Basic Fantasy RPG",domain:"basicfantasy.org",url:"https://basicfantasy.org/"}
+ ],
+ bilingual:[
+  {name:"Gateway RPG",desc:"Sistema universal d20 de reglas ligeras. Su edición definitiva gratuita reúne reglas completas, modo solitario, bestiario inicial y variantes; disponible en inglés y español.",tags:["Universal","d20","English + Español"],source:"Gateway RPG",domain:"gatewayrpg.wordpress.com",url:"https://gatewayrpg.wordpress.com/"}
+ ]
+};
+function renderFreeRpg(){
+ const groups=[["spanish","freeRpgSpanish"],["english","freeRpgEnglish"],["bilingual","freeRpgBilingual"]];
+ groups.forEach(([key,id])=>{
+  const box=$(id);if(!box||box.dataset.loaded)return;box.dataset.loaded="1";
+  freeRpgGames[key].forEach(game=>{
+   const card=document.createElement("article");card.className="free-rpg-card";
+   const source=document.createElement("a");source.className="free-rpg-source";source.href=game.url;source.target="_blank";source.rel="noopener noreferrer";
+   const logo=document.createElement("img");logo.src="https://www.google.com/s2/favicons?domain="+encodeURIComponent(game.domain)+"&sz=64";logo.alt="";logo.loading="lazy";
+   const sourceName=document.createElement("span");sourceName.textContent=game.source;source.append(logo,sourceName);
+   const body=document.createElement("div");body.className="free-rpg-body";
+   const title=document.createElement("h4");title.textContent=game.name;
+   const desc=document.createElement("p");desc.textContent=game.desc;
+   const tags=document.createElement("div");tags.className="free-rpg-tags";game.tags.forEach(tag=>{const item=document.createElement("span");item.textContent=tag;tags.appendChild(item)});
+   const link=document.createElement("a");link.className="free-rpg-link";link.href=game.url;link.target="_blank";link.rel="noopener noreferrer";link.textContent="Visitar página y descargar ↗";
+   body.append(title,desc,tags,link);card.append(source,body);box.appendChild(card);
+  });
+ });
+}
 function setHomeTab(tab){
- const tabs={rooms:"tabRooms",wanted:"tabWanted",events:"tabEvents",communities:"tabCommunities"};
- const panels={rooms:"homeTabRooms",wanted:"homeTabWanted",events:"homeTabEvents",communities:"homeTabCommunities"};
+ const tabs={rooms:"tabRooms",wanted:"tabWanted",events:"tabEvents",communities:"tabCommunities",freeRpg:"tabFreeRpg"};
+ const panels={rooms:"homeTabRooms",wanted:"homeTabWanted",events:"homeTabEvents",communities:"homeTabCommunities",freeRpg:"homeTabFreeRpg"};
  Object.entries(tabs).forEach(([key,id])=>{
   const active=key===tab;
   $(id).classList.toggle("active",active);
@@ -835,6 +892,7 @@ function buildOptions(){}
 $("tabRooms").onclick=()=>setHomeTab("rooms");
 $("tabWanted").onclick=()=>showWantedView("home");
 $("tabCommunities").onclick=()=>setHomeTab("communities");
+$("tabFreeRpg").onclick=()=>{setHomeTab("freeRpg");renderFreeRpg()};
 $("tabEvents").onclick=()=>{setHomeTab("events");loadEvents()};
 $("createRoom").onclick=createRoom;$("refreshMyRooms").onclick=loadMyRooms;$("backToRooms").onclick=backToMyRooms;$("mainBanner").onclick=returnToPortal;$("mainBanner").onkeydown=ev=>{if(ev.key==="Enter"||ev.key===" "){ev.preventDefault();returnToPortal()}};
 const inviteFromUrl=new URLSearchParams(window.location.search).get("sala");
