@@ -1179,8 +1179,16 @@ var genreTables={
 };
 function rollAll(){
  const genre=$("randomGenre").value,tone=$("randomTone").value;
- const tables=(genreTables||{})[genre]||originalTables;
- const values=tables.map(table=>table[Math.floor(Math.random()*table.length)]);
+ const fallbackTables=[
+  ["Un individuo poderoso o influyente.","Una organización clandestina.","Una facción militar o fuerza armada.","Una criatura o monstruo."],
+  ["Obtener algo que no posee.","Recuperar algo que perdió.","Vengarse de alguien.","Proteger algo o a alguien."],
+  ["Una persona específica.","Un objeto valioso o irreemplazable.","Un lugar o territorio.","Un conocimiento o secreto."],
+  ["Provocar una catástrofe o destrucción masiva.","Desencadenar una guerra o conflicto armado.","Liberar una amenaza desconocida.","Cambiar radicalmente el futuro de una sociedad."]
+ ];
+ const selectedGenreTables=typeof genreTables!=="undefined"&&genreTables?genreTables[genre]:null;
+ const tables=Array.isArray(selectedGenreTables)?selectedGenreTables:(Array.isArray(originalTables)?originalTables:fallbackTables);
+ const safeTables=Array.from({length:4},(_,i)=>Array.isArray(tables[i])&&tables[i].length?tables[i]:fallbackTables[i]);
+ const values=safeTables.map(table=>table[Math.floor(Math.random()*table.length)]);
  const story=$("story");story.replaceChildren();
  const style=document.createElement("p");style.className="muted";style.textContent="Género: "+genre+" · Tono: "+tone;
  const premise=document.createElement("p");premise.textContent="El conflicto gira en torno a "+values[0]+". El objetivo es "+values[1]+". Para alcanzarlo, hace falta "+values[2]+". Si se consigue, podría "+values[3]+".";
