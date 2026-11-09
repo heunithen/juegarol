@@ -111,7 +111,7 @@ header{background:#000;border-bottom:1px solid var(--line);padding:12px 22px}
 <body>
 <header id="mainBanner" role="button" tabindex="0" aria-label="Volver al portal de inicio">
  <div class="header-layout">
-  <div class="header-brand"><img class="main-banner-image" src="arte/banner.png" alt="Red de Roleros"><span class="site-version">Versión 1.42.0</span></div>
+  <div class="header-brand"><img class="main-banner-image" src="arte/banner.png" alt="Red de Roleros"><span class="site-version">Versión 1.43.0</span></div>
   <section id="accountBar" class="account-header hidden"><div class="account-header-info"><b id="accountEmail"></b><small id="accountEmailSecondary">Sesión iniciada</small></div><button id="signOut" class="danger" type="button">Cerrar sesión</button></section>
  </div>
 </header>
@@ -493,10 +493,10 @@ async function loadEvents(){
   mine.events.forEach(ev=>{const row=document.createElement("div");row.className="event-admin-row";const title=document.createElement("strong");title.textContent=ev.title;const status=document.createElement("span");status.className="event-status";status.textContent=" · "+statusEventLabel(ev.status);const date=document.createElement("p");date.textContent=eventDateLabel(ev.event_date);row.append(title,status,date);if(ev.review_note){const note=document.createElement("p");note.textContent="Observación del administrador: "+ev.review_note;row.appendChild(note)}target.appendChild(row)})
  }catch(e){$("myEventsList").textContent="No se pudieron cargar tus propuestas: "+e.message}
  try{
-  const admin=await publicApi("list_admin_events");$("eventAdminPanel").classList.remove("hidden");
+  const admin=await publicApi("list_admin_events");
   const target=$("eventAdminList");target.innerHTML="";
-  if(!admin.events.length)$("eventAdminMessage").textContent="No hay propuestas pendientes.";
-  else $("eventAdminMessage").textContent="Propuestas por revisar: "+admin.events.length;
+  $("eventAdminPanel").classList.toggle("hidden",!admin.events.length);
+  if(admin.events.length)$("eventAdminMessage").textContent="Propuestas por revisar: "+admin.events.length;
   admin.events.forEach(ev=>{
    const row=document.createElement("div");row.className="event-admin-row";
    const title=document.createElement("h3");title.textContent=ev.title;row.appendChild(title);
