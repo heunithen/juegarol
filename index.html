@@ -761,7 +761,12 @@ function resetWantedEditor(){
 }
 async function publishWantedPost(ev){
  ev.preventDefault();
- 
+ let displayName=profileName;
+ if(!displayName||displayName==="Jugador"){
+  displayName=(window.prompt("¿Qué nombre quieres mostrar en tu publicación?")||"").trim().replace(/[<>]/g,"").slice(0,32);
+  if(!displayName){$("wantedFormMessage").textContent="Escribe un nombre para publicar.";return;}
+  profileName=displayName;
+ }
  const game=$("wantedGame").value,customGame=$("wantedCustomGame").value.trim();
  const payload={displayName,game,customGame,searchType:$("wantedSearchType").value,modality:$("wantedModality").value,region:$("wantedRegion").value,commune:$("wantedCommune").value,contactMethod:$("wantedContactMethod").value,contactValue:$("wantedContactValue").value,notes:$("wantedNotes").value};
  const postId=$("wantedEditPostId").value;
