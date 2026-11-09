@@ -182,7 +182,7 @@ async function signOut(){
  clearSession();
  await sb.auth.signOut();
  authSession=null;authUser=null;profileName="";
- $("answerC").dataset.loaded="";
+ 
  setAuthUI();
 }
 function restoreRoomSession(){
@@ -206,8 +206,7 @@ async function api(action,data={}){
 }
 function saveSession(){localStorage.setItem(STORAGE_KEY,JSON.stringify(session))}
 function draftKey(){return session?"cats_draft_"+session.roomId+"_"+session.participantId:null}
-function saveDraft(){if(!session)return;localStorage.setItem(draftKey(),JSON.stringify({C:$("answerC").value,A:$("answerA").value,T:$("answerT").value,S:$("answerS").value}))}
-function loadDraft(){if(!session)return;try{const d=JSON.parse(localStorage.getItem(draftKey())||"null");if(d){$("answerC").value=d.C||"";$("answerA").value=d.A||"";$("answerT").value=d.T||"";$("answerS").value=d.S||""}}catch{}}
+
 function clearSession(){localStorage.removeItem(STORAGE_KEY);session=null;roomState=null;if(refreshTimer)clearInterval(refreshTimer);refreshTimer=null}
 function inviteLink(code){const u=new URL(window.location.href);u.search="";u.hash="";u.searchParams.set("sala",code);return u.toString()}
 function enterRoom(data){
@@ -287,7 +286,8 @@ async function refreshRoom(){
   $("participantCount").textContent=d.participants.length+"/12";
   renderParticipants(d);renderReview(d);renderChat(d);
   const mine=d.participants.find(p=>p.id===session.participantId);
-  questionAnswers={C:normalizeAnswer(mine?.answers?.C),A:normalizeAnswer(mine?.answers?.A),T:normalizeAnswer(mine?.answers?.T),S:normalizeAnswer(mine?.answers?.S)};$("startForm").textContent=mine?.form_started?"Continuar cuestionario C.A.T.S.":"Abrir cuestionario C.A.T.S.";updateFormProgress();
+  if($("catsScreen").classList.contains("hidden"))questionAnswers={C:normalizeAnswer(mine?.answers?.C),A:normalizeAnswer(mine?.answers?.A),T:normalizeAnswer(mine?.answers?.T),S:normalizeAnswer(mine?.answers?.S)};
+  $("startForm").textContent=mine?.form_started?"Continuar cuestionario C.A.T.S.":"Abrir cuestionario C.A.T.S.";updateFormProgress();
  }catch(e){
   if(/acceso|sesión|disponible/i.test(e.message)){clearSession();$("roomView").classList.add("hidden");$("home").classList.remove("hidden");showError("homeError","Ya no perteneces a esa sala.");}
   else $("roomStatus").textContent=e.message;
@@ -336,9 +336,14 @@ function closeQuestionnaire(){$("catsScreen").classList.add("hidden");$("roomVie
 function renderQuestion(){const q=questionDefs[questionIndex],x=normalizeAnswer(questionAnswers[q.key]);$("questionLetter").textContent=q.key;$("questionTitle").textContent=q.title;$("questionPrompt").textContent=q.prompt;$("questionCounter").textContent="Pregunta "+(questionIndex+1)+" de 4";$("questionProgressBar").style.width=((questionIndex+1)*25)+"%";$("questionOptions").innerHTML="";q.options.forEach(label=>{const btn=document.createElement("button");btn.type="button";btn.className="option"+(x.selected.includes(label)?" selected":"");btn.textContent=label;btn.setAttribute("aria-pressed",x.selected.includes(label)?"true":"false");btn.onclick=()=>{const v=normalizeAnswer(questionAnswers[q.key]);v.selected=v.selected.includes(label)?v.selected.filter(t=>t!==label):[...v.selected,label];questionAnswers[q.key]=v;renderQuestionOptions(v);scheduleAnswerSave(q.key)};$("questionOptions").appendChild(btn)});$("questionText").value=x.text;$("questionText").oninput=()=>{questionAnswers[q.key]={...normalizeAnswer(questionAnswers[q.key]),text:$("questionText").value};scheduleAnswerSave(q.key)};$("questionPrev").disabled=questionIndex===0;$("questionNext").textContent=questionIndex===3?"Volver a la sala":"Siguiente";$("questionSaveStatus").textContent="Los cambios se guardan automáticamente."}
 function renderQuestionOptions(x){[...$("questionOptions").children].forEach(btn=>{const on=x.selected.includes(btn.textContent);btn.classList.toggle("selected",on);btn.setAttribute("aria-pressed",on?"true":"false")})}
 function scheduleAnswerSave(key){$("questionSaveStatus").textContent="Guardando...";clearTimeout(answerSaveTimer);answerSaveTimer=setTimeout(()=>saveOneAnswer(key),350)}
-function saveOneAnswer(key){const answer=normalizeAnswer(questionAnswers[key]);answerSaveChain=answerSaveChain.then(async()=>{await api("save_answer",{roomId:session.roomId,token:session.token,key,answer});$("questionSaveStatus").textContent="Respuesta guardada.";updateFormProgress()}).catch(err=>{$("questionSaveStatus").textContent="No se pudo guardar: "+err.message});return answerSaveChain}
-async function goQuestionNext(){clearTimeout(answerSaveTimer);await saveOneAnswer(questionDefs[questionIndex].key);if(questionIndex===3){closeQuestionnaire();return}questionIndex++;renderQuestion()}
-async function goQuestionPrev(){clearTimeout(answerSaveTimer);await saveOneAnswer(questionDefs[questionIndex].key);if(questionIndex>0){questionIndex--;renderQuestion()}}
+function saveOneAnswer(key){
+ const answer=normalizeAnswer(questionAnswers[key]);
+ const task=answerSaveChain.then(async()=>{await api("save_answer",{roomId:session.roomId,token:session.token,key,answer});$("questionSaveStatus").textContent="Respuesta guardada.";updateFormProgress()});
+ answerSaveChain=task.catch(()=>{});
+ return task;
+}
+async function goQuestionNext(){clearTimeout(answerSaveTimer);try{await saveOneAnswer(questionDefs[questionIndex].key)}catch(err){$("questionSaveStatus").textContent="No se pudo guardar. No se avanzó: "+err.message;return}if(questionIndex===3){closeQuestionnaire();return}questionIndex++;renderQuestion()}
+async function goQuestionPrev(){clearTimeout(answerSaveTimer);try{await saveOneAnswer(questionDefs[questionIndex].key)}catch(err){$("questionSaveStatus").textContent="No se pudo guardar. No se retrocedió: "+err.message;return}if(questionIndex>0){questionIndex--;renderQuestion()}}
 async function startForm(){try{await api("start_form",{roomId:session.roomId,token:session.token});openQuestionnaire()}catch(err){$("roomStatus").textContent=err.message}}
 async function saveAnswers(){}
 function buildOptions(){}
