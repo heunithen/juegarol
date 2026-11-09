@@ -8,7 +8,7 @@
 <style>
 :root{color-scheme:dark;--bg:#171a20;--panel:#222731;--panel2:#292f3a;--line:#414957;--gold:#e2b65d;--text:#f1eee7;--muted:#aeb6c2;--green:#9bc7a5;--red:#d98282}
 *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:15px/1.5 system-ui,-apple-system,Segoe UI,sans-serif}
-header{padding:30px 20px 22px;text-align:center;background:linear-gradient(140deg,#252b35,#171a20);border-bottom:1px solid var(--line);cursor:pointer}header:focus-visible{outline:2px solid var(--gold);outline-offset:-4px}
+header{padding:14px 16px 12px;text-align:center;background:linear-gradient(140deg,#252b35,#171a20);border-bottom:1px solid var(--line);cursor:pointer}.main-banner-image{display:block;width:min(100%,1100px);height:auto;max-height:220px;object-fit:contain;margin:0 auto}header:focus-visible{outline:2px solid var(--gold);outline-offset:-4px}
 h1{margin:0;color:var(--gold);font:700 clamp(30px,5vw,46px)/1.1 Georgia,serif;letter-spacing:.1em}
 header p{margin:9px auto 0;color:var(--muted);max-width:720px}.chat-help{font-size:12px;margin:7px 0 0;color:var(--muted)}.chat-help b{color:var(--gold)}.site-version{display:inline-block;margin-top:13px;padding:3px 9px;border:1px solid #8b713e;border-radius:20px;color:var(--gold);font:600 11px/1.4 system-ui;letter-spacing:.04em}
 main{max-width:1100px;margin:auto;padding:24px 16px 60px}
@@ -55,7 +55,7 @@ footer{text-align:center;color:#707987;font-size:11px;padding:15px}
 </style>
 </head>
 <body>
-<header id="mainBanner" role="button" tabindex="0" aria-label="Volver al portal de inicio"><h1>Red de Roleros</h1><p>Un espacio para conectar jugadores, organizar partidas y preparar aventuras de rol.</p><span class="site-version">Versión 1.28.0</span></header>
+<header id="mainBanner" role="button" tabindex="0" aria-label="Volver al portal de inicio"><img class="main-banner-image" src="arte/banner.png" alt="Red de Roleros"><span class="site-version">Versión 1.29.0</span></header>
 <main>
 <section id="authPanel" class="panel">
  <h2>Acceso a Red de Roleros</h2>
