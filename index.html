@@ -113,14 +113,14 @@ header{background:#000;border-bottom:1px solid var(--line);padding:12px 22px}
 <body>
 <header id="mainBanner" role="button" tabindex="0" aria-label="Volver al portal de inicio">
  <div class="header-layout">
-  <div class="header-brand"><img class="main-banner-image" src="arte/banner.png" alt="Red de Roleros"><span class="site-version">Versión 1.46.4</span></div>
+  <div class="header-brand"><img class="main-banner-image" src="arte/banner.png" alt="Red de Roleros"><span class="site-version">Versión 1.46.5</span></div>
   
  </div>
 </header>
 <main>
 <section id="authPanel" class="panel">
  <h2>Acceso a Red de Roleros</h2>
- <p>Inicia sesión o crea una cuenta para crear salas y participar. El generador aleatorio sigue disponible sin cuenta.</p>
+ <p>Inicia sesión o crea una cuenta para crear salas, participar y utilizar el generador de partidas con IA.</p>
  <div id="authNameField" class="hidden"><label for="authName">Nombre de jugador</label><input id="authName" maxlength="32" autocomplete="nickname" placeholder="El nombre que verán los demás"></div>
  <label for="authEmail">Correo electrónico</label><input id="authEmail" type="email" autocomplete="email" placeholder="nombre@correo.com">
  <label for="authPassword">Contraseña</label><input id="authPassword" type="password" autocomplete="current-password" minlength="8" placeholder="Tu contraseña">
@@ -341,7 +341,7 @@ const SUPABASE_URL="https://mvbbqgiakysxyacfkarh.supabase.co";
 const SUPABASE_KEY="sb_publishable_5T4XYf4LS3MsHVKEYdLQ1Q_TwUWGVUC";
 const API=SUPABASE_URL+"/functions/v1/cats-room";
 const STORAGE_KEY="cats_room_session_v1";
-const sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY,{auth:{autoRefreshToken:true,persistSession:true,detectSessionInUrl:true,storageKey:"red_de_roleros_auth_v1"}});
+const sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 let authSession=null, authUser=null, profileName="";
 let session=null, roomState=null, refreshTimer=null;
 const $=id=>document.getElementById(id);
@@ -1097,18 +1097,17 @@ $("copyInvite").onclick=async()=>{try{await navigator.clipboard.writeText(invite
 $("startForm").onclick=startForm;$("closePinned").onclick=()=>{$("catsPinned").classList.add("hidden")};$("closeCats").onclick=closeQuestionnaire;$("questionNext").onclick=goQuestionNext;$("questionPrev").onclick=goQuestionPrev;$("chatForm").onsubmit=sendChatMessage;
 $("leaveRoom").onclick=leaveRoom;$("refreshRoom").onclick=refreshRoom;$("toggleRoomClosed").onclick=toggleRoomClosed;
 buildOptions();
-// Mantiene oculta la interfaz de acceso hasta que Supabase termine de
-// recuperar la sesión persistida y emita INITIAL_SESSION.
 $("authPanel").classList.add("hidden");
 $("accountBar").classList.add("hidden");
 loadWantedPosts();
 loadEvents();
-sb.auth.onAuthStateChange((_event,newSession)=>{
- authSession=newSession||null;
- authUser=newSession?.user||null;
- profileName="";
- const isRecovery=new URLSearchParams(window.location.search).get("password_recovery")==="1";
- if(_event==="PASSWORD_RECOVERY"||isRecovery){
+// getSession es la única fuente para resolver la sesión inicial.
+// INITIAL_SESSION se ignora en el listener para evitar procesarla dos veces.
+sb.auth.getSession().then(async({data,error})=>{
+ if(error)console.error("No se pudo recuperar la sesión:",error.message);
+ authSession=data?.session||null;
+ authUser=authSession?.user||null;
+ if(new URLSearchParams(window.location.search).get("password_recovery")==="1"){
   if(authSession){showPasswordRecovery();}
   else{
    $("recoveryMessage").textContent="No se pudo validar el enlace. Solicita uno nuevo e inténtalo otra vez.";
@@ -1117,10 +1116,33 @@ sb.auth.onAuthStateChange((_event,newSession)=>{
   }
   return;
  }
+ if(authUser){
+  try{
+   await ensureProfile();
+   setAuthUI();
+   await restoreRoomSession();
+   await enterFromInviteIfPresent();
+   await loadEvents();
+  }catch(e){
+   setAuthUI();
+   $("profileMessage").textContent=e?.message||"No se pudo cargar el perfil.";
+  }
+ }else setAuthUI();
+}).catch(error=>{
+ console.error("Error al recuperar la sesión:",error?.message||error);
+ setAuthUI();
+});
+sb.auth.onAuthStateChange((_event,newSession)=>{
+ if(_event==="INITIAL_SESSION")return;
+ authSession=newSession||null;
+ authUser=newSession?.user||null;
+ profileName="";
+ if(_event==="PASSWORD_RECOVERY"||new URLSearchParams(window.location.search).get("password_recovery")==="1"){
+  if(authSession)showPasswordRecovery();
+  return;
+ }
  if(!authUser){setAuthUI();return;}
  setAuthUI();
- // No ejecutar consultas de Supabase dentro del callback de auth.
- // Se difieren para evitar bloquear el ciclo interno de autenticación.
  setTimeout(async()=>{
   if(!authUser||authUser.id!==newSession?.user?.id)return;
   try{
