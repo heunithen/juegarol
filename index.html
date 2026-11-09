@@ -279,6 +279,12 @@ header{background:#000;border-bottom:1px solid var(--line);padding:12px 22px}
     <aside class="wanted-popular"><h3>Juegos más buscados</h3><div id="wantedPopular"><p class="muted">Cargando estadísticas...</p></div></aside>
    </div>
   </div>
+  <section class="panel hidden" id="wantedAdminPanel">
+   <h3>Revisión de propuestas</h3>
+   <p class="muted">Estas propuestas solo serán visibles públicamente después de aprobarlas.</p>
+   <div id="wantedAdminMessage" class="muted" role="status" aria-live="polite"></div>
+   <div id="wantedAdminList"></div>
+  </section>
   <div id="wantedPublishView" class="hidden">
    <div class="section-toggle"><h3>Sube una propuesta</h3><button type="button" class="small" id="wantedBackFromPublish">Volver</button></div>
   <form id="wantedForm" class="hidden">
@@ -288,7 +294,7 @@ header{background:#000;border-bottom:1px solid var(--line);padding:12px 22px}
     <div><label for="wantedGame">Juego</label><select id="wantedGame" required><option value="">Selecciona un juego y su edición</option><optgroup label="Dungeons & Dragons"><option>Dungeons & Dragons 3.5</option><option>Dungeons & Dragons 4.ª edición</option><option>Dungeons & Dragons 5.ª edición (2014)</option><option>Dungeons & Dragons 5.ª edición revisada (2024)</option></optgroup><optgroup label="Pathfinder"><option>Pathfinder 1.ª edición</option><option>Pathfinder 2.ª edición (reglas originales)</option><option>Pathfinder 2.ª edición Remaster</option></optgroup><optgroup label="La llamada de Cthulhu"><option>La llamada de Cthulhu 1.ª edición</option><option>La llamada de Cthulhu 2.ª edición</option><option>La llamada de Cthulhu 3.ª edición</option><option>La llamada de Cthulhu 4.ª edición</option><option>La llamada de Cthulhu 5.ª edición</option><option>La llamada de Cthulhu 6.ª edición</option><option>La llamada de Cthulhu 7.ª edición</option></optgroup><optgroup label="Vampiro: La Mascarada"><option>Vampiro: La Mascarada 1.ª edición</option><option>Vampiro: La Mascarada 2.ª edición</option><option>Vampiro: La Mascarada edición revisada (3.ª)</option><option>Vampiro: La Mascarada 20.º aniversario (V20)</option><option>Vampiro: La Mascarada 5.ª edición (V5)</option></optgroup><option>Cyberpunk RED</option><option>Warhammer Fantasy Roleplay</option><option>Starfinder</option><option>Savage Worlds</option><option>Daggerheart</option><option>Blades in the Dark</option><option>Dungeon World</option><option>Fate</option><option>Mork Borg</option><option>Old-School Essentials</option><option>GURPS</option><option>Genesys</option><option>Shadowrun</option><option>Lancer</option><option>Sistema propio</option><option>Otro</option></select></div>
     <div id="wantedCustomGameWrap" class="hidden"><label for="wantedCustomGame">Nombre del juego</label><input id="wantedCustomGame" maxlength="80" placeholder="Especifica el juego"></div>
    </div>
-   <label for="wantedSearchType">¿Qué estás buscando?</label><select id="wantedSearchType" required><option value="">Selecciona una opción</option><option value="busco_mesa">Busco mesa (soy jugador)</option><option value="busco_jugadores">Busco jugadores (soy máster)</option></select>
+   <label for="wantedSearchType">¿Qué estás buscando?</label><select id="wantedSearchType" required><option value="">Selecciona una opción</option><option value="busco_mesa">Busco mesa (soy jugador)</option><option value="busco_jugadores">Busco jugadores (soy DJ)</option></select>
    <label for="wantedModality">Modalidad</label><select id="wantedModality" required><option value="">Selecciona modalidad</option><option>Online</option><option>Presencial</option></select>
    <div class="home-grid">
     <div><label for="wantedRegion">Región</label><select id="wantedRegion" required><option value="">Selecciona una región</option><option>Arica y Parinacota</option><option>Tarapacá</option><option>Antofagasta</option><option>Atacama</option><option>Coquimbo</option><option>Valparaíso</option><option>Metropolitana de Santiago</option><option>Libertador General Bernardo O’Higgins</option><option>Maule</option><option>Ñuble</option><option>Biobío</option><option>La Araucanía</option><option>Los Ríos</option><option>Los Lagos</option><option>Aysén del General Carlos Ibáñez del Campo</option><option>Magallanes y de la Antártica Chilena</option></select></div>
@@ -427,7 +433,7 @@ header{background:#000;border-bottom:1px solid var(--line);padding:12px 22px}
  <section class="panel"><div class="section-toggle"><div><h2>Respuestas de C.A.T.S.</h2><p>Las respuestas aparecen aquí cuando cada jugador las guarda.</p></div><button class="small" id="refreshRoom">Actualizar</button></div><div id="review" class="review-grid"></div><div id="matches" class="match-summary"></div></section>
   </div>
 </section><section id="catsScreen" class="hidden"><div class="question-shell"><div class="question-top"><button id="closeCats" type="button">← Volver a C.A.T.S.</button><span id="questionCounter" class="badge">Pregunta 1 de 4</span></div><div class="question-progress"><div id="questionProgressBar"></div></div><div class="question-body"><div class="cats-title"><span id="questionLetter" class="letter">C</span><div><h2 id="questionTitle">Concepto</h2><p id="questionPrompt">¿De qué trata la partida?</p></div></div><div id="standardQuestionFields"><p class="question-hint">Puedes elegir varias opciones y añadir una descripción propia.</p><div id="questionOptions" class="options question-options"></div><label for="questionText">Otra idea o detalle (opcional)</label><textarea id="questionText" maxlength="600" placeholder="Escribe aquí una respuesta propia..."></textarea></div><div id="safetyFields" class="hidden"><p>Antes de jugar, cada persona puede indicar contenidos que quiere excluir o tratar de forma indirecta. Estas respuestas se comparten con todo el grupo.</p><section class="cats-card"><h3>Líneas</h3><p>Son límites absolutos: contenidos que no deben aparecer en la partida, ni siquiera mencionados o representados.</p><div class="chat-compose"><input id="lineInput" maxlength="200" placeholder="Añadir una línea..."><button class="primary" id="addLine" type="button">+</button></div><ul id="linesList"></ul></section><section class="cats-card"><h3>Velos</h3><p>Son contenidos que pueden existir en la ficción, pero no se describen ni representan explícitamente; quedan fuera de escena.</p><div class="chat-compose"><input id="veilInput" maxlength="200" placeholder="Añadir un velo..."><button class="primary" id="addVeil" type="button">+</button></div><ul id="veilsList"></ul></section></div><div id="questionSaveStatus" class="muted" aria-live="polite">Los cambios se guardan automáticamente.</div></div><div class="question-bottom"><button id="questionPrev" type="button">Anterior</button><button class="primary" id="questionNext" type="button">Siguiente</button></div></div></section>
-</main><section id="accountBar" class="account-header hidden"><button id="signOut" type="button" aria-label="Cerrar sesión de administración">Cerrar sesión de administración</button></section><footer>Red de Roleros · Comunidad y preparación colaborativa de partidas · <button id="adminAccess" type="button" class="text-button" onclick="document.getElementById('home').classList.add('hidden');document.getElementById('roomView').classList.add('hidden');document.getElementById('passwordRecovery').classList.add('hidden');document.getElementById('profileSetup').classList.add('hidden');document.getElementById('accountBar').classList.add('hidden');document.getElementById('authPanel').classList.remove('hidden');document.getElementById('authMessage').textContent='';document.getElementById('authEmail').focus();">Acceso de administración</button><span class="site-version">Versión 1.52.27</span></footer>
+</main><section id="accountBar" class="account-header hidden"><button id="signOut" type="button" aria-label="Cerrar sesión de administración">Cerrar sesión de administración</button></section><footer>Red de Roleros · Comunidad y preparación colaborativa de partidas · <button id="adminAccess" type="button" class="text-button" onclick="document.getElementById('home').classList.add('hidden');document.getElementById('roomView').classList.add('hidden');document.getElementById('passwordRecovery').classList.add('hidden');document.getElementById('profileSetup').classList.add('hidden');document.getElementById('accountBar').classList.add('hidden');document.getElementById('authPanel').classList.remove('hidden');document.getElementById('authMessage').textContent='';document.getElementById('authEmail').focus();">Acceso de administración</button><span class="site-version">Versión 1.52.28</span></footer>
 <script>
 const SUPABASE_URL="https://mvbbqgiakysxyacfkarh.supabase.co";
 const SUPABASE_KEY="sb_publishable_5T4XYf4LS3MsHVKEYdLQ1Q_TwUWGVUC";
@@ -639,7 +645,7 @@ async function publicApi(action,data={}){
 }
 function updateWantedFormAccess(){
  const gate=$("wantedFormGate");
- gate.textContent="Publica y revisa propuestas sin crear una cuenta."; $("wantedForm").classList.remove("hidden");
+ gate.textContent="Envía tu propuesta para revisión. Se publicará cuando la administración la apruebe."; $("wantedForm").classList.remove("hidden");
 }
 
 function eventDateLabel(value){const d=new Date(value+"T12:00:00");return d.toLocaleDateString("es-CL",{day:"numeric",month:"long",year:"numeric"})}
@@ -837,7 +843,13 @@ function renderWantedPosts(data){
   card.append(title,role,type,mode);
   const flyerUrl=safeEventLink(post.flyer_url);
   if(flyerUrl){const flyer=document.createElement("img");flyer.className="wanted-flyer";flyer.src=flyerUrl;flyer.alt="Flyer de "+post.game;flyer.loading="lazy";flyer.referrerPolicy="no-referrer";card.appendChild(flyer)}
-  if(post.mine){const own=document.createElement("span");own.className="wanted-own-tag";own.textContent="TU PROPUESTA";card.appendChild(own)}
+  if(post.mine){
+   const own=document.createElement("span");own.className="wanted-own-tag";own.textContent="TU PROPUESTA";card.appendChild(own);
+   if(post.status==="pending"||post.status==="rejected"){
+    const review=document.createElement("span");review.className="wanted-tag";review.textContent=post.status==="pending"?"PENDIENTE DE REVISIÓN":"RECHAZADA";card.appendChild(review);
+    if(post.review_note){const note=document.createElement("p");note.textContent="Observación de la administración: "+post.review_note;card.appendChild(note)}
+   }
+  }
   card.append(author,location,contact);
   if(post.notes){const notes=document.createElement("p");notes.textContent="Notas: "+post.notes;card.appendChild(notes)}
   if(post.mine){
@@ -861,10 +873,46 @@ async function loadWantedPosts(){
   const data=await publicApi("list_wanted_posts");
   if(!data||!Array.isArray(data.posts)||!Array.isArray(data.popularGames))throw new Error("El servidor respondió, pero los datos de publicaciones tienen un formato inesperado.");
   renderWantedPosts(data);
+  if(authUser)loadAdminWantedPosts();
  }catch(err){
   popular.textContent="No se pudieron cargar las estadísticas.";
   const msg=document.createElement("p");msg.className="error";msg.textContent=err.message||"Error al mostrar las publicaciones.";posts.replaceChildren(msg);
  }finally{wantedPostsLoading=false}
+}
+async function loadAdminWantedPosts(){
+ const panel=$("wantedAdminPanel"),box=$("wantedAdminList"),message=$("wantedAdminMessage");
+ if(!panel||!authUser)return;
+ try{
+  const data=await publicApi("list_admin_wanted_posts");
+  const posts=data.posts||[];
+  box.replaceChildren();
+  panel.classList.toggle("hidden",posts.length===0);
+  message.textContent=posts.length?"Propuestas pendientes: "+posts.length:"No hay propuestas pendientes.";
+  posts.forEach(post=>{
+   const row=document.createElement("article");row.className="event-admin-row";
+   const title=document.createElement("h3");title.textContent=post.game;row.appendChild(title);
+   const role=document.createElement("p");role.textContent=(post.search_type==="busco_jugadores"?"DJ busca jugadores":"Jugador busca mesa")+" · "+post.display_name;row.appendChild(role);
+   const details=document.createElement("p");details.textContent=post.modality+" · "+post.commune+", "+post.region+" · "+post.contact_method+": "+post.contact_value;row.appendChild(details);
+   if(post.notes){const notes=document.createElement("p");notes.textContent="Notas: "+post.notes;row.appendChild(notes)}
+   const flyer=safeEventLink(post.flyer_url);
+   if(flyer){const link=document.createElement("a");link.href=flyer;link.target="_blank";link.rel="noopener noreferrer";link.textContent="Ver flyer ↗";row.appendChild(link)}
+   const actions=document.createElement("div");actions.className="event-admin-actions";
+   const approve=document.createElement("button");approve.type="button";approve.className="primary";approve.textContent="Aprobar y publicar";approve.onclick=()=>reviewWantedPost(post.id,"approved");
+   const reject=document.createElement("button");reject.type="button";reject.className="danger";reject.textContent="Rechazar";reject.onclick=()=>reviewWantedPost(post.id,"rejected");
+   actions.append(approve,reject);row.appendChild(actions);box.appendChild(row);
+  });
+ }catch(error){
+  panel.classList.remove("hidden");box.textContent="No se pudieron cargar las propuestas pendientes.";
+  message.textContent=error.message;
+ }
+}
+async function reviewWantedPost(postId,status){
+ let reviewNote="";
+ if(status==="rejected")reviewNote=window.prompt("Motivo del rechazo (opcional):","")||"";
+ try{
+  await publicApi("review_wanted_post",{postId,status,reviewNote});
+  await loadWantedPosts();
+ }catch(error){$("wantedAdminMessage").textContent=error.message}
 }
 function editWantedPost(post){
  showWantedView("publish");
@@ -904,10 +952,10 @@ async function publishWantedPost(ev){
  const game=$("wantedGame").value,customGame=$("wantedCustomGame").value.trim();
  const payload={displayName,game,customGame,searchType:$("wantedSearchType").value,modality:$("wantedModality").value,region:$("wantedRegion").value,commune:$("wantedCommune").value,contactMethod:$("wantedContactMethod").value,contactValue:$("wantedContactValue").value,notes:$("wantedNotes").value,flyerUrl:$("wantedFlyer").value.trim()};
  const postId=$("wantedEditPostId").value;
- const button=$("publishWanted");button.disabled=true;$("wantedFormMessage").textContent=postId?"Guardando cambios...":"Publicando...";
+ const button=$("publishWanted");button.disabled=true;$("wantedFormMessage").textContent=postId?"Guardando y enviando a revisión...":"Enviando a revisión...";
  try{
   await api(postId?"update_wanted_post":"create_wanted_post",postId?{...payload,postId}:payload);
-  resetWantedEditor();showWantedView("home");$("wantedFormGate").textContent=postId?"Publicación actualizada correctamente.":"Propuesta publicada correctamente.";
+  resetWantedEditor();showWantedView("home");$("wantedFormGate").textContent="Tu propuesta fue enviada a revisión. Se publicará cuando la administración la apruebe.";
  }catch(err){$("wantedFormMessage").textContent=err.message}
  finally{button.disabled=false}
 }
@@ -1937,4 +1985,4 @@ function rollAll(){
 @media(max-width:600px){#randomTools .form-grid{grid-template-columns:1fr}}
 </style>
 
-<!-- GitHub Pages redeploy trigger: 1.52.27 -->
+<!-- GitHub Pages redeploy trigger: 1.52.28 -->
