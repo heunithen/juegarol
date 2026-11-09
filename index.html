@@ -832,7 +832,7 @@ async function loadMyRooms(){
     const enter=document.createElement("button");enter.className="primary";enter.textContent="Entrar a C.A.T.S.";
     enter.onclick=()=>resumeRoom(room.id,enter);actions.appendChild(enter);
    }
-   const remove=document.createElement("button");remove.className="danger small";remove.textContent=p.is_host?"Eliminar sala":"Salir de C.A.T.S.";
+   const remove=document.createElement("button");remove.className="danger small";remove.textContent=p.is_host?"Eliminar C.A.T.S.":"Salir de C.A.T.S.";
    remove.title=p.is_host?"Eliminar C.A.T.S. y todos sus datos":"Salir de C.A.T.S.";
    remove.onclick=()=>removeRoomFromList(room.id,!!p.is_host,remove);actions.appendChild(remove);
    card.append(info,actions);box.appendChild(card);
