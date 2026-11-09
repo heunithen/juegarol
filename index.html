@@ -82,7 +82,7 @@ main{padding:18px 16px 48px}
 </style>
 </head>
 <body>
-<header id="mainBanner" role="button" tabindex="0" aria-label="Volver al portal de inicio"><img class="main-banner-image" src="arte/banner.png" alt="Red de Roleros"><span class="site-version">Versión 1.37.0</span></header>
+<header id="mainBanner" role="button" tabindex="0" aria-label="Volver al portal de inicio"><img class="main-banner-image" src="arte/banner.png" alt="Red de Roleros"><span class="site-version">Versión 1.38.0</span></header>
 <main>
 <section id="authPanel" class="panel">
  <h2>Acceso a Red de Roleros</h2>
@@ -102,6 +102,7 @@ main{padding:18px 16px 48px}
   <button type="button" class="home-tab" id="tabEvents" role="tab" aria-selected="false" aria-controls="homeTabEvents">Eventos</button>
   <button type="button" class="home-tab" id="tabCommunities" role="tab" aria-selected="false" aria-controls="homeTabCommunities">Comunidades</button>
   <button type="button" class="home-tab" id="tabFreeRpg" role="tab" aria-selected="false" aria-controls="homeTabFreeRpg">¡Rol gratis!</button>
+  <button type="button" class="home-tab" id="tabAbout" role="tab" aria-selected="false" aria-controls="homeTabAbout">¿Quiénes somos?</button>
  </nav>
  <div id="homeTabRooms" class="home-tab-panel" role="tabpanel" aria-labelledby="tabRooms">
  <section id="homeCreatePanel" class="panel">
@@ -249,6 +250,19 @@ main{padding:18px 16px 48px}
    <div class="free-rpg-grid" id="freeRpgBilingual"></div>
    <p class="muted free-rpg-foot">Los juegos pertenecen a sus respectivos autores. Red de Roleros solo reúne y enlaza las páginas de descarga; revisa las condiciones de licencia y uso indicadas por cada creador.</p>
   </section>
+ </div>
+ <div id="homeTabAbout" class="home-tab-panel hidden" role="tabpanel" aria-labelledby="tabAbout">
+  <section class="panel"><h2>¿Quiénes somos?</h2>
+   <p>Somos un grupo de apasionados por los juegos de rol que busca conectar a la mayor cantidad posible de jugadores de Chile.</p>
+   <p>Queremos ofrecer un portal donde la comunidad pueda encontrar eventos, organizar mesas, conocer otras comunidades y descubrir nuevas oportunidades para jugar. Creemos que los juegos de rol se disfrutan más cuando compartimos la mesa y hacemos crecer la comunidad.</p>
+   <p>Red de Roleros es un proyecto independiente y sin fines de lucro, creado para facilitar el encuentro y la colaboración entre quienes disfrutan de esta afición.</p></section>
+  <section class="panel"><h2>Enviar una sugerencia</h2>
+   <p>¿Tienes una idea, propuesta o algo que podríamos mejorar? Envíanos tu sugerencia. Será recibida por la administración.</p>
+   <form id="suggestionForm"><label for="suggestionMessage">Tu sugerencia</label>
+    <textarea id="suggestionMessage" maxlength="1000" minlength="5" placeholder="Escribe aquí tu sugerencia (máximo 1000 caracteres)..." required></textarea>
+    <div class="row" style="align-items:center;margin-top:10px"><small id="suggestionCount" class="muted">0/1000</small><button class="primary" id="sendSuggestion" type="submit">Enviar sugerencia</button></div>
+    <div id="suggestionFeedback" class="muted" role="status" aria-live="polite"></div></form></section>
+  <section id="adminSuggestionsPanel" class="panel hidden"><div class="section-toggle"><div><h2>Sugerencias recibidas</h2><p>Mensajes enviados por la comunidad.</p></div><button type="button" class="small" id="refreshSuggestions">Actualizar</button></div><div id="adminSuggestionsList"><p class="muted">Cargando sugerencias...</p></div></section>
  </div>
 </section>
 
@@ -541,8 +555,8 @@ function renderFreeRpg(){
  });
 }
 function setHomeTab(tab){
- const tabs={rooms:"tabRooms",wanted:"tabWanted",events:"tabEvents",communities:"tabCommunities",freeRpg:"tabFreeRpg"};
- const panels={rooms:"homeTabRooms",wanted:"homeTabWanted",events:"homeTabEvents",communities:"homeTabCommunities",freeRpg:"homeTabFreeRpg"};
+ const tabs={rooms:"tabRooms",wanted:"tabWanted",events:"tabEvents",communities:"tabCommunities",freeRpg:"tabFreeRpg",about:"tabAbout"};
+ const panels={rooms:"homeTabRooms",wanted:"homeTabWanted",events:"homeTabEvents",communities:"homeTabCommunities",freeRpg:"homeTabFreeRpg",about:"homeTabAbout"};
  Object.entries(tabs).forEach(([key,id])=>{
   const active=key===tab;
   $(id).classList.toggle("active",active);
@@ -667,6 +681,21 @@ $("wantedOpenReview").onclick=()=>showWantedView("review");
 $("wantedBackFromPublish").onclick=()=>{resetWantedEditor();showWantedView("home")};
 $("wantedBackFromReview").onclick=()=>showWantedView("home");
 $("refreshWanted").onclick=loadWantedPosts;
+async function sendSuggestion(ev){
+ ev.preventDefault();const message=$("suggestionMessage").value.trim();
+ if(message.length<5){$("suggestionFeedback").textContent="Escribe una sugerencia de al menos 5 caracteres.";return;}
+ const button=$("sendSuggestion");button.disabled=true;$("suggestionFeedback").textContent="Enviando...";
+ try{await api("create_suggestion",{message});$("suggestionForm").reset();$("suggestionCount").textContent="0/1000";$("suggestionFeedback").textContent="Tu sugerencia fue enviada a la administración. Gracias por colaborar.";if(authUser?.email==="ch.munoz@gmail.com")loadAdminSuggestions();}
+ catch(err){$("suggestionFeedback").textContent=err.message;}finally{button.disabled=false;}
+}
+async function loadAdminSuggestions(){
+ const box=$("adminSuggestionsList");box.textContent="Cargando sugerencias...";
+ try{const data=await api("list_admin_suggestions");box.replaceChildren();if(!data.suggestions.length){box.textContent="Todavía no hay sugerencias.";return;}
+ data.suggestions.forEach(item=>{const card=document.createElement("article");card.style.cssText="padding:12px;border:1px solid var(--line);border-radius:9px;margin:10px 0;background:#191e26";
+ const head=document.createElement("p");head.style.color="var(--gold)";head.textContent=(item.display_name||item.email||"Usuario")+" · "+new Date(item.created_at).toLocaleString("es-CL");
+ const body=document.createElement("p");body.style.whiteSpace="pre-wrap";body.textContent=item.message;const email=document.createElement("small");email.className="muted";email.textContent=item.email||"";card.append(head,body,email);box.append(card);});
+ }catch(err){box.textContent=err.message;}
+}
 async function api(action,data={}){
  if(!authSession?.access_token)throw new Error("Debes iniciar sesión para usar las salas de Red de Roleros");
  const res=await fetch(API,{method:"POST",headers:{"Content-Type":"application/json","apikey":SUPABASE_KEY,"Authorization":"Bearer "+authSession.access_token},body:JSON.stringify({action,...data})});
@@ -942,6 +971,10 @@ $("tabRooms").onclick=()=>setHomeTab("rooms");
 $("tabWanted").onclick=()=>showWantedView("home");
 $("tabCommunities").onclick=()=>setHomeTab("communities");
 $("tabFreeRpg").onclick=()=>{setHomeTab("freeRpg");renderFreeRpg()};
+$("tabAbout").onclick=()=>{setHomeTab("about");$("adminSuggestionsPanel").classList.toggle("hidden",!authUser||authUser.email!=="ch.munoz@gmail.com");};
+$("suggestionMessage").addEventListener("input",()=>$("suggestionCount").textContent=$("suggestionMessage").value.length+"/1000");
+$("suggestionForm").addEventListener("submit",sendSuggestion);
+$("refreshSuggestions").onclick=loadAdminSuggestions;
 $("tabEvents").onclick=()=>{setHomeTab("events");loadEvents()};
 $("createRoom").onclick=createRoom;$("refreshMyRooms").onclick=loadMyRooms;$("backToRooms").onclick=backToMyRooms;$("mainBanner").onclick=returnToPortal;$("mainBanner").onkeydown=ev=>{if(ev.key==="Enter"||ev.key===" "){ev.preventDefault();returnToPortal()}};
 const inviteFromUrl=new URLSearchParams(window.location.search).get("sala");
