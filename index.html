@@ -384,7 +384,7 @@ setAuthUI();
 sb.auth.getSession().then(async({data})=>{
  authSession=data.session;authUser=data.session?.user||null;
  if(authUser){
-  try{await ensureProfile();setAuthUI();if(profileName){restoreRoomSession();await enterFromInviteIfPresent();}}
+  try{await ensureProfile();setAuthUI();await restoreRoomSession();await enterFromInviteIfPresent();}
   catch(e){setAuthUI();$("profileMessage").textContent=e.message;}
  }else setAuthUI();
 });
