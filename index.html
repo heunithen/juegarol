@@ -60,7 +60,7 @@ footer{text-align:center;color:#707987;font-size:11px;padding:15px}
  <div class="panel"><h2>Preparar una partida</h2><p>Crea una sala y comparte su enlace de invitación. Quienes tengan el enlace podrán unirse.</p></div>
  <div class="home-grid">
   <section class="panel"><h3>Crear una sala</h3><p>Primero crea la sala. Después podrás indicar tu nombre y el juego desde su interior.</p><div class="actions"><button class="primary" id="createRoom">Crear sala</button></div></section>
-  <section class="panel"><h3>Unirse a una sala</h3><p>Abre el enlace de invitación para entrar directamente. Tu nombre de perfil se utilizará automáticamente.</p><div class="actions"><button class="primary" id="joinRoom">Entrar con enlace</button></div></section>
+  <section class="panel"><h3>Unirse a una sala</h3><p>Para entrar, abre el enlace de invitación que te compartió el anfitrión. La sala se abrirá automáticamente con tu nombre de jugador.</p></section>
  </div><div id="homeError" class="error" role="alert"></div>
 </section>
 
@@ -313,7 +313,7 @@ function buildOptions(){
   items.forEach(item=>{const b=document.createElement("button");b.type="button";b.className="option";b.textContent=item;b.onclick=()=>{textarea.value=item;[...box.children].forEach(x=>x.classList.remove("selected"));b.classList.add("selected")};box.appendChild(b)});
  });
 }
-$("createRoom").onclick=createRoom;$("joinRoom").onclick=joinRoom;
+$("createRoom").onclick=createRoom;
 const inviteFromUrl=new URLSearchParams(window.location.search).get("sala");
 $("copyInvite").onclick=async()=>{try{await navigator.clipboard.writeText(inviteLink(session.code));$("copyInvite").textContent="Enlace copiado"}catch{$("copyInvite").textContent="No se pudo copiar"}setTimeout(()=>$("copyInvite").textContent="Copiar enlace",1600)};
 $("startForm").onclick=startForm;
