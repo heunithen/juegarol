@@ -1113,6 +1113,9 @@ sb.auth.getSession().then(async({data})=>{
  }else setAuthUI();
 });
 sb.auth.onAuthStateChange((_event,newSession)=>{
+ // La sesión inicial se procesa únicamente mediante getSession() más arriba.
+ // Evita que el evento INITIAL_SESSION compita con la restauración inicial.
+ if(_event==="INITIAL_SESSION")return;
  authSession=newSession;authUser=newSession?.user||null;profileName="";
  if(_event==="PASSWORD_RECOVERY"||new URLSearchParams(window.location.search).get("password_recovery")==="1"){
   showPasswordRecovery();
