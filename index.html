@@ -952,11 +952,8 @@ async function refreshRoom(){
  if(!session)return;
  try{
   const d=await api("get",{roomId:session.roomId,token:session.token});roomState=d;
-  $("roomTitle").textContent=d.room.room_name||"Partida";$("roomGame").textContent=d.room.game_name||"";$("inviteUrl").textContent=inviteLink(d.room.code);$("roomCodeDisplay").textContent=d.room.code;$("hostBadge").classList.toggle("hidden",!d.me.is_host);
+  $("roomTitle").textContent=d.room.room_name||"Partida";$("roomGame").textContent=d.room.game_name||"";$("inviteUrl").textContent=inviteLink(d.room.code);$("roomCodeDisplay").textContent=d.room.code;$("hostBadge").classList.toggle("hidden",!d.me.is_host);$("hostBadge").textContent=d.me.is_host?"ERES EL ANFITRIÓN":"ANFITRIÓN";
   $("roomStatus").textContent=(d.me.is_host?"Eres el anfitrión de este C.A.T.S. ":"")+(d.room.closed?"Este C.A.T.S. está cerrado.":"Comparte el enlace para invitar a los demás jugadores. Cada persona ingresa con el nombre que escriba al entrar y puede completar su cuestionario cuando quiera.");
-  $("hostRoomControls").classList.toggle("hidden",!d.me.is_host);
-  $("toggleRoomClosed").textContent=d.room.closed?"Reabrir C.A.T.S.":"Cerrar C.A.T.S.";
-  $("toggleRoomClosed").classList.toggle("danger",!d.room.closed);
   $("participantCount").textContent=d.participants.length+"/12";
   renderParticipants(d);renderReview(d);
   const mine=d.participants.find(p=>p.id===session.participantId);
