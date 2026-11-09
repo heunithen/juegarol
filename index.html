@@ -52,7 +52,7 @@ footer{text-align:center;color:#707987;font-size:11px;padding:15px}
  <label for="authName">Nombre de jugador (para el registro)</label><input id="authName" maxlength="32" placeholder="Tu nombre">
  <label for="authEmail">Correo electrónico</label><input id="authEmail" type="email" autocomplete="email" placeholder="nombre@correo.com">
  <label for="authPassword">Contraseña</label><input id="authPassword" type="password" autocomplete="current-password" minlength="8" placeholder="Mínimo 8 caracteres">
- <div class="actions"><button class="primary" id="signIn">Iniciar sesión</button><button id="signUp">Crear cuenta</button></div>
+ <div class="actions"><button class="primary" id="signIn">Iniciar sesión</button><button id="signUp">Crear cuenta</button><button id="googleSignIn">Continuar con Google</button></div>
  <div id="authMessage" class="muted" aria-live="polite"></div>
 </section>
 <section id="accountBar" class="panel hidden"><div class="row"><div><b id="accountEmail"></b><p>Sesión iniciada</p></div><button id="signOut" class="danger">Cerrar sesión</button></div></section>
@@ -118,6 +118,14 @@ function setAuthUI(){
  $("accountEmail").textContent=authUser?.email||"";
  if(!logged){if(refreshTimer)clearInterval(refreshTimer);refreshTimer=null;session=null;roomState=null;}
 }
+async function signInWithGoogle(){
+ $("authMessage").textContent="Conectando con Google...";
+ const {error}=await sb.auth.signInWithOAuth({
+  provider:"google",
+  options:{redirectTo:window.location.origin+window.location.pathname}
+ });
+ if(error)$("authMessage").textContent="No se pudo iniciar sesión con Google: "+error.message;
+}
 async function signIn(){
  $("authMessage").textContent="Iniciando sesión...";
  const email=$("authEmail").value.trim(),password=$("authPassword").value;
@@ -161,7 +169,7 @@ function restoreRoomSession(){
   }
  }catch{clearSession()}
 }
-$("signIn").onclick=signIn;$("signUp").onclick=signUp;$("signOut").onclick=signOut;
+$("signIn").onclick=signIn;$("signUp").onclick=signUp;$("googleSignIn").onclick=signInWithGoogle;$("signOut").onclick=signOut;
 
 async function api(action,data={}){
  if(!authSession?.access_token)throw new Error("Debes iniciar sesión para usar las salas C.A.T.S.");
