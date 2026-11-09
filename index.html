@@ -155,9 +155,9 @@ function render(){
  const s=document.getElementById("story");
  if(current.every(v=>v!==null)){
   const v=current.map((n,i)=>tables[i].items[n-1]);
-  s.textContent="La amenaza: "+v[0]+"\\nQuiere: "+v[1]+"\\nPara conseguirlo: "+v[2]+"\\nLo que podría suceder: "+v[3];
+  s.textContent="La amenaza: "+v[0]+"\nQuiere: "+v[1]+"\nPara conseguirlo: "+v[2]+"\nLo que podría suceder: "+v[3];
  }else if(current.some(v=>v!==null)){
-  s.textContent="Resultados parciales. Lanza los dados que faltan o genera una aventura completa.";
+  s.textContent="Resultados parciales. Lanza los dados que faltan o genera una aventura.";
  }else{s.textContent="Pulsa «Generar aventura» para generar un conflicto.";}
 }
 document.getElementById("generate").onclick=rollAll;
