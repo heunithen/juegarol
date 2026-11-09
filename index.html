@@ -52,7 +52,7 @@ footer{text-align:center;color:#707987;font-size:11px;padding:15px}
 .wanted-warning{padding:11px 13px;border:1px solid #8b5555;border-left:4px solid #d98282;border-radius:8px;background:#382629;color:#f0c4c4;font-size:12px}.wanted-popular,.wanted-posts-wrap{margin-top:20px;padding-top:16px;border-top:1px solid var(--line)}.wanted-posts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:10px}.wanted-post{background:#191e26;border:1px solid var(--line);border-radius:10px;padding:14px;min-width:0}.wanted-post h4{margin:0 0 6px;color:var(--gold);font:700 17px Georgia,serif}.wanted-post p{font-size:13px;overflow-wrap:anywhere}.wanted-post .wanted-tag{display:inline-block;border:1px solid #8b713e;border-radius:20px;padding:3px 8px;color:var(--gold);font-size:11px;margin:3px 4px 6px 0}.wanted-post .wanted-contact{padding:8px;background:#242b35;border-radius:7px;color:var(--text)}.wanted-bar{display:grid;grid-template-columns:minmax(100px,1fr) 3fr auto;gap:10px;align-items:center;margin:8px 0;font-size:12px}.wanted-bar-track{height:9px;border-radius:9px;background:#171c23;overflow:hidden}.wanted-bar-fill{height:100%;background:var(--gold)}select{width:100%;background:#171c23;border:1px solid var(--line);border-radius:8px;color:var(--text);font:15px system-ui;padding:11px 12px;outline:none}select:focus{border-color:var(--gold)}@media(max-width:700px){.wanted-posts{grid-template-columns:1fr}.wanted-bar{grid-template-columns:1fr auto}.wanted-bar-track{grid-column:1/-1;grid-row:2}}.wanted-choice-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin:18px 0}.wanted-choice{display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:8px;min-height:125px;padding:20px;text-align:left}.wanted-choice strong{font:700 20px Georgia,serif;color:var(--gold)}.wanted-choice span{font-size:13px;font-weight:400;color:var(--muted)}.wanted-choice.primary strong{color:#211b10}.wanted-choice.primary span{color:#3a3020}.wanted-review-layout{display:grid;grid-template-columns:minmax(0,1fr) 260px;gap:18px;align-items:start}.wanted-review-layout .wanted-popular{margin:0;padding:14px;background:#191e26;border:1px solid var(--line);border-radius:10px}.wanted-review-layout .wanted-posts-wrap{margin:0;padding:0;border:0}.wanted-back{margin-bottom:12px}@media(max-width:700px){.wanted-choice-grid,.wanted-review-layout{grid-template-columns:1fr}.wanted-review-layout .wanted-popular{grid-row:1}}</style>
 </head>
 <body>
-<header id="mainBanner" role="button" tabindex="0" aria-label="Volver al portal de inicio"><h1>C.A.T.S.</h1><p>Una herramienta para construir juntos el concepto de una partida de rol.</p><span class="site-version">Versión 1.11.1</span></header>
+<header id="mainBanner" role="button" tabindex="0" aria-label="Volver al portal de inicio"><h1>C.A.T.S.</h1><p>Una herramienta para construir juntos el concepto de una partida de rol.</p><span class="site-version">Versión 1.12.0</span></header>
 <main>
 <section id="authPanel" class="panel">
  <h2>Acceso a C.A.T.S.</h2>
@@ -86,6 +86,7 @@ footer{text-align:center;color:#707987;font-size:11px;padding:15px}
   <div id="wantedPublishView" class="hidden">
    <div class="section-toggle"><h3>Sube una propuesta</h3><button type="button" class="small" id="wantedBackFromPublish">Volver</button></div>
   <form id="wantedForm" class="hidden">
+   <input type="hidden" id="wantedEditPostId" value="">
    <div class="home-grid">
     <div><label for="wantedGame">Juego</label><select id="wantedGame" required><option value="">Selecciona un juego</option><option>Dungeons & Dragons 5e</option><option>Pathfinder 2e</option><option>Call of Cthulhu</option><option>Vampiro: La Mascarada</option><option>Cyberpunk RED</option><option>Warhammer Fantasy Roleplay</option><option>Starfinder</option><option>Savage Worlds</option><option>Daggerheart</option><option>Blades in the Dark</option><option>Dungeon World</option><option>Fate</option><option>Mork Borg</option><option>Old-School Essentials</option><option>GURPS</option><option>Genesys</option><option>Shadowrun</option><option>Lancer</option><option>Sistema propio</option><option>Otro</option></select></div>
     <div id="wantedCustomGameWrap" class="hidden"><label for="wantedCustomGame">Nombre del juego</label><input id="wantedCustomGame" maxlength="80" placeholder="Especifica el juego"></div>
@@ -287,14 +288,20 @@ function renderWantedPosts(data){
  data.posts.forEach(post=>{
   const card=document.createElement("article");card.className="wanted-post";
   const title=document.createElement("h4");title.textContent=post.game;
-  const type=document.createElement("span");type.className="wanted-tag";type.textContent=post.search_type==="busco_mesa"?"BUSCO MESA":"BUSCO JUGADORES";
+  const role=document.createElement("span");role.className="wanted-tag";role.textContent=post.search_type==="busco_jugadores"?"DJ":"JUGADOR";
+  const type=document.createElement("span");type.className="wanted-tag";type.textContent=post.search_type==="busco_mesa"?"BUSCA UNA MESA":"BUSCA JUGADORES";
   const mode=document.createElement("span");mode.className="wanted-tag";mode.textContent=post.modality;
   const author=document.createElement("p");author.textContent="Publicado por "+post.display_name+" · "+new Date(post.created_at).toLocaleDateString("es-CL");
   const location=document.createElement("p");location.textContent="📍 "+post.commune+", "+post.region;
   const contact=document.createElement("p");contact.className="wanted-contact";contact.textContent="Contacto ("+post.contact_method+"): "+post.contact_value;
-  card.append(title,type,mode,author,location,contact);
+  card.append(title,role,type,mode,author,location,contact);
   if(post.notes){const notes=document.createElement("p");notes.textContent="Notas: "+post.notes;card.appendChild(notes)}
-  if(post.mine){const remove=document.createElement("button");remove.className="danger small";remove.textContent="Eliminar mi publicación";remove.onclick=()=>deleteWantedPost(post.id,remove);card.appendChild(remove)}
+  if(post.mine){
+   const actions=document.createElement("div");actions.className="actions";
+   const edit=document.createElement("button");edit.className="small";edit.textContent="Editar";edit.onclick=()=>editWantedPost(post);actions.appendChild(edit);
+   const remove=document.createElement("button");remove.className="danger small";remove.textContent="Eliminar";remove.onclick=()=>deleteWantedPost(post.id,remove);actions.appendChild(remove);
+   card.appendChild(actions);
+  }
   grid.appendChild(card);
  });
  postsBox.appendChild(grid);
@@ -306,14 +313,41 @@ async function loadWantedPosts(){
   renderWantedPosts(data);
  }catch(err){$("wantedPopular").textContent="No se pudieron cargar las estadísticas.";const msg=document.createElement("p");msg.className="error";msg.textContent=err.message;$("wantedPosts").replaceChildren(msg)}
 }
+function editWantedPost(post){
+ showWantedView("publish");
+ $("wantedEditPostId").value=post.id;
+ $("wantedGame").value=post.game.startsWith("Otro: ")?"Otro":post.game;
+ $("wantedCustomGame").value=post.game.startsWith("Otro: ")?post.game.slice(6):"";
+ $("wantedCustomGameWrap").classList.toggle("hidden",$("wantedGame").value!=="Otro");
+ $("wantedCustomGame").required=$("wantedGame").value==="Otro";
+ $("wantedSearchType").value=post.search_type;
+ $("wantedModality").value=post.modality;
+ $("wantedRegion").value=post.region;
+ $("wantedCommune").value=post.commune;
+ $("wantedContactMethod").value=post.contact_method;
+ $("wantedContactValue").value=post.contact_value;
+ $("wantedNotes").value=post.notes||"";
+ $("publishWanted").textContent="Guardar cambios";
+ $("wantedFormMessage").textContent="Editando tu publicación.";
+ $("wantedPublishView").scrollIntoView({behavior:"smooth",block:"start"});
+}
+function resetWantedEditor(){
+ $("wantedEditPostId").value="";
+ $("publishWanted").textContent="Publicar búsqueda";
+ $("wantedForm").reset();
+ $("wantedCustomGameWrap").classList.add("hidden");
+ $("wantedCustomGame").required=false;
+}
 async function publishWantedPost(ev){
  ev.preventDefault();
  if(!authUser){$("wantedFormMessage").textContent="Inicia sesión para publicar.";return}
  const game=$("wantedGame").value,customGame=$("wantedCustomGame").value.trim();
  const payload={game,customGame,searchType:$("wantedSearchType").value,modality:$("wantedModality").value,region:$("wantedRegion").value,commune:$("wantedCommune").value,contactMethod:$("wantedContactMethod").value,contactValue:$("wantedContactValue").value,notes:$("wantedNotes").value};
- const button=$("publishWanted");button.disabled=true;$("wantedFormMessage").textContent="Publicando...";
+ const postId=$("wantedEditPostId").value;
+ const button=$("publishWanted");button.disabled=true;$("wantedFormMessage").textContent=postId?"Guardando cambios...":"Publicando...";
  try{
-  await api("create_wanted_post",payload);$("wantedForm").reset();$("wantedCustomGameWrap").classList.add("hidden");$("wantedFormMessage").textContent="Publicación creada.";await loadWantedPosts();showWantedView("review");
+  await api(postId?"update_wanted_post":"create_wanted_post",postId?{...payload,postId}:payload);
+  resetWantedEditor();$("wantedFormMessage").textContent=postId?"Publicación actualizada.":"Publicación creada.";await loadWantedPosts();showWantedView("review");
  }catch(err){$("wantedFormMessage").textContent=err.message}
  finally{button.disabled=false}
 }
@@ -327,7 +361,7 @@ $("wantedGame").onchange=()=>{$("wantedCustomGameWrap").classList.toggle("hidden
 $("wantedForm").onsubmit=publishWantedPost;
 $("wantedOpenPublish").onclick=()=>showWantedView("publish");
 $("wantedOpenReview").onclick=()=>showWantedView("review");
-$("wantedBackFromPublish").onclick=()=>showWantedView("home");
+$("wantedBackFromPublish").onclick=()=>{resetWantedEditor();showWantedView("home")};
 $("wantedBackFromReview").onclick=()=>showWantedView("home");
 $("refreshWanted").onclick=loadWantedPosts;
 async function api(action,data={}){
