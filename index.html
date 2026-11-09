@@ -67,7 +67,7 @@ tbody tr:hover{background:#2b323e}
 <tbody id="rows"></tbody>
 </table>
 </div>
-<p class="hint">Los cuatro resultados plantean una amenaza, lo que busca, lo que necesita y las posibles consecuencias de conseguirlo. Interpreta y conecta las ideas libremente.</p>
+<p class="hint">Los cuatro resultados plantean una amenaza, su motivación, lo que necesita y las posibles consecuencias. Interpreta y conecta las ideas libremente.</p>
 </main>
 <script>
 const tables = [
@@ -90,19 +90,19 @@ const tables = [
 "Recuperar algo que perdió.",
 "Vengarse de alguien.",
 "Destruir o eliminar algo.",
-"Controlar o dominar algo.",
-"Proteger o preservar algo.",
+"Imponer su voluntad sobre otros.",
+"Proteger algo o a alguien.",
 "Escapar de una situación o amenaza.",
-"Transformar o cambiar algo.",
+"Cambiar el orden establecido.",
 "Descubrir un secreto o conocimiento.",
-"Demostrar su superioridad o legitimidad.",
+"Conseguir reconocimiento, autoridad o legitimidad.",
 "Expandir su influencia o territorio.",
-"Impedir que algo suceda."
+"Evitar que algo o alguien alcance su objetivo."
 ]},
 {title:"Para conseguirlo",die:12,items:[
 "Una persona específica.",
-"Un grupo de personas o comunidad.",
-"Un objeto único o reliquia.",
+"Un grupo de personas o una comunidad.",
+"Un objeto valioso o irreemplazable.",
 "Un arma o herramienta especial.",
 "Un lugar o territorio.",
 "Un recurso natural o material escaso.",
@@ -111,20 +111,20 @@ const tables = [
 "Un documento, registro o prueba.",
 "Una criatura o ser extraordinario.",
 "Una organización o institución.",
-"Un acontecimiento o fenómeno específico."
+"Una alianza o acuerdo con alguien."
 ]},
 {title:"Lo que podría suceder",die:12,items:[
 "Provocar una catástrofe o destrucción masiva.",
 "Desencadenar una guerra o conflicto armado.",
-"Provocar la caída de un gobierno o autoridad.",
+"Derrocar un gobierno o autoridad.",
 "Someter a una población o civilización.",
-"Alterar el equilibrio de poder.",
+"Reorganizar el equilibrio de poder entre distintas facciones.",
 "Liberar una amenaza desconocida.",
-"Provocar una transformación irreversible.",
-"Desestabilizar el orden social.",
-"Poner en peligro a una comunidad o población.",
+"Transformar permanentemente un lugar o entorno.",
+"Provocar el colapso económico de una región.",
+"Obligar a una población a abandonar su hogar.",
 "Alterar las leyes naturales o la realidad.",
-"Desencadenar una crisis que se extenderá progresivamente.",
+"Desatar una rebelión, persecución o conflicto social.",
 "Cambiar radicalmente el futuro de una sociedad."
 ]},
 ];
@@ -155,8 +155,7 @@ function render(){
  const s=document.getElementById("story");
  if(current.every(v=>v!==null)){
   const v=current.map((n,i)=>tables[i].items[n-1]);
-  const lower = text => text.charAt(0).toLowerCase()+text.slice(1);
-  s.textContent=v[0]+" busca "+lower(v[1])+". Para lograrlo, necesita "+lower(v[2])+". Si lo consigue, podría "+lower(v[3]);
+  s.textContent="El conflicto gira en torno a "+v[0]+". La situación está impulsada por el deseo de "+v[1]+". Para conseguirlo, hace falta "+v[2]+". Si se alcanza ese objetivo, podría "+v[3];
  }else if(current.some(v=>v!==null)){
   s.textContent="Resultados parciales. Lanza los dados que faltan o genera una aventura.";
  }else{s.textContent="Pulsa «Generar aventura» para generar un conflicto.";}
