@@ -55,7 +55,7 @@ footer{text-align:center;color:#707987;font-size:11px;padding:15px}
 </style>
 </head>
 <body>
-<header id="mainBanner" role="button" tabindex="0" aria-label="Volver al portal de inicio"><h1>C.A.T.S.</h1><p>Una herramienta para construir juntos el concepto de una partida de rol.</p><span class="site-version">Versión 1.24.0</span></header>
+<header id="mainBanner" role="button" tabindex="0" aria-label="Volver al portal de inicio"><h1>C.A.T.S.</h1><p>Una herramienta para construir juntos el concepto de una partida de rol.</p><span class="site-version">Versión 1.25.0</span></header>
 <main>
 <section id="authPanel" class="panel">
  <h2>Acceso a C.A.T.S.</h2>
@@ -384,7 +384,12 @@ function renderWantedPosts(data){
   const role=document.createElement("span");role.className="wanted-tag";role.textContent=post.search_type==="busco_jugadores"?"DJ":"JUGADOR";
   const type=document.createElement("span");type.className="wanted-tag";type.textContent=post.search_type==="busco_mesa"?"BUSCA UNA MESA":"BUSCA JUGADORES";
   const mode=document.createElement("span");mode.className="wanted-tag";mode.textContent=post.modality;
-  const author=document.createElement("p");author.textContent="Publicado por "+post.display_name+" · "+new Date(post.created_at).toLocaleDateString("es-CL");
+  const author=document.createElement("p");
+  const ageDays=Math.max(0,Math.floor((Date.now()-new Date(post.created_at).getTime())/86400000));
+  const daysLeft=Math.max(0,21-ageDays);
+  const ageLabel=ageDays===0?"Publicado hoy":"Publicado hace "+ageDays+" "+(ageDays===1?"día":"días");
+  const expiryLabel=daysLeft===0?"Se elimina próximamente":"Se elimina en "+daysLeft+" "+(daysLeft===1?"día":"días");
+  author.textContent="Publicado por "+post.display_name+" · "+new Date(post.created_at).toLocaleDateString("es-CL")+" · "+ageLabel+" · "+expiryLabel;
   const location=document.createElement("p");location.textContent="📍 "+post.commune+", "+post.region;
   const contact=document.createElement("p");contact.className="wanted-contact";contact.textContent="Contacto ("+post.contact_method+"): "+post.contact_value;
   card.append(title,role,type,mode);
