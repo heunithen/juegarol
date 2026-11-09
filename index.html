@@ -228,10 +228,13 @@ function getInviteCode(value){
 let joiningInvite=false;
 async function enterFromInviteIfPresent(){
  const code=new URLSearchParams(window.location.search).get("sala");
- if(!authUser||!code||session||joiningInvite)return;
+ if(!authUser||!code||joiningInvite)return;
+ if(session&&session.code===code)return;
  joiningInvite=true;showError("homeError","");
- try{const d=await api("join",{code});enterRoom(d);history.replaceState({},document.title,window.location.pathname);}
- catch(e){showError("homeError",e.message)}
+ try{
+  if(session){try{await api("leave",{roomId:session.roomId,token:session.token});}catch{}clearSession();}
+  const d=await api("join",{code});enterRoom(d);history.replaceState({},document.title,window.location.pathname);
+ }catch(e){showError("homeError",e.message)}
  finally{joiningInvite=false}
 }
 async function joinRoom(){
