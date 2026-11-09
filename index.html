@@ -279,7 +279,9 @@ async function restoreRoomSession(){await loadMyRooms()}
 $("signIn").onclick=signIn;$("signUp").onclick=signUp;$("googleSignIn").onclick=signInWithGoogle;$("signOut").onclick=signOut;$("saveProfile").onclick=saveProfile;
 
 async function publicApi(action,data={}){
- const res=await fetch(API,{method:"POST",headers:{"Content-Type":"application/json","apikey":SUPABASE_KEY},body:JSON.stringify({action,...data})});
+ const headers={"Content-Type":"application/json","apikey":SUPABASE_KEY};
+ if(authSession?.access_token)headers.Authorization="Bearer "+authSession.access_token;
+ const res=await fetch(API,{method:"POST",headers,body:JSON.stringify({action,...data})});
  const json=await res.json().catch(()=>({error:"Respuesta no válida del servidor."}));
  if(!res.ok)throw new Error(json.error||"No se pudo completar la operación.");
  return json;
