@@ -118,9 +118,9 @@ function setAuthUI(){
  const logged=!!authUser;
  $("authPanel").classList.toggle("hidden",logged);
  $("accountBar").classList.toggle("hidden",!logged);
- $("profileSetup").classList.toggle("hidden",!logged||!!profileName);
- $("home").classList.toggle("hidden",!logged||!profileName);
- $("roomView").classList.toggle("hidden",!logged||!profileName||!session);
+ $("profileSetup").classList.add("hidden");
+ $("home").classList.toggle("hidden",!logged);
+ $("roomView").classList.toggle("hidden",!logged||!session);
  $("accountEmail").textContent=authUser?.email||"";
  if(!logged){profileName="";if(refreshTimer)clearInterval(refreshTimer);refreshTimer=null;session=null;roomState=null;}
 }
@@ -224,12 +224,40 @@ function inviteLink(code){const u=new URL(window.location.href);u.search="";u.ha
 function enterRoom(data){
  session={roomId:data.room.id,code:data.room.code,participantId:data.participant.id,token:data.token};
  saveSession();$("home").classList.add("hidden");$("roomView").classList.remove("hidden");
- $("roomSetup").classList.add("hidden");$("roomContent").classList.remove("hidden");
- $("roomTitle").textContent=data.room.room_name||"Sala C.A.T.S.";$("roomGame").textContent=data.room.game_name||"";
+ $("roomTitle").textContent=data.room.room_name||"Sala C.A.T.S.";
+ $("roomGame").textContent=data.room.game_name||"";
  $("inviteUrl").textContent=inviteLink(data.room.code);
  $("catsForm").classList.add("hidden");$("startForm").classList.remove("hidden");
  $("answerC").value="";$("answerA").value="";$("answerT").value="";$("answerS").value="";$("answerC").dataset.loaded="";
+ const isHost=!!data.participant.is_host;
+ const needsName=!profileName || ["Anfitrión","Jugador"].includes(data.participant.display_name);
+ const needsGame=isHost && (!data.room.game_name || data.room.game_name==="Juego sin especificar");
+ if(needsName||needsGame){
+  $("roomContent").classList.add("hidden");
+  $("roomSetup").classList.remove("hidden");
+  $("roomSetup").innerHTML='<h3>Configurar la sala</h3><p>Antes de comenzar, indica tu nombre de jugador'+(isHost?' y el juego.':'.')+'</p><label for="setupPlayerName">Tu nombre</label><input id="setupPlayerName" maxlength="32" placeholder="Tu nombre"><div id="setupGameWrap"><label for="setupGameName">Juego</label><input id="setupGameName" maxlength="80" placeholder="Nombre del juego"></div><div class="actions"><button class="primary" id="roomSetupSave">Continuar</button></div><div id="roomSetupError" class="error" role="alert"></div>';
+  $("setupPlayerName").value=profileName||(["Anfitrión","Jugador"].includes(data.participant.display_name)?"":data.participant.display_name);
+  if(!isHost)$("setupGameWrap").classList.add("hidden");
+  $("roomSetupSave").onclick=saveRoomSetup;
+ }else{
+  $("roomSetup").classList.add("hidden");
+  $("roomContent").classList.remove("hidden");
+ }
  refreshRoom();if(refreshTimer)clearInterval(refreshTimer);refreshTimer=setInterval(refreshRoom,4500);
+}
+async function saveRoomSetup(){
+ const name=$("setupPlayerName").value.trim().replace(/[<>]/g,"").slice(0,32);
+ const gameName=$("setupGameName")?.value.trim().replace(/[<>]/g,"").slice(0,80)||"";
+ if(!name){$("roomSetupError").textContent="Escribe tu nombre de jugador.";return;}
+ if(roomState?.me?.is_host && !gameName){$("roomSetupError").textContent="Escribe el nombre del juego.";return;}
+ $("roomSetupSave").disabled=true;$("roomSetupError").textContent="Guardando...";
+ try{
+  await api("configure",{roomId:session.roomId,token:session.token,name,gameName});
+  profileName=name;
+  $("roomSetup").classList.add("hidden");$("roomContent").classList.remove("hidden");
+  await refreshRoom();
+ }catch(e){$("roomSetupError").textContent=e.message;}
+ finally{if($("roomSetupSave"))$("roomSetupSave").disabled=false;}
 }
 async function createRoom(){
  showError("homeError","");
