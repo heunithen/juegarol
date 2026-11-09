@@ -49,10 +49,12 @@ footer{text-align:center;color:#707987;font-size:11px;padding:15px}
 .room-layout{display:grid;grid-template-columns:minmax(0,1fr) 280px;gap:16px;align-items:stretch}.chat-panel{display:flex;flex-direction:column;min-height:390px}.chat-messages{height:300px;overflow-y:auto;display:flex;flex-direction:column;gap:9px;padding:12px;background:#171c23;border:1px solid var(--line);border-radius:9px}.chat-message{max-width:90%;padding:8px 11px;border-radius:10px;background:#2b3340;align-self:flex-start;overflow-wrap:anywhere;white-space:pre-line}.chat-message.mine{align-self:flex-end;background:#3a3325}.chat-message b{display:block;color:var(--gold);font-size:12px;margin-bottom:2px}.chat-message small{display:block;color:var(--muted);font-size:10px;text-align:right;margin-top:4px}.cats-pin{position:sticky;top:0;z-index:3;margin:10px 0 12px;padding:13px 15px;border:1px solid #b68d32;border-left:5px solid #f0c34e;border-radius:10px;background:linear-gradient(110deg,#4a3b19,#302a1d);box-shadow:0 5px 16px #0005}.cats-pin-head{display:flex;align-items:center;gap:7px;color:#ffdc79;font-size:10px;font-weight:800;letter-spacing:.1em}.cats-pin-close{margin-left:auto;padding:1px 7px;border:1px solid #a78a4b;background:#3b301b;color:#ffe6a1;font-size:19px;line-height:1.2}.pin-icon{font-size:14px}.cats-pin-content{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:5px}.cats-pin-content strong{color:#ffe6a1;font:700 18px Georgia,serif}.cats-pin-content p{margin:3px 0;color:#f0dfb5;font-size:12px}.cats-pin-progress{color:#e9d49e;font-size:11px}.cats-pin-button{flex-shrink:0;background:#f0c34e;border-color:#f0c34e;color:#241c0b}.cats-pin-button:hover{background:#ffda75}.match-fill{transition:width .25s,background-color .25s}.match-fill.votes-1{background:#f1eee7}.match-fill.votes-2{background:#70c98b}.match-fill.votes-3{background:#5798ed}.match-fill.votes-4{background:#a879e8}.match-legend{display:flex;flex-wrap:wrap;gap:9px;margin:10px 0 14px;font-size:11px;color:var(--muted)}.match-legend span{display:inline-flex;align-items:center;gap:5px}.match-legend i{display:inline-block;width:10px;height:10px;border-radius:3px}@media(max-width:700px){.cats-pin-content{align-items:flex-start;flex-direction:column}.cats-pin-button{width:100%}}.chat-compose{display:flex;gap:8px;margin-top:10px}.chat-compose input{min-width:0}.online-dot,.offline-dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:7px}.online-dot{background:#76c58a}.offline-dot{background:#737d8a}.cats-launch{margin-top:16px}#catsScreen{position:fixed;inset:0;z-index:50;background:var(--bg);overflow-y:auto;padding:20px}.question-shell{max-width:760px;min-height:calc(100vh - 40px);margin:auto;display:flex;flex-direction:column;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:clamp(16px,4vw,32px)}.question-top,.question-bottom{display:flex;justify-content:space-between;align-items:center;gap:12px}.question-progress{height:5px;background:#171c23;border-radius:9px;margin:22px 0 30px;overflow:hidden}#questionProgressBar{height:100%;width:25%;background:var(--gold);transition:width .2s}.question-body{flex:1}.question-body h2{margin:0}.question-hint{margin:24px 0 12px}.question-options .option{font-size:14px;padding:9px 12px}.question-options .option.selected{background:#4a3d23;border-color:var(--gold);color:var(--gold)}#questionText{min-height:120px}#questionSaveStatus{margin-top:10px;font-size:12px}.question-bottom{margin-top:28px;padding-top:18px;border-top:1px solid var(--line)}@media(max-width:700px){.room-layout{grid-template-columns:1fr}.chat-panel{min-height:350px}.chat-messages{height:240px}#catsScreen{padding:8px}.question-shell{min-height:calc(100vh - 16px);padding:16px}}
 
 @media(max-width:700px){main{padding:16px 10px 40px}.home-grid,.review-grid{grid-template-columns:1fr}.panel{padding:15px}.row>*{flex:1 1 100%}.room-head{align-items:flex-start}}
-.wanted-warning{padding:11px 13px;border:1px solid #8b5555;border-left:4px solid #d98282;border-radius:8px;background:#382629;color:#f0c4c4;font-size:12px}.wanted-popular,.wanted-posts-wrap{margin-top:20px;padding-top:16px;border-top:1px solid var(--line)}.wanted-posts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:10px}.wanted-post{background:#191e26;border:1px solid var(--line);border-radius:10px;padding:14px;min-width:0}.wanted-post h4{margin:0 0 6px;color:var(--gold);font:700 17px Georgia,serif}.wanted-post p{font-size:13px;overflow-wrap:anywhere}.wanted-post .wanted-tag{display:inline-block;border:1px solid #8b713e;border-radius:20px;padding:3px 8px;color:var(--gold);font-size:11px;margin:3px 4px 6px 0}.wanted-post .wanted-contact{padding:8px;background:#242b35;border-radius:7px;color:var(--text)}.wanted-bar{display:grid;grid-template-columns:minmax(100px,1fr) 3fr auto;gap:10px;align-items:center;margin:8px 0;font-size:12px}.wanted-bar-track{height:9px;border-radius:9px;background:#171c23;overflow:hidden}.wanted-bar-fill{height:100%;background:var(--gold)}select{width:100%;background:#171c23;border:1px solid var(--line);border-radius:8px;color:var(--text);font:15px system-ui;padding:11px 12px;outline:none}select:focus{border-color:var(--gold)}@media(max-width:700px){.wanted-posts{grid-template-columns:1fr}.wanted-bar{grid-template-columns:1fr auto}.wanted-bar-track{grid-column:1/-1;grid-row:2}}.wanted-choice-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin:18px 0}.wanted-choice{display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:8px;min-height:125px;padding:20px;text-align:left}.wanted-choice strong{font:700 20px Georgia,serif;color:var(--gold)}.wanted-choice span{font-size:13px;font-weight:400;color:var(--muted)}.wanted-choice.primary strong{color:#211b10}.wanted-choice.primary span{color:#3a3020}.wanted-review-layout{display:grid;grid-template-columns:minmax(0,1fr) 260px;gap:18px;align-items:start}.wanted-review-layout .wanted-popular{margin:0;padding:14px;background:#191e26;border:1px solid var(--line);border-radius:10px}.wanted-review-layout .wanted-posts-wrap{margin:0;padding:0;border:0}.wanted-back{margin-bottom:12px}@media(max-width:700px){.wanted-choice-grid,.wanted-review-layout{grid-template-columns:1fr}.wanted-review-layout .wanted-popular{grid-row:1}}</style>
+.wanted-warning{padding:11px 13px;border:1px solid #8b5555;border-left:4px solid #d98282;border-radius:8px;background:#382629;color:#f0c4c4;font-size:12px}.wanted-popular,.wanted-posts-wrap{margin-top:20px;padding-top:16px;border-top:1px solid var(--line)}.wanted-posts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:10px}.wanted-post{background:#191e26;border:1px solid var(--line);border-radius:10px;padding:14px;min-width:0}.wanted-post h4{margin:0 0 6px;color:var(--gold);font:700 17px Georgia,serif}.wanted-post p{font-size:13px;overflow-wrap:anywhere}.wanted-post .wanted-tag{display:inline-block;border:1px solid #8b713e;border-radius:20px;padding:3px 8px;color:var(--gold);font-size:11px;margin:3px 4px 6px 0}.wanted-post .wanted-contact{padding:8px;background:#242b35;border-radius:7px;color:var(--text)}.wanted-bar{display:grid;grid-template-columns:minmax(100px,1fr) 3fr auto;gap:10px;align-items:center;margin:8px 0;font-size:12px}.wanted-bar-track{height:9px;border-radius:9px;background:#171c23;overflow:hidden}.wanted-bar-fill{height:100%;background:var(--gold)}select{width:100%;background:#171c23;border:1px solid var(--line);border-radius:8px;color:var(--text);font:15px system-ui;padding:11px 12px;outline:none}select:focus{border-color:var(--gold)}@media(max-width:700px){.wanted-posts{grid-template-columns:1fr}.wanted-bar{grid-template-columns:1fr auto}.wanted-bar-track{grid-column:1/-1;grid-row:2}}.wanted-choice-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin:18px 0}.wanted-choice{display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:8px;min-height:125px;padding:20px;text-align:left}.wanted-choice strong{font:700 20px Georgia,serif;color:var(--gold)}.wanted-choice span{font-size:13px;font-weight:400;color:var(--muted)}.wanted-choice.primary strong{color:#211b10}.wanted-choice.primary span{color:#3a3020}.wanted-review-layout{display:grid;grid-template-columns:minmax(0,1fr) 260px;gap:18px;align-items:start}.wanted-review-layout .wanted-popular{margin:0;padding:14px;background:#191e26;border:1px solid var(--line);border-radius:10px}.wanted-review-layout .wanted-posts-wrap{margin:0;padding:0;border:0}.wanted-back{margin-bottom:12px}@media(max-width:700px){.wanted-choice-grid,.wanted-review-layout{grid-template-columns:1fr}.wanted-review-layout .wanted-popular{grid-row:1}}
+.home-tabs{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 18px;padding:6px;background:#191e26;border:1px solid var(--line);border-radius:11px}.home-tab{flex:1 1 180px;padding:12px 15px;background:transparent;border-color:transparent;color:var(--muted);font-size:14px}.home-tab.active{background:#3a3325;border-color:#8b713e;color:var(--gold)}.home-tab:focus-visible{outline:2px solid var(--gold);outline-offset:2px}.home-tab-panel{min-width:0}
+</style>
 </head>
 <body>
-<header id="mainBanner" role="button" tabindex="0" aria-label="Volver al portal de inicio"><h1>C.A.T.S.</h1><p>Una herramienta para construir juntos el concepto de una partida de rol.</p><span class="site-version">Versión 1.14.0</span></header>
+<header id="mainBanner" role="button" tabindex="0" aria-label="Volver al portal de inicio"><h1>C.A.T.S.</h1><p>Una herramienta para construir juntos el concepto de una partida de rol.</p><span class="site-version">Versión 1.15.0</span></header>
 <main>
 <section id="authPanel" class="panel">
  <h2>Acceso a C.A.T.S.</h2>
@@ -66,6 +68,12 @@ footer{text-align:center;color:#707987;font-size:11px;padding:15px}
 <section id="accountBar" class="panel hidden"><div class="row"><div><b id="accountEmail"></b><p>Sesión iniciada</p></div><button id="signOut" class="danger">Cerrar sesión</button></div></section>
 <section id="profileSetup" class="panel hidden"><h2>Configurar nombre de jugador</h2><p>Elige el nombre que aparecerá en las salas y junto a tus respuestas.</p><label for="profileNameInput">Nombre de jugador</label><input id="profileNameInput" maxlength="32" placeholder="Tu nombre"><div class="actions"><button class="primary" id="saveProfile">Guardar nombre</button></div><div id="profileMessage" class="error" role="alert"></div></section>
 <section id="home" class="hidden">
+ <nav class="home-tabs" role="tablist" aria-label="Secciones principales">
+  <button type="button" class="home-tab active" id="tabRooms" role="tab" aria-selected="true" aria-controls="homeTabRooms">Salas de reunión</button>
+  <button type="button" class="home-tab" id="tabWanted" role="tab" aria-selected="false" aria-controls="homeTabWanted">¿Qué quiero jugar?</button>
+  <button type="button" class="home-tab" id="tabCommunities" role="tab" aria-selected="false" aria-controls="homeTabCommunities">Comunidades</button>
+ </nav>
+ <div id="homeTabRooms" class="home-tab-panel" role="tabpanel" aria-labelledby="tabRooms">
  <section id="homeCreatePanel" class="panel">
   <h2>Crear una sala</h2><p>Crea una sala y comparte el enlace de invitación. Cualquier usuario registrado que tenga el enlace podrá unirse. Después podrás indicar el juego desde el interior de la sala.</p>
   <div class="actions"><button class="primary" id="createRoom">Crear una sala</button></div>
@@ -74,6 +82,17 @@ footer{text-align:center;color:#707987;font-size:11px;padding:15px}
   <div class="section-toggle"><div><h2>Mis salas</h2><p>Salas en las que participas como anfitrión o jugador.</p></div><button class="small" id="refreshMyRooms">Actualizar</button></div>
   <div id="myRoomsList" class="my-rooms-list"><p>Cargando tus salas...</p></div>
  </section>
+ <section class="panel" id="randomTools">
+ <div class="section-toggle"><div><h2>Generador aleatorio</h2><p>Una herramienta para cuando el grupo no sabe qué jugar.</p></div><button id="toggleTable">Mostrar herramienta</button></div>
+ <div id="tableTools" class="hidden">
+  <div class="panel" style="margin-top:12px"><h3>Aventura generada</h3><div id="story" class="story">Pulsa «Generar propuesta» para obtener una idea.</div><div id="rolls" class="rolls"></div></div>
+  <div class="actions"><button class="primary" id="generate">⚄ Generar propuesta</button><button id="reset">Limpiar</button></div>
+  <div class="table-wrap"><table><thead><tr><th>1. Una amenaza...</th><th>2. Que quiere...</th><th>3. Para conseguirlo...</th><th>4. Lo que podría suceder...</th></tr></thead><tbody id="rows"></tbody></table></div>
+ </div>
+</section>
+ <div id="homeError" class="error" role="alert"></div>
+ </div>
+ <div id="homeTabWanted" class="home-tab-panel hidden" role="tabpanel" aria-labelledby="tabWanted">
  <section class="panel" id="wantedBoard">
   <div class="section-toggle"><div><h2>¿Qué quiero jugar?</h2><p>Encuentra una mesa o publica que estás buscando jugadores.</p></div></div>
   <div id="wantedHomeView">
@@ -116,15 +135,10 @@ footer{text-align:center;color:#707987;font-size:11px;padding:15px}
    </div>
   </div>
  </section>
- <section class="panel" id="randomTools">
- <div class="section-toggle"><div><h2>Generador aleatorio</h2><p>Una herramienta para cuando el grupo no sabe qué jugar.</p></div><button id="toggleTable">Mostrar herramienta</button></div>
- <div id="tableTools" class="hidden">
-  <div class="panel" style="margin-top:12px"><h3>Aventura generada</h3><div id="story" class="story">Pulsa «Generar propuesta» para obtener una idea.</div><div id="rolls" class="rolls"></div></div>
-  <div class="actions"><button class="primary" id="generate">⚄ Generar propuesta</button><button id="reset">Limpiar</button></div>
-  <div class="table-wrap"><table><thead><tr><th>1. Una amenaza...</th><th>2. Que quiere...</th><th>3. Para conseguirlo...</th><th>4. Lo que podría suceder...</th></tr></thead><tbody id="rows"></tbody></table></div>
  </div>
-</section>
- <div id="homeError" class="error" role="alert"></div>
+ <div id="homeTabCommunities" class="home-tab-panel hidden" role="tabpanel" aria-labelledby="tabCommunities">
+  <section class="panel"><h2>Comunidades</h2><p>Este espacio estará destinado a comunidades de rol y sus espacios de encuentro.</p><p class="muted">Sección pendiente de definir.</p></section>
+ </div>
 </section>
 
 <section id="roomView" class="hidden">
@@ -255,9 +269,18 @@ function updateWantedFormAccess(){
  const gate=$("wantedFormGate");
  gate.textContent=authUser?"":"Para subir una propuesta debes iniciar sesión o crear una cuenta. Puedes revisar las propuestas sin iniciar sesión.";
 }
+function setHomeTab(tab){
+ const tabs={rooms:"tabRooms",wanted:"tabWanted",communities:"tabCommunities"};
+ const panels={rooms:"homeTabRooms",wanted:"homeTabWanted",communities:"homeTabCommunities"};
+ Object.entries(tabs).forEach(([key,id])=>{
+  const active=key===tab;
+  $(id).classList.toggle("active",active);
+  $(id).setAttribute("aria-selected",active?"true":"false");
+  $(panels[key]).classList.toggle("hidden",!active);
+ });
+}
 function showWantedView(view){
- const focused=view!=="home";
- ["homeCreatePanel","homeRoomsPanel","randomTools","homeError"].forEach(id=>$(id).classList.toggle("hidden",focused));
+ setHomeTab("wanted");
  $("wantedHomeView").classList.toggle("hidden",view!=="home");
  $("wantedPublishView").classList.toggle("hidden",view!=="publish");
  $("wantedReviewView").classList.toggle("hidden",view!=="review");
@@ -266,7 +289,6 @@ function showWantedView(view){
  if(view==="publish"&&!authUser){
   $("wantedPublishView").classList.add("hidden");
   $("wantedHomeView").classList.remove("hidden");
-  ["homeCreatePanel","homeRoomsPanel","randomTools","homeError"].forEach(id=>$(id).classList.remove("hidden"));
   $("wantedFormGate").textContent="Para subir una propuesta debes iniciar sesión o crear una cuenta.";
  }
 }
@@ -424,14 +446,14 @@ async function resumeRoom(roomId,button){
  finally{if(button&&button.isConnected)button.disabled=false}
 }
 function backToMyRooms(){
- clearSession();$("catsScreen").classList.add("hidden");$("roomView").classList.add("hidden");$("home").classList.remove("hidden");loadMyRooms();
+ clearSession();$("catsScreen").classList.add("hidden");$("roomView").classList.add("hidden");$("home").classList.remove("hidden");setHomeTab("rooms");loadMyRooms();
 }
 async function returnToPortal(){
  if(!authUser)return;
  if(session&&!$("catsScreen").classList.contains("hidden")){
   try{await saveCurrentQuestion()}catch(err){$("questionSaveStatus").textContent="No se pudo guardar. No se volvió al portal: "+err.message;return}
  }
- clearSession();$("catsScreen").classList.add("hidden");$("roomView").classList.add("hidden");$("home").classList.remove("hidden");resetWantedEditor();showWantedView("home");await loadMyRooms();
+ clearSession();$("catsScreen").classList.add("hidden");$("roomView").classList.add("hidden");$("home").classList.remove("hidden");resetWantedEditor();setHomeTab("rooms");showWantedView("home");setHomeTab("rooms");await loadMyRooms();
 }
 function saveSession(){localStorage.setItem(STORAGE_KEY,JSON.stringify(session))}
 function draftKey(){return session?"cats_draft_"+session.roomId+"_"+session.participantId:null}
@@ -623,6 +645,9 @@ async function goQuestionPrev(){try{await saveCurrentQuestion()}catch(err){$("qu
 async function startForm(){try{await api("start_form",{roomId:session.roomId,token:session.token});openQuestionnaire()}catch(err){$("roomStatus").textContent=err.message}}
 async function saveAnswers(){}
 function buildOptions(){}
+$("tabRooms").onclick=()=>setHomeTab("rooms");
+$("tabWanted").onclick=()=>showWantedView("home");
+$("tabCommunities").onclick=()=>setHomeTab("communities");
 $("createRoom").onclick=createRoom;$("refreshMyRooms").onclick=loadMyRooms;$("backToRooms").onclick=backToMyRooms;$("mainBanner").onclick=returnToPortal;$("mainBanner").onkeydown=ev=>{if(ev.key==="Enter"||ev.key===" "){ev.preventDefault();returnToPortal()}};
 const inviteFromUrl=new URLSearchParams(window.location.search).get("sala");
 $("copyInvite").onclick=async()=>{try{await navigator.clipboard.writeText(inviteLink(session.code));$("copyInvite").textContent="Enlace copiado"}catch{$("copyInvite").textContent="No se pudo copiar"}setTimeout(()=>$("copyInvite").textContent="Copiar enlace",1600)};
