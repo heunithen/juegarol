@@ -125,7 +125,16 @@ header{background:#000;border-bottom:1px solid var(--line);padding:12px 22px}
  <label for="authEmail">Correo electrónico</label><input id="authEmail" type="email" autocomplete="email" placeholder="nombre@correo.com">
  <label for="authPassword">Contraseña</label><input id="authPassword" type="password" autocomplete="current-password" minlength="8" placeholder="Mínimo 8 caracteres">
  <div class="actions"><button class="primary" id="signIn">Iniciar sesión</button><button id="signUp">Crear cuenta</button><button id="googleSignIn">Continuar con Google</button></div>
+ <button type="button" id="forgotPassword" class="small" style="margin-top:10px">Olvidé mi contraseña</button>
  <div id="authMessage" class="muted" aria-live="polite"></div>
+</section>
+<section id="passwordRecovery" class="panel hidden">
+ <h2>Restablecer contraseña</h2>
+ <p>Escribe una contraseña nueva para tu cuenta.</p>
+ <label for="newPassword">Nueva contraseña</label><input id="newPassword" type="password" autocomplete="new-password" minlength="8" placeholder="Mínimo 8 caracteres">
+ <label for="confirmNewPassword">Repetir contraseña</label><input id="confirmNewPassword" type="password" autocomplete="new-password" minlength="8" placeholder="Repite la contraseña">
+ <div class="actions"><button type="button" class="primary" id="saveNewPassword">Guardar contraseña</button></div>
+ <div id="recoveryMessage" class="muted" aria-live="polite"></div>
 </section>
 
 <section id="profileSetup" class="panel hidden"><h2>Configurar nombre de jugador</h2><p>Elige el nombre que aparecerá en las salas y junto a tus respuestas.</p><label for="profileNameInput">Nombre de jugador</label><input id="profileNameInput" maxlength="32" placeholder="Tu nombre"><div class="actions"><button class="primary" id="saveProfile">Guardar nombre</button></div><div id="profileMessage" class="error" role="alert"></div></section>
@@ -359,6 +368,33 @@ function setAuthUI(){
 
  if(!logged){profileName="";if(refreshTimer)clearInterval(refreshTimer);refreshTimer=null;session=null;roomState=null;}
 }
+async function sendPasswordRecovery(){
+ const email=$("authEmail").value.trim(),message=$("authMessage");
+ if(!email){message.textContent="Introduce tu correo electrónico para enviarte el enlace.";return;}
+ $("forgotPassword").disabled=true;message.textContent="Enviando enlace de recuperación...";
+ try{
+  const {error}=await sb.auth.resetPasswordForEmail(email,{redirectTo:window.location.origin+window.location.pathname});
+  if(error)throw error;
+  message.textContent="Si el correo corresponde a una cuenta, recibirás un enlace para restablecer la contraseña. Revisa también el correo no deseado.";
+ }catch(e){message.textContent="No se pudo enviar el enlace: "+(e?.message||"Error desconocido");}
+ finally{$("forgotPassword").disabled=false;}
+}
+async function saveNewPassword(){
+ const password=$("newPassword").value,confirmation=$("confirmNewPassword").value,message=$("recoveryMessage");
+ if(password.length<8){message.textContent="La contraseña debe tener al menos 8 caracteres.";return;}
+ if(password!==confirmation){message.textContent="Las contraseñas no coinciden.";return;}
+ $("saveNewPassword").disabled=true;message.textContent="Actualizando contraseña...";
+ try{
+  const {error}=await sb.auth.updateUser({password});
+  if(error)throw error;
+  $("passwordRecovery").classList.add("hidden");
+  $("newPassword").value="";$("confirmNewPassword").value="";
+  message.textContent="";authSession=(await sb.auth.getSession()).data.session;authUser=authSession?.user||null;
+  setAuthUI();await ensureProfile();setAuthUI();await restoreRoomSession();await loadWantedPosts();await loadEvents();
+  $("authMessage").textContent="Contraseña actualizada. Ya puedes entrar con tu nueva contraseña.";
+ }catch(e){message.textContent="No se pudo actualizar la contraseña: "+(e?.message||"Error desconocido");}
+ finally{$("saveNewPassword").disabled=false;}
+}
 async function signInWithGoogle(){
  $("authMessage").textContent="Conectando con Google...";
  const {error}=await sb.auth.signInWithOAuth({
@@ -451,7 +487,7 @@ async function signOut(){
  setAuthUI();
 }
 async function restoreRoomSession(){await loadMyRooms()}
-$("signIn").onclick=signIn;$("signUp").onclick=signUp;$("googleSignIn").onclick=signInWithGoogle;$("signOut").onclick=signOut;$("saveProfile").onclick=saveProfile;
+$("signIn").onclick=signIn;$("signUp").onclick=signUp;$("googleSignIn").onclick=signInWithGoogle;$("forgotPassword").onclick=sendPasswordRecovery;$("saveNewPassword").onclick=saveNewPassword;$("signOut").onclick=signOut;$("saveProfile").onclick=saveProfile;
 
 async function publicApi(action,data={}){
  const headers={"Content-Type":"application/json","apikey":SUPABASE_KEY};
@@ -1049,6 +1085,14 @@ sb.auth.getSession().then(async({data})=>{
 });
 sb.auth.onAuthStateChange((_event,newSession)=>{
  authSession=newSession;authUser=newSession?.user||null;profileName="";
+ if(_event==="PASSWORD_RECOVERY"){
+  $("passwordRecovery").classList.remove("hidden");
+  $("authPanel").classList.add("hidden");
+  $("home").classList.add("hidden");
+  $("accountBar").classList.add("hidden");
+  $("recoveryMessage").textContent="Enlace verificado. Elige tu nueva contraseña.";
+  return;
+ }
  if(!authUser){setAuthUI();return;}
  setAuthUI();
  setTimeout(async()=>{
