@@ -217,11 +217,33 @@ async function loadMyRooms(){
    date.textContent="Te uniste el "+new Date(p.joined_at).toLocaleDateString("es-CL");
    info.append(title,meta,date);
    const actions=document.createElement("div");actions.className="room-actions";
-   const button=document.createElement("button");button.className=closed?"":"primary";button.textContent=closed?"Cerrada":"Entrar a la sala";button.disabled=closed;
-   button.onclick=()=>resumeRoom(room.id,button);actions.appendChild(button);
+   if(!closed){
+    const enter=document.createElement("button");enter.className="primary";enter.textContent="Entrar a la sala";
+    enter.onclick=()=>resumeRoom(room.id,enter);actions.appendChild(enter);
+   }
+   const remove=document.createElement("button");remove.className="danger small";remove.textContent=p.is_host?"Eliminar sala":"Salir de la sala";
+   remove.title=p.is_host?"Eliminar la sala y todos sus datos":"Salir y quitar la sala de Mis salas";
+   remove.onclick=()=>removeRoomFromList(room.id,!!p.is_host,remove);actions.appendChild(remove);
    card.append(info,actions);box.appendChild(card);
   });
  }catch(err){box.innerHTML="";const msg=document.createElement("p");msg.className="error";msg.textContent="No se pudieron cargar tus salas: "+err.message;box.appendChild(msg)}
+}
+async function removeRoomFromList(roomId,isHost,button){
+ const question=isHost
+  ?"¿Eliminar esta sala definitivamente? Se borrarán los participantes, respuestas y mensajes. Esta acción no se puede deshacer."
+  :"¿Salir de esta sala? Dejará de aparecer en Mis salas, pero seguirá disponible para los demás.";
+ if(!confirm(question))return;
+ if(button)button.disabled=true;
+ try{
+  await api(isHost?"delete_room":"leave_membership",{roomId});
+  if(session?.roomId===roomId){
+   clearSession();$("catsScreen").classList.add("hidden");$("roomView").classList.add("hidden");$("home").classList.remove("hidden");
+  }
+  await loadMyRooms();
+ }catch(err){
+  showError("homeError",err.message);
+  if(button&&button.isConnected)button.disabled=false;
+ }
 }
 async function resumeRoom(roomId,button){
  if(button)button.disabled=true;
