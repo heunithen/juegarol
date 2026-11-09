@@ -107,13 +107,13 @@ header{background:#000;border-bottom:1px solid var(--line);padding:12px 22px}
 .account-header #signOut{align-self:flex-end;min-width:0;padding:6px 9px;font-size:11px;line-height:1.2;border-radius:7px;white-space:nowrap}
 @media(max-width:760px){.account-header{transform:translateY(2px)}}
 
-.random-config{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-top:15px}.random-output{margin-top:20px}.random-premise,.random-card{background:#191e26;border:1px solid var(--line);border-radius:10px;padding:15px}.random-premise p,.random-card p{color:var(--text);white-space:pre-wrap}.random-group{margin-top:18px}.random-cards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.random-card strong{color:var(--gold);font:700 16px Georgia,serif}.random-card p{font-size:13px;margin-bottom:0}@media(max-width:700px){.random-config,.random-cards{grid-template-columns:1fr}}
+
 </style>
 </head>
 <body>
 <header id="mainBanner" role="button" tabindex="0" aria-label="Volver al portal de inicio">
  <div class="header-layout">
-  <div class="header-brand"><img class="main-banner-image" src="arte/banner.png" alt="Red de Roleros"><span class="site-version">Versión 1.46.7</span></div>
+  <div class="header-brand"><img class="main-banner-image" src="arte/banner.png" alt="Red de Roleros"><span class="site-version">Versión 1.46.8</span></div>
   
  </div>
 </header>
@@ -157,19 +157,9 @@ header{background:#000;border-bottom:1px solid var(--line);padding:12px 22px}
   <div id="myRoomsList" class="my-rooms-list"><p>Cargando tus salas...</p></div>
  </section>
  <section class="panel" id="randomTools">
-  <div><h2>Generador aleatorio</h2><p>Configura el género y el tono, añade tus propias ideas si lo deseas y genera una premisa abierta para desarrollar con tu grupo.</p></div>
-  <div class="random-config">
-   <div><label for="randomGenre">Género</label><select id="randomGenre">
-    <option>Fantasía medieval</option><option>Fantasía oscura</option><option>Ciencia ficción</option><option>Terror</option><option>Misterio</option><option>Investigación</option><option>Aventura</option><option>Western</option><option>Postapocalíptico</option><option>Horror cósmico</option><option>Comedia</option><option>Otro / mezcla</option>
-   </select></div>
-   <div><label for="randomTone">Tono</label><select id="randomTone">
-    <option>Heroico</option><option>Épico</option><option>Sombrío</option><option>Oscuro</option><option>Misterioso</option><option>Humorístico</option><option>Dramático</option><option>Aventurero</option><option>Supervivencia</option>
-   </select></div>
-  </div>
-  <label for="randomNotes">¿Qué te gustaría incluir? (opcional)</label>
-  <textarea id="randomNotes" maxlength="1200" placeholder="Escribe ideas, temas, ambientación, elementos que te gustaría explorar o cualquier otra indicación."></textarea>
-  <div class="actions"><button class="primary" id="generate" type="button" aria-label="Generar partida" title="Generar partida" style="font-size:24px;min-width:54px">⚅</button><span id="randomStatus" class="muted" role="status" aria-live="polite"></span></div>
-  <div id="story" class="random-output" aria-live="polite"><p class="muted">Pulsa el dado para generar una premisa, cuatro PNJ y cuatro lugares.</p></div>
+  <div><h2>Generador aleatorio</h2><p>¿El grupo no sabe qué jugar o se quedaron sin ideas? Utiliza el generador aleatorio para encontrar inspiración y descubrir nuevas posibilidades para tu próxima partida.</p></div>
+  <div class="random-result" style="margin-top:14px"><div id="story" class="story">Pulsa el dado para generar una idea de aventura.</div></div>
+  <div class="actions"><button class="primary" id="generate" type="button" aria-label="Generar aventura aleatoria" title="Generar aventura aleatoria" style="font-size:24px;min-width:54px">⚅</button></div>
  </section>
  <div id="homeError" class="error" role="alert"></div>
  </div>
@@ -1147,45 +1137,9 @@ const tables=[
 {items:["Una persona específica.","Un grupo de personas o una comunidad.","Un objeto valioso o irreemplazable.","Un arma o herramienta especial.","Un lugar o territorio.","Un recurso natural o material escaso.","Una fuente de energía o poder.","Un conocimiento o secreto.","Un documento, registro o prueba.","Una criatura o ser extraordinario.","Una organización o institución.","Una alianza o acuerdo con alguien."]},
 {items:["Provocar una catástrofe o destrucción masiva.","Desencadenar una guerra o conflicto armado.","Derrocar un gobierno o autoridad.","Someter a una población o civilización.","Reorganizar el equilibrio de poder entre distintas facciones.","Liberar una amenaza desconocida.","Transformar permanentemente un lugar o entorno.","Provocar el colapso económico de una región.","Obligar a una población a abandonar su hogar.","Alterar las leyes naturales o la realidad.","Desatar una rebelión, persecución o conflicto social.","Cambiar radicalmente el futuro de una sociedad."]}
 ];
-function renderRandomAdventure(data){
- const box=$("story");box.innerHTML="";
- const premise=document.createElement("section");premise.className="random-premise";
- const heading=document.createElement("h3");heading.textContent="Premisa";const text=document.createElement("p");text.textContent=data.premise;premise.append(heading,text);box.appendChild(premise);
- const groups=[["Personajes no jugadores",data.npcs],["Lugares",data.places]];
- groups.forEach(([title,items])=>{const section=document.createElement("section");section.className="random-group";const h=document.createElement("h3");h.textContent=title;section.appendChild(h);const grid=document.createElement("div");grid.className="random-cards";items.forEach(item=>{const card=document.createElement("article");card.className="random-card";const name=document.createElement("strong");name.textContent=item.name;const desc=document.createElement("p");desc.textContent=item.description;card.append(name,desc);grid.appendChild(card)});section.appendChild(grid);box.appendChild(section)});
-}
-async function rollAll(){
- const button=$("generate"),status=$("randomStatus"),box=$("story");
- button.disabled=true;
- status.textContent="Comprobando sesión...";
- box.innerHTML="<p class='muted'>Preparando la generación...</p>";
- try{
-  const {data,error:sessionError}=await sb.auth.getSession();
-  if(sessionError)throw sessionError;
-  authSession=data.session;authUser=data.session?.user||null;
-  if(!authSession?.access_token){
-   status.textContent="Tu sesión no está activa. Inicia sesión y vuelve a intentarlo.";
-   box.innerHTML="<p class='error'>No se encontró una sesión válida de Supabase.</p>";
-   setAuthUI();
-   return;
-  }
-  status.textContent="La IA está preparando la partida...";
-  box.innerHTML="<p class='muted'>Generando premisa, PNJ y lugares...</p>";
-  const dieRoll=Math.floor(Math.random()*6)+1;
-  const response=await fetch(SUPABASE_URL+"/functions/v1/generate-random-adventure",{
-   method:"POST",
-   headers:{"Content-Type":"application/json","apikey":SUPABASE_KEY,"Authorization":"Bearer "+authSession.access_token},
-   body:JSON.stringify({genre:$("randomGenre").value,tone:$("randomTone").value,notes:$("randomNotes").value.trim(),dieRoll})
-  });
-  const result=await response.json().catch(()=>({error:"El servidor devolvió una respuesta no válida."}));
-  if(!response.ok)throw new Error(result.error||("Error HTTP "+response.status));
-  if(!result||typeof result.premise!=="string"||!Array.isArray(result.npcs)||!Array.isArray(result.places))throw new Error("La respuesta de la IA llegó incompleta.");
-  renderRandomAdventure(result);status.textContent="Partida generada.";
- }catch(error){
-  box.innerHTML="";
-  const p=document.createElement("p");p.className="error";p.textContent=error?.message||"Error desconocido al generar.";box.appendChild(p);
-  status.textContent="No se pudo completar la generación.";
- }finally{button.disabled=false}
+function rollAll(){
+ const values=tables.map(table=>table.items[Math.floor(Math.random()*table.items.length)]);
+ $("story").textContent="El conflicto gira en torno a "+values[0]+". El objetivo es "+values[1]+". Para alcanzarlo, hace falta "+values[2]+". Si se consigue, podría "+values[3]+".";
 }
 $("generate").onclick=rollAll;
 </script>
