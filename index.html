@@ -168,7 +168,7 @@ const tables = [
 "Una oportunidad inesperada permite resolver el conflicto sin derrotar a la amenaza.",
 "La amenaza principal es solo el instrumento de alguien que permanece oculto."
 ]}];
-const labels=["Amenaza","Motivación","Objetivo","Consecuencia","Inicio","Complicación","Giro"];
+const labels=["Responsable","Propósito","Objetivo","Consecuencia","Inicio","Obstáculo","Giro"];
 let current=Array(7).fill(null);
 const tbody=document.getElementById("rows");
 function buildTable(){
@@ -198,7 +198,7 @@ function render(){
   s.textContent=v[0]+" pretende "+v[1]+" "+v[2]+". Si lo consigue, "+v[3]+".\n\n"+v[4]+" El problema es que "+v[5].charAt(0).toLowerCase()+v[5].slice(1)+" Además, "+v[6].charAt(0).toLowerCase()+v[6].slice(1);
  }else if(current.some(v=>v!==null)){
   s.textContent="Resultados parciales. Lanza los dados que faltan o genera una aventura completa.";
- }else{s.textContent="Pulsa «Generar aventura» para crear un conflicto y sus complicaciones.";}
+ }else{s.textContent="Pulsa «Generar aventura completa» para construir un conflicto conectado y sus complicaciones.";}
 }
 document.getElementById("generate").onclick=rollAll;
 document.getElementById("reroll").onclick=rollAll;
