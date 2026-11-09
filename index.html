@@ -119,7 +119,7 @@ header{background:#000;border-bottom:1px solid var(--line);padding:12px 22px}
  </div>
 </header>
 <main>
-<section id="authPanel" class="panel">
+<section id="authPanel" class="panel hidden">
  <h2>Acceso de administración</h2>
  <p>El acceso de jugadores es público y no requiere registro.</p>
  <div id="authNameField" class="hidden"><label for="authName">Nombre de jugador</label><input id="authName" maxlength="32" autocomplete="nickname" placeholder="El nombre que verán los demás"></div>
@@ -139,7 +139,7 @@ header{background:#000;border-bottom:1px solid var(--line);padding:12px 22px}
 </section>
 
 <section id="profileSetup" class="panel hidden"><h2>Configurar nombre de jugador</h2><p>Elige el nombre que aparecerá en las salas y junto a tus respuestas.</p><label for="profileNameInput">Nombre de jugador</label><input id="profileNameInput" maxlength="32" placeholder="Tu nombre"><div class="actions"><button class="primary" id="saveProfile">Guardar nombre</button></div><div id="profileMessage" class="error" role="alert"></div></section>
-<section id="home" class="hidden">
+<section id="home">
  <nav class="home-tabs" role="tablist" aria-label="Secciones principales">
   <button type="button" class="home-tab active" id="tabRooms" role="tab" aria-selected="true" aria-controls="homeTabRooms">Punto de encuentro</button>
   <button type="button" class="home-tab" id="tabWanted" role="tab" aria-selected="false" aria-controls="homeTabWanted">¿Qué quieres jugar?</button>
@@ -342,6 +342,7 @@ function showError(el,msg){$(el).textContent=msg||""}
 
 function setAuthUI(){
  const adminAccount=!!authUser&&!authUser.is_anonymous;
+ if(adminAccount)adminLoginOpen=false;
  $("authPanel").classList.toggle("hidden",!adminLoginOpen);
  $("accountBar").classList.toggle("hidden",!adminAccount);
  $("profileSetup").classList.add("hidden");
@@ -351,7 +352,6 @@ function setAuthUI(){
  $("roomView").classList.toggle("hidden",!session);
  $("accountEmail").textContent=profileName||authUser?.user_metadata?.display_name||authUser?.email||"";
  $("accountEmailSecondary").textContent=authUser?.email||"";
- if(adminAccount)adminLoginOpen=false;
  if(!authUser){profileName="";if(refreshTimer)clearInterval(refreshTimer);refreshTimer=null;session=null;roomState=null;}
 }
 function showPasswordRecovery(){
@@ -1083,7 +1083,7 @@ $("suggestionMessage").addEventListener("input",()=>$("suggestionCount").textCon
 $("suggestionForm").addEventListener("submit",sendSuggestion);
 $("refreshSuggestions").onclick=loadAdminSuggestions;
 $("tabEvents").onclick=()=>{setHomeTab("events");loadEvents()};
-$("createRoom").onclick=createRoom;$("refreshMyRooms").onclick=loadMyRooms;$("backToRooms").onclick=backToMyRooms;$("mainBanner").onclick=returnToPortal;$("mainBanner").onkeydown=ev=>{if(ev.key==="Enter"||ev.key===" "){ev.preventDefault();returnToPortal()}};
+$("createRoom").onclick=createRoom;$("joinRoomCode").onclick=joinRoomByCode;$("backToRooms").onclick=backToMyRooms;$("mainBanner").onclick=returnToPortal;$("mainBanner").onkeydown=ev=>{if(ev.key==="Enter"||ev.key===" "){ev.preventDefault();returnToPortal()}};
 const inviteFromUrl=new URLSearchParams(window.location.search).get("sala");
 $("copyInvite").onclick=async()=>{try{await navigator.clipboard.writeText(inviteLink(session.code));$("copyInvite").textContent="Enlace copiado"}catch{$("copyInvite").textContent="No se pudo copiar"}setTimeout(()=>$("copyInvite").textContent="Copiar enlace",1600)};
 $("startForm").onclick=startForm;$("closePinned").onclick=()=>{$("catsPinned").classList.add("hidden")};$("closeCats").onclick=closeQuestionnaire;$("questionNext").onclick=goQuestionNext;$("questionPrev").onclick=goQuestionPrev;
