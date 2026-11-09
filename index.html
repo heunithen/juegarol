@@ -54,7 +54,7 @@ footer{text-align:center;color:#707987;font-size:11px;padding:15px}
 </style>
 </head>
 <body>
-<header id="mainBanner" role="button" tabindex="0" aria-label="Volver al portal de inicio"><h1>C.A.T.S.</h1><p>Una herramienta para construir juntos el concepto de una partida de rol.</p><span class="site-version">Versión 1.17.0</span></header>
+<header id="mainBanner" role="button" tabindex="0" aria-label="Volver al portal de inicio"><h1>C.A.T.S.</h1><p>Una herramienta para construir juntos el concepto de una partida de rol.</p><span class="site-version">Versión 1.18.0</span></header>
 <main>
 <section id="authPanel" class="panel">
  <h2>Acceso a C.A.T.S.</h2>
@@ -193,13 +193,31 @@ async function signInWithGoogle(){
  if(error)$("authMessage").textContent="No se pudo iniciar sesión con Google: "+error.message;
 }
 async function signIn(){
- $("authMessage").textContent="Iniciando sesión...";
- const email=$("authEmail").value.trim(),password=$("authPassword").value;
- const {data,error}=await sb.auth.signInWithPassword({email,password});
- if(error){$("authMessage").textContent=error.message;return;}
- authSession=data.session;authUser=data.user;$("authMessage").textContent="";
- await ensureProfile();setAuthUI();
- await restoreRoomSession();await enterFromInviteIfPresent();
+ const button=$("signIn"),message=$("authMessage");
+ button.disabled=true;message.textContent="Iniciando sesión...";
+ try{
+  const email=$("authEmail").value.trim(),password=$("authPassword").value;
+  if(!email||!password)throw new Error("Introduce tu correo electrónico y contraseña.");
+  const {data,error}=await sb.auth.signInWithPassword({email,password});
+  if(error)throw error;
+  authSession=data.session;authUser=data.user;
+  setAuthUI();
+  message.textContent="";
+  try{
+   await ensureProfile();
+   setAuthUI();
+   await restoreRoomSession();
+   await enterFromInviteIfPresent();
+   await loadWantedPosts();
+  }catch(e){
+   $("profileMessage").textContent="Sesión iniciada, pero hubo un problema al cargar tu perfil o tus salas: "+(e?.message||"Error desconocido");
+   setAuthUI();
+  }
+ }catch(e){
+  message.textContent="No se pudo iniciar sesión: "+(e?.message||"Error desconocido");
+ }finally{
+  button.disabled=false;
+ }
 }
 async function ensureProfile(){
  if(!authUser){profileName="";return "";}
