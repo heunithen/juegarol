@@ -55,10 +55,34 @@ footer{text-align:center;color:#707987;font-size:11px;padding:15px}
 
 .events-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;margin-top:18px}.event-card{background:#151515;border:1px solid #4b402b;border-radius:12px;overflow:hidden}.event-card img{display:block;width:100%;max-height:240px;object-fit:contain;background:#090909}.event-card-body{padding:16px}.event-meta{display:flex;flex-wrap:wrap;gap:7px;margin:10px 0}.event-meta span{font-size:12px;padding:4px 8px;border:1px solid #51452e;border-radius:20px;color:var(--gold)}.event-form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.event-form-grid .full{grid-column:1/-1}.event-form-grid label{display:block;margin:0 0 5px}.event-form-grid input,.event-form-grid select,.event-form-grid textarea{width:100%;box-sizing:border-box}.event-form-grid textarea{min-height:95px}.event-admin-row{border:1px solid #51452e;border-radius:10px;padding:14px;margin:12px 0}.event-admin-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.event-status{font-size:12px;font-weight:700;color:var(--gold)}@media(max-width:620px){.event-form-grid{grid-template-columns:1fr}.event-form-grid .full{grid-column:auto}}
 .free-rpg-note{padding:11px 13px;border:1px solid #806b43;border-left:4px solid var(--gold);border-radius:8px;background:#302a20;color:#e8d5a9;font-size:12px}.free-rpg-heading{margin:24px 0 12px;padding-bottom:8px;border-bottom:1px solid var(--line)}.free-rpg-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px}.free-rpg-card{overflow:hidden;background:#191e26;border:1px solid var(--line);border-radius:10px;min-width:0}.free-rpg-source{display:flex;align-items:center;gap:9px;padding:9px 12px;background:#303744;border-bottom:1px solid var(--line);color:#e7e2d8;text-decoration:none;font-size:11px;font-weight:700;letter-spacing:.03em}.free-rpg-source img{width:25px;height:25px;object-fit:contain;border-radius:5px;background:#fff;padding:2px}.free-rpg-cover{display:block;width:100%;height:145px;object-fit:cover;object-position:center 35%;background:#242a33;border-bottom:1px solid var(--line)}.free-rpg-body{padding:13px}.free-rpg-body h4{margin:0 0 6px;color:var(--gold);font:700 17px Georgia,serif}.free-rpg-body p{font-size:12px;line-height:1.5}.free-rpg-tags{display:flex;flex-wrap:wrap;gap:6px;margin:9px 0}.free-rpg-tags span{border:1px solid #505968;border-radius:20px;padding:3px 7px;color:var(--muted);font-size:10px}.free-rpg-link{display:inline-block;margin-top:5px;color:var(--gold);font-size:12px;text-decoration:none;border:1px solid #806b43;border-radius:6px;padding:6px 9px}.free-rpg-link:hover{border-color:var(--gold);text-decoration:underline}.free-rpg-foot{margin-top:22px;padding-top:12px;border-top:1px solid var(--line);font-size:11px}@media(max-width:700px){.free-rpg-grid{grid-template-columns:1fr}}
+
+/* Ajustes de proporción y jerarquía visual */
+.main-banner-image{max-height:180px}
+header{padding:10px 16px 9px}
+.site-version{margin-top:8px}
+main{padding:18px 16px 48px}
+.panel{padding:18px;margin-bottom:15px}
+#accountBar{padding:15px 18px}
+#accountBar .row{align-items:center}
+#accountBar .row>div{flex:1 1 auto}
+#accountBar #signOut{flex:0 0 auto;min-width:170px}
+.home-tabs{gap:5px;margin-bottom:14px;padding:5px}
+.home-tab{flex:1 1 150px;padding:10px 12px;text-align:center}
+.home-tab.active{background:#403723;border-color:var(--gold);color:#f0c66e;box-shadow:inset 0 0 0 1px rgba(226,182,93,.12)}
+.home-tab:focus-visible{outline-offset:1px}
+@media(max-width:620px){
+ header{padding:9px 12px 8px}
+ .main-banner-image{max-height:145px}
+ main{padding:13px 10px 34px}
+ .panel{padding:15px;margin-bottom:12px}
+ #accountBar #signOut{flex:1 1 100%;min-width:0}
+ .home-tabs{gap:4px}
+ .home-tab{flex:1 1 calc(50% - 4px);padding:9px 7px;font-size:13px}
+}
 </style>
 </head>
 <body>
-<header id="mainBanner" role="button" tabindex="0" aria-label="Volver al portal de inicio"><img class="main-banner-image" src="arte/banner.png" alt="Red de Roleros"><span class="site-version">Versión 1.36.0</span></header>
+<header id="mainBanner" role="button" tabindex="0" aria-label="Volver al portal de inicio"><img class="main-banner-image" src="arte/banner.png" alt="Red de Roleros"><span class="site-version">Versión 1.37.0</span></header>
 <main>
 <section id="authPanel" class="panel">
  <h2>Acceso a Red de Roleros</h2>
