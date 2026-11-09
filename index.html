@@ -1110,73 +1110,470 @@ var originalTables=[
  ["Provocar una catástrofe o destrucción masiva.","Desencadenar una guerra o conflicto armado.","Derrocar un gobierno o autoridad.","Someter a una población o civilización.","Reorganizar el equilibrio de poder entre distintas facciones.","Liberar una amenaza desconocida.","Transformar permanentemente un lugar o entorno.","Provocar el colapso económico de una región.","Obligar a una población a abandonar su hogar.","Alterar las leyes naturales o la realidad.","Desatar una rebelión, persecución o conflicto social.","Cambiar radicalmente el futuro de una sociedad."]
 ];
 var genreTables={
- "Fantasía medieval":[
- ["Un monarca o señor feudal.","Una orden de caballería.","Un ejército invasor.","Un dragón o bestia legendaria."],
- ["Reclamar un trono.","Recuperar una reliquia perdida.","Vengar una traición.","Proteger un reino amenazado."],
- ["Un heredero legítimo.","Una aldea fronteriza.","Una corona encantada.","Un castillo disputado."],
- ["Desatar una guerra entre reinos.","Derribar una dinastía.","Despertar a una criatura ancestral.","Romper un antiguo pacto mágico."]
+ "Fantasía medieval": [
+  [
+   "Un rey cuyo heredero ha desaparecido antes de la coronación.",
+   "Una casa noble acusa a otra de traición y reclama justicia por las armas.",
+   "Una orden de caballeros rompe el juramento que la mantenía unida.",
+   "Un dragón exige tributo a varios señoríos y uno se niega a pagarlo.",
+   "Un gremio de magos disputa a la corona el control de la hechicería.",
+   "Un ejército extranjero cruza la frontera siguiendo una antigua profecía.",
+   "Un campesino descubre que es el último descendiente de una dinastía caída.",
+   "Un consejo de ciudades libres desafía el poder de un emperador."
+  ],
+  [
+   "Asegurar la sucesión antes de que estalle una guerra civil.",
+   "Recuperar una reliquia capaz de legitimar una coronación.",
+   "Reunir a los clanes para resistir una invasión.",
+   "Romper el asedio de una fortaleza aislada.",
+   "Descubrir quién falsificó el tratado entre dos reinos.",
+   "Encontrar al caballero que abandonó su juramento y huyó.",
+   "Impedir que una disputa por tierras destruya una alianza.",
+   "Decidir el destino de un territorio reclamado por dos coronas."
+  ],
+  [
+   "Un mapa de caminos olvidados que atraviesa tierras en guerra.",
+   "El sello real que autentica los decretos de la corona.",
+   "La espada ceremonial de una dinastía extinta.",
+   "El testimonio de un dragón que presenció la fundación del reino.",
+   "Un permiso de paso firmado por tres señores rivales.",
+   "Un antiguo pacto entre humanos, enanos y elfos.",
+   "La ubicación de una fortaleza que no aparece en los mapas.",
+   "Un heredero cuya identidad debe mantenerse en secreto."
+  ],
+  [
+   "Desatar una guerra sucesoria entre los grandes señores.",
+   "Dejar el reino bajo el gobierno de un regente ilegítimo.",
+   "Romper la frágil paz entre pueblos ancestrales.",
+   "Permitir que un ejército extranjero ocupe la capital.",
+   "Reavivar una disputa que llevaba siglos contenida.",
+   "Cambiar el equilibrio de poder entre la corona y los gremios.",
+   "Dejar una frontera indefensa ante criaturas y saqueadores.",
+   "Revelar que el derecho al trono se sostiene sobre una mentira."
+  ]
  ],
- "Fantasía oscura":[
- ["Un señor inmortal.","Un culto secreto.","Una hueste de muertos vivientes.","Una entidad demoníaca."],
- ["Romper una maldición heredada.","Recuperar un alma robada.","Vengar una atrocidad.","Evitar que la corrupción se extienda."],
- ["Un niño marcado por una profecía.","Una aldea condenada.","Un grimorio prohibido.","Un territorio contaminado."],
- ["Desatar una plaga sobrenatural.","Entregar una región a fuerzas oscuras.","Resucitar a un tirano.","Corromper una tierra para siempre."]
+ "Fantasía oscura": [
+  [
+   "Una familia noble mantiene su poder mediante sacrificios secretos.",
+   "Un santo venerado regresa convertido en algo monstruoso.",
+   "Una aldea entrega cada año a uno de sus habitantes a un bosque viviente.",
+   "Un inquisidor persigue a quienes manifiestan una magia que él mismo utiliza.",
+   "Una reina prolonga su vida robando los recuerdos de sus súbditos.",
+   "Los muertos de una guerra regresan reclamando las promesas de sus generales.",
+   "Un culto anuncia que el eclipse traerá la salvación, aunque sus fieles desaparecen.",
+   "Una plaga transforma lentamente a los habitantes en aquello que más temen."
+  ],
+  [
+   "Romper el pacto que alimenta la prosperidad de una familia maldita.",
+   "Encontrar qué nombre fue borrado de los registros de los muertos.",
+   "Rescatar a alguien entregado como tributo a una presencia antigua.",
+   "Impedir que una reliquia corrompa a quien la porte.",
+   "Descubrir por qué los difuntos se niegan a permanecer enterrados.",
+   "Atravesar una región donde la luz atrae a las criaturas.",
+   "Decidir si liberar a una entidad que mantiene encerrado algo peor.",
+   "Poner fin a una sucesión de sacrificios sin condenar a toda la comunidad."
+  ],
+  [
+   "Un libro escrito con los recuerdos de personas desaparecidas.",
+   "La sangre de un descendiente que desconoce su linaje.",
+   "Una campana que solo suena cuando alguien va a morir.",
+   "Un relicario que contiene un alma consciente.",
+   "El verdadero nombre de la entidad que reclama el territorio.",
+   "Un camino seguro a través de tierras infestadas.",
+   "Un testigo que sobrevivió a un ritual prohibido.",
+   "Un objeto cotidiano que perteneció a la primera víctima."
+  ],
+  [
+   "Extender una maldición a quienes nunca participaron en el pacto.",
+   "Devolver al mundo algo que debía permanecer muerto.",
+   "Convertir la salvación prometida en una condena colectiva.",
+   "Desatar una cacería contra quienes conocen la verdad.",
+   "Dejar a una comunidad sin recuerdos de su propia historia.",
+   "Liberar una fuerza que ni sus adoradores pueden controlar.",
+   "Consolidar el poder de una familia a costa de generaciones futuras.",
+   "Obligar a elegir quién cargará con la culpa de los demás."
+  ]
  ],
- "Ciencia ficción":[
- ["Un magnate de megacorporación.","Una red clandestina de colonos.","Una fuerza militar interestelar.","Una inteligencia artificial autónoma."],
- ["Robar tecnología experimental.","Recuperar datos desaparecidos.","Desactivar una máquina peligrosa.","Proteger a una tripulación."],
- ["Un científico desaparecido.","Una colonia aislada.","Un núcleo de energía.","Un prototipo de arma."],
- ["Provocar un colapso planetario.","Iniciar una guerra entre sistemas.","Derribar un gobierno colonial.","Liberar una inteligencia artificial hostil."]
+ "Ciencia ficción": [
+  [
+   "Una megacorporación declara propiedad privada una colonia habitada.",
+   "Una inteligencia artificial empieza a emitir órdenes usando la identidad de la tripulación.",
+   "Un carguero llega vacío después de enviar una señal de auxilio.",
+   "Un gobierno planetario oculta que su estación orbital está fallando.",
+   "Un grupo de terraformadores descubre organismos bajo la superficie.",
+   "Una flota militar bloquea una ruta comercial independiente.",
+   "Un clon reclama derechos sobre los recuerdos de su original.",
+   "Una expedición recibe una transmisión fechada varios siglos en el futuro."
+  ],
+  [
+   "Averiguar qué ocurrió con una nave que desapareció del radar.",
+   "Evitar que una colonia pierda su suministro de oxígeno.",
+   "Recuperar datos antes de que una corporación los borre.",
+   "Negociar el paso por un territorio espacial bloqueado.",
+   "Determinar si una inteligencia artificial está tomando decisiones propias.",
+   "Encontrar un reemplazo para una pieza que ya no se fabrica.",
+   "Proteger a quienes conocen el origen de una señal extraterrestre.",
+   "Decidir quién tiene autoridad sobre un descubrimiento científico."
+  ],
+  [
+   "Las coordenadas de una instalación fuera de los mapas oficiales.",
+   "Una muestra biológica que no coincide con ninguna especie conocida.",
+   "Un módulo de navegación con registros alterados.",
+   "Una batería capaz de mantener activa una ciudad durante meses.",
+   "La clave de acceso a una red de satélites abandonados.",
+   "Un testigo cuya memoria fue modificada.",
+   "Un prototipo que puede reparar tejidos o destruirlos.",
+   "Un acuerdo entre colonias que nunca fue ratificado."
+  ],
+  [
+   "Provocar un conflicto armado entre colonias independientes.",
+   "Dejar a miles de personas sin soporte vital.",
+   "Entregar el control de una región a una inteligencia artificial.",
+   "Revelar que una corporación experimentó con población civil.",
+   "Alterar el equilibrio político de varios sistemas estelares.",
+   "Permitir que una señal desconocida alcance todos los asentamientos.",
+   "Convertir un descubrimiento científico en un recurso militar.",
+   "Cuestionar quién puede ser considerado una persona."
+  ]
  ],
- "Terror":[
- ["Un vecino con un secreto inhumano.","Una sociedad cerrada.","Una criatura que acecha de noche.","Una presencia sobrenatural."],
- ["Sobrevivir a la persecución.","Recuperar a alguien desaparecido.","Destruir el origen de la amenaza.","Escapar de un lugar aislado."],
- ["Un testigo que sabe demasiado.","Un grupo de supervivientes.","Un objeto maldito.","Un edificio abandonado."],
- ["Desatar una matanza.","Extender el terror a una localidad.","Liberar algo encerrado.","Hacer que nadie pueda escapar."]
+ "Terror": [
+  [
+   "Los habitantes de un edificio oyen cada noche a alguien caminar por un piso que no existe.",
+   "Una familia recibe fotografías de una persona que nadie recuerda.",
+   "Un pueblo entero insiste en que una casa abandonada sigue habitada.",
+   "Un grupo de excursionistas encuentra sus propias huellas delante de ellos.",
+   "Una criatura imita las voces de personas desaparecidas.",
+   "Un médico descubre que varios pacientes sueñan con el mismo lugar.",
+   "Una transmisión de radio describe accidentes antes de que ocurran.",
+   "Alguien vuelve a casa después de años, pero su familia asegura que nunca se fue."
+  ],
+  [
+   "Sobrevivir hasta el amanecer sin atraer aquello que ronda la casa.",
+   "Encontrar a una persona antes de que todos olviden que existió.",
+   "Salir de un lugar cuyos pasillos cambian cuando nadie los mira.",
+   "Descubrir qué provoca las llamadas desde una línea desconectada.",
+   "Mantener a salvo a alguien que parece reconocer a la criatura.",
+   "Averiguar quién abrió la puerta que debía permanecer cerrada.",
+   "Escapar sin separarse de quienes todavía confían entre sí.",
+   "Entender qué ocurrió durante la hora que todos han olvidado."
+  ],
+  [
+   "Una grabación con una voz que no estaba presente al registrarla.",
+   "La llave de una habitación que no figura en los planos.",
+   "Un diario cuyas páginas aparecen escritas cada mañana.",
+   "Una fotografía donde cambia la posición de las personas.",
+   "Un refugio que la criatura parece incapaz de atravesar.",
+   "El nombre que la presencia repite desde lugares distintos.",
+   "Un objeto perteneciente a alguien que oficialmente nunca nació.",
+   "Un testigo que recuerda versiones incompatibles de la misma noche."
+  ],
+  [
+   "Hacer que la amenaza encuentre una salida al mundo exterior.",
+   "Dejar a alguien atrapado en el lugar en que desaparecieron los demás.",
+   "Revelar que la persona más confiable lleva tiempo ocultando algo.",
+   "Extender el fenómeno a quienes intenten investigarlo.",
+   "Obligar a los supervivientes a desconfiar de sus propios recuerdos.",
+   "Convertir un refugio seguro en el siguiente lugar de peligro.",
+   "Hacer que la desaparición parezca un accidente sin explicación.",
+   "Dejar una presencia libre para imitar a cualquiera."
+  ]
  ],
- "Misterio":[
- ["Un aristócrata de pasado dudoso.","Una sociedad de benefactores.","Un círculo de conspiradores.","Una figura que aparece en varios lugares."],
- ["Obtener una respuesta oculta.","Recuperar una pieza robada.","Destruir pruebas comprometedoras.","Evitar que se descubra una identidad."],
- ["Un testigo clave.","Una comunidad llena de secretos.","Una joya desaparecida.","Un libro de cuentas alterado."],
- ["Provocar un escándalo público.","Desencadenar acusaciones.","Arruinar la vida de un inocente.","Revelar una conspiración mayor."]
+ "Misterio": [
+  [
+   "Un coleccionista muere y todas las personas invitadas aseguran haber recibido una invitación distinta.",
+   "Una obra de arte robada reaparece en una habitación cerrada desde dentro.",
+   "Un pueblo recibe cartas que anuncian secretos aún no descubiertos.",
+   "Un testamento cambia cada vez que alguien lo lee.",
+   "Un miembro de una expedición desaparece y todos recuerdan un número distinto de integrantes.",
+   "Un objeto sin valor aparente provoca una disputa entre familias influyentes.",
+   "Una persona confiesa un crimen que todavía no ha ocurrido.",
+   "Un cadáver aparece con pertenencias de varias personas que siguen vivas."
+  ],
+  [
+   "Reconstruir qué ocurrió durante una reunión a puerta cerrada.",
+   "Identificar quién se beneficia de una desaparición aparentemente voluntaria.",
+   "Averiguar por qué varias personas cuentan la misma mentira.",
+   "Descubrir el origen de un objeto que nadie admite haber visto antes.",
+   "Determinar cuál de varias versiones incompatibles es auténtica.",
+   "Encontrar la conexión entre sucesos que parecen no tener relación.",
+   "Resolver un robo sin acusar a la persona equivocada.",
+   "Establecer qué ocurrió antes de que se destruyeran las pruebas."
+  ],
+  [
+   "Una lista de invitados con un nombre añadido a mano.",
+   "Una llave que abre más de una propiedad.",
+   "Un registro con una fecha imposible.",
+   "Una carta cuyo remitente niega haberla escrito.",
+   "Un objeto que aparece en varias escenas sin explicación.",
+   "El testimonio de alguien que no puede revelar su identidad.",
+   "Un plano con una habitación que no existe oficialmente.",
+   "Una prueba que contradice la coartada más convincente."
+  ],
+  [
+   "Destruir la reputación de una familia respetada.",
+   "Convertir a un inocente en el principal sospechoso.",
+   "Reabrir un caso que alguien poderoso consiguió cerrar.",
+   "Demostrar que varias personas protegían al mismo culpable.",
+   "Revelar que la víctima organizó parte de lo ocurrido.",
+   "Provocar una disputa por una herencia o una identidad.",
+   "Dejar sin resolver la pregunta más importante del caso.",
+   "Exponer un secreto que afecta a toda la comunidad."
+  ]
  ],
- "Investigación":[
- ["Un funcionario con información reservada.","Una agencia de investigación.","Una unidad policial o militar.","Una red de contrabandistas."],
- ["Encontrar al responsable.","Recuperar evidencia sustraída.","Desmantelar una operación.","Proteger a un testigo."],
- ["Un testigo protegido.","Una comunidad bajo sospecha.","Un objeto de la escena del crimen.","Un archivo clasificado."],
- ["Provocar una crisis institucional.","Desatar una guerra entre organizaciones.","Derribar a una autoridad corrupta.","Desatar una persecución generalizada."]
+ "Investigación": [
+  [
+   "Una periodista recibe documentos sobre contratos públicos que nunca debieron existir.",
+   "Un laboratorio informa resultados contradictorios y luego retira el informe.",
+   "Una organización denuncia irregularidades, pero sus propios archivos han sido alterados.",
+   "Un funcionario desaparece después de solicitar una auditoría.",
+   "Varias empresas registran operaciones idénticas en lugares distintos.",
+   "Un barrio reporta incidentes que las autoridades clasifican como hechos aislados.",
+   "Un investigador independiente encuentra una conexión entre casos archivados.",
+   "Una fuente anónima ofrece pruebas a cambio de protección."
+  ],
+  [
+   "Verificar si las pruebas sostienen una denuncia pública.",
+   "Reconstruir una cadena de decisiones que terminó en un daño colectivo.",
+   "Identificar quién alteró los registros y con qué propósito.",
+   "Contrastar testimonios antes de que los involucrados coordinen sus versiones.",
+   "Seguir el recorrido de fondos que desaparecieron de una institución.",
+   "Determinar si los incidentes comparten una causa común.",
+   "Proteger a una fuente sin comprometer la investigación.",
+   "Publicar una conclusión que resista el escrutinio y la presión."
+  ],
+  [
+   "Acceso legal a archivos restringidos o desclasificados.",
+   "Una cadena de custodia que permita validar las pruebas.",
+   "Un registro financiero con movimientos inexplicables.",
+   "Entrevistas independientes con personas de distintos niveles.",
+   "Una muestra que debe ser analizada por un laboratorio imparcial.",
+   "Una cronología verificable de los acontecimientos.",
+   "La cooperación de alguien que teme represalias.",
+   "Un documento original que contradice las copias oficiales."
+  ],
+  [
+   "Exponer una red de corrupción con alcance institucional.",
+   "Poner en riesgo a quienes entregaron información confidencial.",
+   "Provocar la caída de una investigación por contaminación de pruebas.",
+   "Obligar a una institución a reconocer años de negligencia.",
+   "Desencadenar una disputa pública entre organismos rivales.",
+   "Dejar a una comunidad sin respuestas ni responsables claros.",
+   "Cambiar la legislación o los protocolos de una institución.",
+   "Revelar que una fuente clave también ocultó información."
+  ]
  ],
- "Aventura":[
- ["Un explorador famoso.","Una compañía de buscadores.","Una expedición armada.","Un rival que busca el mismo tesoro."],
- ["Encontrar un destino legendario.","Recuperar un tesoro perdido.","Destruir un obstáculo imposible.","Proteger a los compañeros de viaje."],
- ["Un guía experimentado.","Una caravana o expedición.","Un mapa incompleto.","Una región inexplorada."],
- ["Desatar una catástrofe natural.","Iniciar una disputa territorial.","Liberar una criatura antigua.","Cambiar una ruta comercial para siempre."]
+ "Aventura": [
+  [
+   "Un explorador anuncia haber encontrado una ruta que no aparece en ningún mapa.",
+   "Una expedición rival parte con ventaja hacia un territorio inexplorado.",
+   "Un barco queda varado en una costa que cambia con las mareas.",
+   "Un inventor ofrece una recompensa por recuperar su creación perdida.",
+   "Un guía local se niega a volver al lugar que conoce mejor que nadie.",
+   "Una caravana desaparece en una ruta que todos consideran segura.",
+   "Un mapa antiguo llega a manos de personas que no saben leerlo.",
+   "Una celebración se interrumpe cuando alguien roba el objeto central del evento."
+  ],
+  [
+   "Llegar a un destino antes que una expedición rival.",
+   "Recuperar algo perdido durante un viaje peligroso.",
+   "Encontrar una ruta segura a través de un territorio desconocido.",
+   "Acompañar a alguien hasta un lugar al que no puede llegar solo.",
+   "Resolver cómo continuar cuando el transporte queda inutilizado.",
+   "Reunir a los miembros de una expedición dispersa.",
+   "Entregar un objeto antes de que termine una oportunidad única.",
+   "Descubrir qué hay más allá de una región que nadie ha cruzado."
+  ],
+  [
+   "Un mapa incompleto con marcas hechas por viajeros distintos.",
+   "Un vehículo que necesita piezas difíciles de conseguir.",
+   "Un guía que conoce una ruta alternativa.",
+   "Provisiones suficientes para atravesar una zona aislada.",
+   "Una herramienta diseñada para superar un obstáculo natural.",
+   "Un permiso para cruzar territorios controlados por terceros.",
+   "La ayuda de una comunidad que conoce el entorno.",
+   "Un objeto que sirve como prueba de haber alcanzado el destino."
+  ],
+  [
+   "Dejar una ruta peligrosa abierta para futuros viajeros.",
+   "Desencadenar una competencia entre quienes reclaman el hallazgo.",
+   "Poner a una comunidad en contacto con un peligro desconocido.",
+   "Perder la oportunidad de regresar por el mismo camino.",
+   "Revelar que el destino buscado era distinto de lo que indicaba el mapa.",
+   "Cambiar el futuro de una región aislada.",
+   "Dejar un descubrimiento valioso en manos de quienes lo explotarían.",
+   "Obligar a elegir entre completar el viaje o ayudar a otros."
+  ]
  ],
- "Western":[
- ["Un terrateniente poderoso.","Una banda de forajidos.","Una compañía ferroviaria armada.","Un agente de la ley corrupto."],
- ["Conseguir una recompensa.","Recuperar ganado robado.","Vengarse de una emboscada.","Proteger a una familia amenazada."],
- ["Un testigo del último asalto.","Un pueblo fronterizo.","Una caja fuerte con dinero.","Una mina disputada."],
- ["Provocar una guerra entre bandas.","Desencadenar una disputa territorial.","Expulsar a los habitantes de sus tierras.","Convertir la frontera en tierra sin ley."]
+ "Western": [
+  [
+   "Una compañía ferroviaria reclama tierras que pertenecen a pequeños rancheros.",
+   "Un alguacil llega a un pueblo donde nadie reconoce su autoridad.",
+   "Una banda roba ganado y deja pruebas para culpar a un rival.",
+   "Un buscador de oro encuentra algo que contradice el título de propiedad de una mina.",
+   "Un terrateniente contrata pistoleros para expulsar a los habitantes de un valle.",
+   "Un antiguo forajido regresa justo antes de una elección local.",
+   "Una caravana desaparece entre dos puestos fronterizos.",
+   "Un juez itinerante debe resolver una disputa que divide al pueblo."
+  ],
+  [
+   "Impedir que una compañía expulse a varias familias de sus tierras.",
+   "Encontrar a alguien que huyó con el dinero de una recompensa.",
+   "Escoltar un cargamento a través de un territorio disputado.",
+   "Averiguar quién provocó un enfrentamiento entre ranchos rivales.",
+   "Conseguir que un testigo llegue vivo al juicio.",
+   "Recuperar documentos que prueban la propiedad de un rancho.",
+   "Restablecer el orden sin convertir el pueblo en un campo de batalla.",
+   "Decidir si aceptar una recompensa por capturar a alguien conocido."
+  ],
+  [
+   "La escritura original de un terreno vendido bajo amenaza.",
+   "Un caballo capaz de recorrer largas distancias sin descanso.",
+   "Un testigo dispuesto a declarar en público.",
+   "Un libro de cuentas con pagos a pistoleros.",
+   "Un telegrama que llegó antes de ser enviado.",
+   "Un mapa de pozos de agua en una región seca.",
+   "Una insignia cuya autoridad nadie reconoce ya.",
+   "Un acuerdo firmado por las familias enfrentadas."
+  ],
+  [
+   "Desatar una guerra abierta por el control del territorio.",
+   "Dejar el pueblo bajo el dominio de una compañía privada.",
+   "Convertir a un fugitivo en símbolo de resistencia.",
+   "Provocar represalias contra quienes testificaron.",
+   "Reabrir una disputa que separó a varias familias.",
+   "Hacer que la ley pierda toda credibilidad en la región.",
+   "Entregar el único suministro de agua a un terrateniente.",
+   "Obligar a la comunidad a decidir qué significa realmente la justicia."
+  ]
  ],
- "Postapocalíptico":[
- ["Un jefe de asentamiento.","Una red de saqueadores.","Una milicia de carretera.","Una bestia mutada."],
- ["Conseguir agua o alimento.","Recuperar medicinas perdidas.","Destruir una fuente de contaminación.","Proteger un refugio."],
- ["Un médico indispensable.","Un asentamiento aislado.","Un depósito de combustible.","Una reserva de agua."],
- ["Provocar una nueva catástrofe.","Desatar una guerra por recursos.","Someter a los supervivientes.","Obligar a miles a abandonar su hogar."]
+ "Postapocalíptico": [
+  [
+   "Una comunidad fortificada descubre que su reserva de agua está contaminada.",
+   "Una caravana regresa con menos personas de las que partieron y sin explicar por qué.",
+   "Una banda controla el único puente que sigue en pie.",
+   "Un asentamiento recibe una señal desde una ciudad declarada inhabitable.",
+   "Un líder distribuye medicinas según un registro que nadie puede revisar.",
+   "Un grupo de recolectores encuentra instalaciones que aún tienen energía.",
+   "Una tormenta obliga a comunidades rivales a compartir refugio.",
+   "Un antiguo sistema automatizado comienza a cerrar las rutas de suministro."
+  ],
+  [
+   "Asegurar agua potable antes de que se agoten las reservas.",
+   "Encontrar un lugar habitable para quienes perdieron su refugio.",
+   "Reparar una infraestructura de la que dependen varios asentamientos.",
+   "Negociar el paso por una ruta controlada por una facción hostil.",
+   "Averiguar por qué las provisiones desaparecen durante la noche.",
+   "Evacuar a un grupo antes de que llegue una amenaza ambiental.",
+   "Decidir cómo repartir un recurso que no alcanza para todos.",
+   "Contactar con otra comunidad sin revelar la ubicación del asentamiento."
+  ],
+  [
+   "Un filtro capaz de purificar agua contaminada.",
+   "Un generador compatible con piezas recuperadas.",
+   "Un mapa actualizado de zonas transitables.",
+   "Medicinas que requieren conservación especial.",
+   "Una batería con carga suficiente para activar una antena.",
+   "Un vehículo reparable y combustible limitado.",
+   "La confianza de una comunidad que controla un recurso vital.",
+   "Un manual técnico de una instalación abandonada."
+  ],
+  [
+   "Dejar a un asentamiento sin su principal fuente de agua.",
+   "Desatar un conflicto por el control de los recursos restantes.",
+   "Exponer a una comunidad a una amenaza que creía superada.",
+   "Concentrar el poder en quienes controlan la infraestructura.",
+   "Obligar a abandonar un territorio que parecía seguro.",
+   "Reactivar una tecnología cuyo funcionamiento nadie comprende del todo.",
+   "Romper una alianza necesaria para la supervivencia colectiva.",
+   "Cambiar quién decide cómo se distribuyen los recursos."
+  ]
  ],
- "Horror cósmico":[
- ["Un académico obsesionado.","Una secta clandestina.","Una criatura llegada del vacío.","Una inteligencia incomprensible."],
- ["Descifrar una señal imposible.","Recuperar un artefacto alienígena.","Destruir un portal.","Evitar que algo despierte."],
- ["Una persona que oyó la señal.","Un pueblo apartado.","Un fragmento de meteorito.","Un manuscrito anterior a la humanidad."],
- ["Provocar una ruptura de la realidad.","Desencadenar un conflicto entre cultos.","Liberar una presencia exterior.","Cambiar las leyes de la naturaleza."]
+ "Horror cósmico": [
+  [
+   "Un observatorio detecta una constelación que no aparece en ningún registro histórico.",
+   "Una expedición vuelve hablando de un lugar que no puede localizarse dos veces.",
+   "Un culto interpreta una señal astronómica como la llegada de algo anterior al universo.",
+   "Una comunidad costera encuentra estructuras bajo el mar que parecen crecer.",
+   "Un matemático descubre que una fórmula predice acontecimientos imposibles.",
+   "Una transmisión llega desde una estación que fue destruida décadas atrás.",
+   "Varias personas sueñan con la misma arquitectura y despiertan con recuerdos ajenos.",
+   "Un archivo antiguo describe un fenómeno que está ocurriendo en el cielo."
+  ],
+  [
+   "Determinar si la señal recibida tiene un origen humano o algo distinto.",
+   "Impedir que una expedición repita un contacto que alteró a sus integrantes.",
+   "Comprender por qué ciertos lugares desaparecen de los mapas y de la memoria.",
+   "Encontrar el origen de una secuencia que aparece en documentos separados por siglos.",
+   "Evitar que una comunidad complete un ritual cuyo propósito desconoce.",
+   "Registrar un fenómeno antes de que cambie de forma o desaparezca.",
+   "Descubrir qué relación existe entre los sueños de personas desconocidas.",
+   "Decidir si revelar un hallazgo que podría destruir certezas fundamentales."
+  ],
+  [
+   "Un registro astronómico anterior a la historia conocida.",
+   "Una muestra cuya estructura cambia al ser observada.",
+   "Un conjunto de símbolos repetidos en culturas sin contacto conocido.",
+   "Un dispositivo que recibe señales sin fuente identificable.",
+   "El testimonio de alguien que recuerda haber vivido otra versión del mundo.",
+   "Un mapa que solo coincide con el terreno durante ciertas horas.",
+   "Una traducción incompleta de un texto anterior a la humanidad.",
+   "Un instrumento capaz de medir una presencia que no debería existir."
+  ],
+  [
+   "Alterar la percepción de la realidad de quienes conocen el hallazgo.",
+   "Atraer la atención de algo que no distingue entre individuos y civilizaciones.",
+   "Revelar que la humanidad ocupa un lugar irrelevante en un proceso inmenso.",
+   "Hacer que un fenómeno imposible se vuelva permanente.",
+   "Destruir la confianza en los recuerdos y registros compartidos.",
+   "Abrir una vía de contacto que nadie sabe cerrar.",
+   "Cambiar la comprensión del tiempo, el espacio o la identidad.",
+   "Dejar a los investigadores con una verdad imposible de comunicar."
+  ]
  ],
- "Comedia":[
- ["Un noble incompetente.","Una asociación absurda.","Una guardia mal organizada.","Un inventor con ideas desastrosas."],
- ["Conseguir algo ridículamente específico.","Recuperar un objeto extraviado.","Destruir una máquina fuera de control.","Proteger un secreto vergonzoso."],
- ["Una persona que entendió todo mal.","Un pueblo lleno de personajes raros.","Un trofeo sin valor aparente.","Una receta imposible."],
- ["Provocar un desastre por accidente.","Desencadenar una pelea multitudinaria.","Someter a todos mediante una regla absurda.","Cambiar el destino por un malentendido."]
+ "Comedia": [
+  [
+   "Un alcalde prohíbe una costumbre local que resulta ser la base de toda la economía del pueblo.",
+   "Dos familias rivales organizan por error la misma celebración en el mismo lugar.",
+   "Una persona mediocre es confundida con el experto más buscado del país.",
+   "Una asociación secreta pierde el objeto absurdo que juró proteger.",
+   "Un concurso insignificante recibe una atención desproporcionada de autoridades y medios.",
+   "Un inventor presenta una máquina que resuelve problemas creando otros peores.",
+   "Un grupo de vecinos interpreta una instrucción sencilla de maneras incompatibles.",
+   "Un funcionario intenta ocultar un error administrativo que ya afecta a toda la ciudad."
+  ],
+  [
+   "Conseguir que dos grupos enfrentados acepten compartir un mismo evento.",
+   "Recuperar un objeto ridículo antes de que comience una ceremonia oficial.",
+   "Mantener una mentira pequeña sin perjudicar a quienes confían en ella.",
+   "Evitar que un malentendido termine convertido en asunto de Estado.",
+   "Organizar una solución improvisada con recursos completamente inadecuados.",
+   "Demostrar quién tiene razón sin admitir los propios errores.",
+   "Conseguir que alguien importante llegue a tiempo y en condiciones presentables.",
+   "Deshacer una cadena de favores que nadie recuerda haber pedido."
+  ],
+  [
+   "Un formulario que debe llevar una firma imposible de conseguir.",
+   "Un disfraz que ya ha sido usado por demasiadas personas.",
+   "Una receta cuya preparación se convirtió en tradición oficial.",
+   "Un objeto barato tratado como tesoro nacional.",
+   "La cooperación de dos personas que no se soportan.",
+   "Un vehículo poco fiable y un horario demasiado ajustado.",
+   "Un reglamento lleno de excepciones absurdas.",
+   "Una grabación que demuestra lo contrario de lo que se quería probar."
+  ],
+  [
+   "Provocar una crisis pública por un asunto completamente trivial.",
+   "Convertir a una persona equivocada en héroe local.",
+   "Hacer que dos instituciones compitan por resolver el mismo problema.",
+   "Revelar que el supuesto gran plan dependía de una confusión.",
+   "Dejar a todo el pueblo comprometido con una tradición inventada.",
+   "Transformar un error menor en una costumbre difícil de abandonar.",
+   "Obligar a los responsables a reconocer que nadie entendió las instrucciones.",
+   "Resolver el conflicto de una forma tan torpe que todos la consideren un éxito."
+  ]
  ]
 };
+
 function rollAll(){
  const genre=$("randomGenre").value,tone=$("randomTone").value;
  const fallbackTables=[
