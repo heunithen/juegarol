@@ -249,7 +249,7 @@ async function saveRoomSetup(){
  const name=$("setupPlayerName").value.trim().replace(/[<>]/g,"").slice(0,32);
  const gameName=$("setupGameName")?.value.trim().replace(/[<>]/g,"").slice(0,80)||"";
  if(!name){$("roomSetupError").textContent="Escribe tu nombre de jugador.";return;}
- if(roomState?.me?.is_host && !gameName){$("roomSetupError").textContent="Escribe el nombre del juego.";return;}
+ if($("setupGameWrap") && !$("setupGameWrap").classList.contains("hidden") && !gameName){$("roomSetupError").textContent="Escribe el nombre del juego.";return;}
  $("roomSetupSave").disabled=true;$("roomSetupError").textContent="Guardando...";
  try{
   await api("configure",{roomId:session.roomId,token:session.token,name,gameName});
