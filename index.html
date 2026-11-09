@@ -311,13 +311,14 @@ header{background:#000;border-bottom:1px solid var(--line);padding:12px 22px}
 </section>
 
 <section id="roomView" class="hidden">
+ <div class="cats-pin" id="catsPinned"><div class="cats-pin-head"><span class="pin-icon">📌</span><span>CUESTIONARIO DE PARTIDA</span></div><div class="cats-pin-content"><div><strong>Cuestionario de partida</strong><p>Responde los cuatro apartados y define líneas y velos. Puedes volver cuando quieras para consultar o modificar tus respuestas.</p><span id="formProgress" class="cats-pin-progress">0 de 4 apartados respondidos</span></div><button class="cats-pin-button" id="startForm" type="button">Abrir cuestionario</button></div></div>
  <div class="panel">
   <div class="room-head"><div><div class="room-meta"><span class="badge">C.A.T.S. EN CURSO</span><span id="hostBadge" class="badge host hidden">ANFITRIÓN</span></div><h2 id="roomTitle" style="margin:8px 0 0">Partida</h2><p id="roomGame" style="margin:5px 0 0;color:var(--gold)">Juego</p></div><div><div class="muted" style="font-size:11px">ENLACE PARA INVITAR</div><div id="inviteUrl" style="max-width:320px;overflow-wrap:anywhere;color:var(--muted);font-size:12px;margin:6px 0">Enlace para compartir</div><div style="margin:8px 0;color:var(--gold);font-weight:700">Código: <span id="roomCodeDisplay"></span></div><div class="actions"><button class="small" id="copyInvite">Copiar enlace</button><button class="small" id="backToRooms">Volver al portal</button></div></div></div>
   <p id="roomStatus">Comparte el enlace para invitar a los demás jugadores.</p>
     <div id="roomSetup" class="cats-card hidden"></div>
  </div>
  <div id="roomContent" class="hidden">
- <div class="cats-pin" id="catsPinned"><div class="cats-pin-head"><span class="pin-icon">📌</span><span>CUESTIONARIO DE PARTIDA</span></div><div class="cats-pin-content"><div><strong>Cuestionario de partida</strong><p>Responde los cuatro apartados y define líneas y velos. Puedes volver cuando quieras para consultar o modificar tus respuestas.</p><span id="formProgress" class="cats-pin-progress">0 de 4 apartados respondidos</span></div><button class="cats-pin-button" id="startForm" type="button">Abrir cuestionario</button></div></div><div class="room-layout"><aside class="panel"><div class="section-toggle"><h2>Participantes</h2><span id="participantCount" class="badge">0/12</span></div><div id="participants" class="participants"></div><div class="actions"><button id="leaveRoom" class="danger">Salir de C.A.T.S.</button></div></aside></div>
+ <div class="room-layout"><aside class="panel"><div class="section-toggle"><h2>Participantes</h2><span id="participantCount" class="badge">0/12</span></div><div id="participants" class="participants"></div><div class="actions"><button id="leaveRoom" class="danger">Salir de C.A.T.S.</button></div></aside></div>
  <section class="panel"><div class="section-toggle"><div><h2>Respuestas de C.A.T.S.</h2><p>Las respuestas aparecen aquí cuando cada jugador las guarda.</p></div><button class="small" id="refreshRoom">Actualizar</button></div><div id="review" class="review-grid"></div><div id="matches" class="match-summary"></div></section>
   </div>
 </section><section id="catsScreen" class="hidden"><div class="question-shell"><div class="question-top"><button id="closeCats" type="button">← Volver a C.A.T.S.</button><span id="questionCounter" class="badge">Pregunta 1 de 4</span></div><div class="question-progress"><div id="questionProgressBar"></div></div><div class="question-body"><div class="cats-title"><span id="questionLetter" class="letter">C</span><div><h2 id="questionTitle">Concepto</h2><p id="questionPrompt">¿De qué trata la partida?</p></div></div><div id="standardQuestionFields"><p class="question-hint">Puedes elegir varias opciones y añadir una descripción propia.</p><div id="questionOptions" class="options question-options"></div><label for="questionText">Otra idea o detalle (opcional)</label><textarea id="questionText" maxlength="600" placeholder="Escribe aquí una respuesta propia..."></textarea></div><div id="safetyFields" class="hidden"><p>Antes de jugar, cada persona puede indicar contenidos que quiere excluir o tratar de forma indirecta. Estas respuestas se comparten con todo el grupo.</p><section class="cats-card"><h3>Líneas</h3><p>Son límites absolutos: contenidos que no deben aparecer en la partida, ni siquiera mencionados o representados.</p><div class="chat-compose"><input id="lineInput" maxlength="200" placeholder="Añadir una línea..."><button class="primary" id="addLine" type="button">+</button></div><ul id="linesList"></ul></section><section class="cats-card"><h3>Velos</h3><p>Son contenidos que pueden existir en la ficción, pero no se describen ni representan explícitamente; quedan fuera de escena.</p><div class="chat-compose"><input id="veilInput" maxlength="200" placeholder="Añadir un velo..."><button class="primary" id="addVeil" type="button">+</button></div><ul id="veilsList"></ul></section></div><div id="questionSaveStatus" class="muted" aria-live="polite">Los cambios se guardan automáticamente.</div></div><div class="question-bottom"><button id="questionPrev" type="button">Anterior</button><button class="primary" id="questionNext" type="button">Siguiente</button></div></div></section>
@@ -886,6 +887,7 @@ function enterRoom(data){
  const isHost=!!data.participant.is_host;
  const needsName=!data.restored;
  const needsGame=isHost && (!data.room.game_name || data.room.game_name==="Juego sin especificar");
+ $("startForm").disabled=needsName||needsGame;
  if(needsName||needsGame){
   $("roomContent").classList.add("hidden");
   $("roomSetup").classList.remove("hidden");
@@ -908,7 +910,7 @@ async function saveRoomSetup(){
  try{
   await api("configure",{roomId:session.roomId,token:session.token,name,gameName});
   profileName=name;
-  $("roomSetup").classList.add("hidden");$("roomContent").classList.remove("hidden");
+  $("roomSetup").classList.add("hidden");$("roomContent").classList.remove("hidden");$("startForm").disabled=false;
   await refreshRoom();
  }catch(e){$("roomSetupError").textContent=e.message;}
  finally{if($("roomSetupSave"))$("roomSetupSave").disabled=false;}
