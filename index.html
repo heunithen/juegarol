@@ -138,10 +138,10 @@ header{background:#000;border-bottom:1px solid var(--line);padding:12px 22px}
  <div id="recoveryMessage" class="muted" aria-live="polite"></div>
 </section>
 
-<section id="profileSetup" class="panel hidden"><h2>Configurar nombre de jugador</h2><p>Elige el nombre que aparecerá en las salas y junto a tus respuestas.</p><label for="profileNameInput">Nombre de jugador</label><input id="profileNameInput" maxlength="32" placeholder="Tu nombre"><div class="actions"><button class="primary" id="saveProfile">Guardar nombre</button></div><div id="profileMessage" class="error" role="alert"></div></section>
+<section id="profileSetup" class="panel hidden"><h2>Configurar nombre de jugador</h2><p>Elige el nombre que aparecerá junto a tus respuestas en C.A.T.S.</p><label for="profileNameInput">Nombre de jugador</label><input id="profileNameInput" maxlength="32" placeholder="Tu nombre"><div class="actions"><button class="primary" id="saveProfile">Guardar nombre</button></div><div id="profileMessage" class="error" role="alert"></div></section>
 <section id="home">
  <nav class="home-tabs" role="tablist" aria-label="Secciones principales">
-  <button type="button" class="home-tab active" id="tabRooms" role="tab" aria-selected="true" aria-controls="homeTabRooms">Punto de encuentro</button>
+  <button type="button" class="home-tab active" id="tabRooms" role="tab" aria-selected="true" aria-controls="homeTabRooms">Herramientas</button>
   <button type="button" class="home-tab" id="tabWanted" role="tab" aria-selected="false" aria-controls="homeTabWanted">¿Qué quieres jugar?</button>
   <button type="button" class="home-tab" id="tabEvents" role="tab" aria-selected="false" aria-controls="homeTabEvents">Eventos</button>
   <button type="button" class="home-tab" id="tabCommunities" role="tab" aria-selected="false" aria-controls="homeTabCommunities">Comunidades</button>
@@ -150,8 +150,8 @@ header{background:#000;border-bottom:1px solid var(--line);padding:12px 22px}
  </nav>
  <div id="homeTabRooms" class="home-tab-panel" role="tabpanel" aria-labelledby="tabRooms">
  <section id="homeCreatePanel" class="panel">
-  <h2>Crear una sala</h2><p>Crea una sala donde puedas ponerte de acuerdo con otros jugadores sobre qué jugar, cómo y cuándo, en tiempo real y mediante un cuestionario colaborativo. Propongan ideas con el cuestionario de partida y definan sus límites y preferencias utilizando herramientas de seguridad como líneas y velos. Llegar a estos acuerdos antes de la sesión 0 puede ayudar a prevenir malos ratos durante la partida.</p>
-  <div class="actions"><button class="primary" id="createRoom">Crear una sala</button></div><div class="join-room-box"><label for="roomCodeInput">Unirse a una sala con código</label><div class="actions"><input id="roomCodeInput" maxlength="6" autocomplete="off" placeholder="Código de 6 caracteres" aria-label="Código de sala"><button id="joinRoomCode" type="button">Unirse</button></div></div>
+  <h2>¿Qué es C.A.T.S.?</h2><p>C.A.T.S. es una herramienta colaborativa para preparar una partida de rol: permite acordar el <strong>Concepto</strong>, la <strong>Acción u objetivo</strong>, el <strong>Tono</strong> y la <strong>Temática</strong>, además de establecer límites mediante líneas y velos. Pulsa <strong>Ocupar C.A.T.S.</strong> para iniciar un espacio de preparación, indica tu nombre y el juego, y comparte el enlace o el código que se genera. Los demás jugadores podrán entrar desde sus dispositivos, responder el cuestionario y ponerse de acuerdo contigo antes de jugar.</p>
+  <div class="actions"><button class="primary" id="createRoom">Ocupar C.A.T.S.</button></div><div class="join-room-box"><label for="roomCodeInput">Entrar a C.A.T.S. con código</label><div class="actions"><input id="roomCodeInput" maxlength="6" autocomplete="off" placeholder="Código de 6 caracteres" aria-label="Código de C.A.T.S."><button id="joinRoomCode" type="button">Unirse</button></div></div>
  </section>
  <section class="panel" id="randomTools">
   <div><h2>Generador aleatorio</h2><p>¿El grupo no sabe qué jugar o se quedaron sin ideas? Utiliza el generador aleatorio para encontrar inspiración y descubrir nuevas posibilidades para tu próxima partida.</p></div>
@@ -312,16 +312,16 @@ header{background:#000;border-bottom:1px solid var(--line);padding:12px 22px}
 
 <section id="roomView" class="hidden">
  <div class="panel">
-  <div class="room-head"><div><div class="room-meta"><span class="badge">SALA DE JUEGO</span><span id="hostBadge" class="badge host hidden">ANFITRIÓN</span></div><h2 id="roomTitle" style="margin:8px 0 0">Partida</h2><p id="roomGame" style="margin:5px 0 0;color:var(--gold)">Juego</p></div><div><div class="muted" style="font-size:11px">ENLACE PARA INVITAR</div><div id="inviteUrl" style="max-width:320px;overflow-wrap:anywhere;color:var(--muted);font-size:12px;margin:6px 0">Enlace de la sala</div><div style="margin:8px 0;color:var(--gold);font-weight:700">Código: <span id="roomCodeDisplay"></span></div><div class="actions"><button class="small" id="copyInvite">Copiar enlace</button><button class="small" id="backToRooms">Volver al portal</button></div></div></div>
+  <div class="room-head"><div><div class="room-meta"><span class="badge">C.A.T.S. EN CURSO</span><span id="hostBadge" class="badge host hidden">ANFITRIÓN</span></div><h2 id="roomTitle" style="margin:8px 0 0">Partida</h2><p id="roomGame" style="margin:5px 0 0;color:var(--gold)">Juego</p></div><div><div class="muted" style="font-size:11px">ENLACE PARA INVITAR</div><div id="inviteUrl" style="max-width:320px;overflow-wrap:anywhere;color:var(--muted);font-size:12px;margin:6px 0">Enlace para compartir</div><div style="margin:8px 0;color:var(--gold);font-weight:700">Código: <span id="roomCodeDisplay"></span></div><div class="actions"><button class="small" id="copyInvite">Copiar enlace</button><button class="small" id="backToRooms">Volver al portal</button></div></div></div>
   <p id="roomStatus">Comparte el enlace para invitar a los demás jugadores.</p>
-  <div id="hostRoomControls" class="actions hidden" style="margin:10px 0"><button id="toggleRoomClosed" class="danger small" type="button">Cerrar sala</button><span class="muted">Solo el anfitrión puede gestionar el acceso a la sala.</span></div>
+  <div id="hostRoomControls" class="actions hidden" style="margin:10px 0"><button id="toggleRoomClosed" class="danger small" type="button">Cerrar C.A.T.S.</button><span class="muted">Solo quien inició este C.A.T.S. puede gestionar el acceso.</span></div>
   <div id="roomSetup" class="cats-card hidden"></div>
  </div>
  <div id="roomContent" class="hidden">
- <div class="cats-pin" id="catsPinned"><div class="cats-pin-head"><span class="pin-icon">📌</span><span>CUESTIONARIO DE PARTIDA</span><button class="cats-pin-close" id="closePinned" type="button" aria-label="Ocultar cuestionario">×</button></div><div class="cats-pin-content"><div><strong>Cuestionario de partida</strong><p>Responde los cuatro apartados y define líneas y velos. Puedes volver cuando quieras para consultar o modificar tus respuestas.</p><span id="formProgress" class="cats-pin-progress">0 de 4 apartados respondidos</span></div><button class="cats-pin-button" id="startForm" type="button">Abrir cuestionario</button></div></div><div class="room-layout"><aside class="panel"><div class="section-toggle"><h2>Participantes</h2><span id="participantCount" class="badge">0/12</span></div><div id="participants" class="participants"></div><div class="actions"><button id="leaveRoom" class="danger">Salir de la sala</button></div></aside></div>
- <section class="panel"><div class="section-toggle"><div><h2>Respuestas de la sala</h2><p>Las respuestas aparecen aquí cuando cada jugador las guarda.</p></div><button class="small" id="refreshRoom">Actualizar</button></div><div id="review" class="review-grid"></div><div id="matches" class="match-summary"></div></section>
+ <div class="cats-pin" id="catsPinned"><div class="cats-pin-head"><span class="pin-icon">📌</span><span>CUESTIONARIO DE PARTIDA</span><button class="cats-pin-close" id="closePinned" type="button" aria-label="Ocultar cuestionario">×</button></div><div class="cats-pin-content"><div><strong>Cuestionario de partida</strong><p>Responde los cuatro apartados y define líneas y velos. Puedes volver cuando quieras para consultar o modificar tus respuestas.</p><span id="formProgress" class="cats-pin-progress">0 de 4 apartados respondidos</span></div><button class="cats-pin-button" id="startForm" type="button">Abrir cuestionario</button></div></div><div class="room-layout"><aside class="panel"><div class="section-toggle"><h2>Participantes</h2><span id="participantCount" class="badge">0/12</span></div><div id="participants" class="participants"></div><div class="actions"><button id="leaveRoom" class="danger">Salir de C.A.T.S.</button></div></aside></div>
+ <section class="panel"><div class="section-toggle"><div><h2>Respuestas de C.A.T.S.</h2><p>Las respuestas aparecen aquí cuando cada jugador las guarda.</p></div><button class="small" id="refreshRoom">Actualizar</button></div><div id="review" class="review-grid"></div><div id="matches" class="match-summary"></div></section>
   </div>
-</section><section id="catsScreen" class="hidden"><div class="question-shell"><div class="question-top"><button id="closeCats" type="button">← Volver a la sala</button><span id="questionCounter" class="badge">Pregunta 1 de 4</span></div><div class="question-progress"><div id="questionProgressBar"></div></div><div class="question-body"><div class="cats-title"><span id="questionLetter" class="letter">C</span><div><h2 id="questionTitle">Concepto</h2><p id="questionPrompt">¿De qué trata la partida?</p></div></div><div id="standardQuestionFields"><p class="question-hint">Puedes elegir varias opciones y añadir una descripción propia.</p><div id="questionOptions" class="options question-options"></div><label for="questionText">Otra idea o detalle (opcional)</label><textarea id="questionText" maxlength="600" placeholder="Escribe aquí una respuesta propia..."></textarea></div><div id="safetyFields" class="hidden"><p>Antes de jugar, cada persona puede indicar contenidos que quiere excluir o tratar de forma indirecta. Estas respuestas se comparten con todo el grupo.</p><section class="cats-card"><h3>Líneas</h3><p>Son límites absolutos: contenidos que no deben aparecer en la partida, ni siquiera mencionados o representados.</p><div class="chat-compose"><input id="lineInput" maxlength="200" placeholder="Añadir una línea..."><button class="primary" id="addLine" type="button">+</button></div><ul id="linesList"></ul></section><section class="cats-card"><h3>Velos</h3><p>Son contenidos que pueden existir en la ficción, pero no se describen ni representan explícitamente; quedan fuera de escena.</p><div class="chat-compose"><input id="veilInput" maxlength="200" placeholder="Añadir un velo..."><button class="primary" id="addVeil" type="button">+</button></div><ul id="veilsList"></ul></section></div><div id="questionSaveStatus" class="muted" aria-live="polite">Los cambios se guardan automáticamente.</div></div><div class="question-bottom"><button id="questionPrev" type="button">Anterior</button><button class="primary" id="questionNext" type="button">Siguiente</button></div></div></section>
+</section><section id="catsScreen" class="hidden"><div class="question-shell"><div class="question-top"><button id="closeCats" type="button">← Volver a C.A.T.S.</button><span id="questionCounter" class="badge">Pregunta 1 de 4</span></div><div class="question-progress"><div id="questionProgressBar"></div></div><div class="question-body"><div class="cats-title"><span id="questionLetter" class="letter">C</span><div><h2 id="questionTitle">Concepto</h2><p id="questionPrompt">¿De qué trata la partida?</p></div></div><div id="standardQuestionFields"><p class="question-hint">Puedes elegir varias opciones y añadir una descripción propia.</p><div id="questionOptions" class="options question-options"></div><label for="questionText">Otra idea o detalle (opcional)</label><textarea id="questionText" maxlength="600" placeholder="Escribe aquí una respuesta propia..."></textarea></div><div id="safetyFields" class="hidden"><p>Antes de jugar, cada persona puede indicar contenidos que quiere excluir o tratar de forma indirecta. Estas respuestas se comparten con todo el grupo.</p><section class="cats-card"><h3>Líneas</h3><p>Son límites absolutos: contenidos que no deben aparecer en la partida, ni siquiera mencionados o representados.</p><div class="chat-compose"><input id="lineInput" maxlength="200" placeholder="Añadir una línea..."><button class="primary" id="addLine" type="button">+</button></div><ul id="linesList"></ul></section><section class="cats-card"><h3>Velos</h3><p>Son contenidos que pueden existir en la ficción, pero no se describen ni representan explícitamente; quedan fuera de escena.</p><div class="chat-compose"><input id="veilInput" maxlength="200" placeholder="Añadir un velo..."><button class="primary" id="addVeil" type="button">+</button></div><ul id="veilsList"></ul></section></div><div id="questionSaveStatus" class="muted" aria-live="polite">Los cambios se guardan automáticamente.</div></div><div class="question-bottom"><button id="questionPrev" type="button">Anterior</button><button class="primary" id="questionNext" type="button">Siguiente</button></div></div></section>
 </main><section id="accountBar" class="account-header hidden"><button id="signOut" type="button" aria-label="Cerrar sesión de administración">Cerrar sesión de administración</button></section><footer>Red de Roleros · Comunidad y preparación colaborativa de partidas · <button id="adminAccess" type="button" class="text-button">Acceso de administración</button></footer>
 <script>
 const SUPABASE_URL="https://mvbbqgiakysxyacfkarh.supabase.co";
@@ -823,7 +823,7 @@ async function loadMyRooms(){
    const room=item.room,p=item.participant,closed=!!room.closed;
    const card=document.createElement("article");card.className="my-room-card"+(closed?" closed":"");
    const info=document.createElement("div"),title=document.createElement("h3"),meta=document.createElement("p"),date=document.createElement("p");
-   title.textContent=room.game_name&&room.game_name!=="Juego sin especificar"?room.game_name:(room.room_name||"Sala de rol");
+   title.textContent=room.game_name&&room.game_name!=="Juego sin especificar"?room.game_name:(room.room_name||"C.A.T.S.");
    meta.textContent=(p.is_host?"Anfitrión":"Participante")+" · Código "+room.code+" · "+(closed?"Sala cerrada":"Sala abierta");
    date.textContent="Te uniste el "+new Date(p.joined_at).toLocaleDateString("es-CL");
    info.append(title,meta,date);
@@ -832,8 +832,8 @@ async function loadMyRooms(){
     const enter=document.createElement("button");enter.className="primary";enter.textContent="Entrar a la sala";
     enter.onclick=()=>resumeRoom(room.id,enter);actions.appendChild(enter);
    }
-   const remove=document.createElement("button");remove.className="danger small";remove.textContent=p.is_host?"Eliminar sala":"Salir de la sala";
-   remove.title=p.is_host?"Eliminar la sala y todos sus datos":"Salir y quitar la sala de Mis salas";
+   const remove=document.createElement("button");remove.className="danger small";remove.textContent=p.is_host?"Eliminar sala":"Salir de C.A.T.S.";
+   remove.title=p.is_host?"Eliminar C.A.T.S. y todos sus datos":"Salir y quitar la sala de Mis salas";
    remove.onclick=()=>removeRoomFromList(room.id,!!p.is_host,remove);actions.appendChild(remove);
    card.append(info,actions);box.appendChild(card);
   });
@@ -880,7 +880,7 @@ function inviteLink(code){const u=new URL(window.location.href);u.search="";u.ha
 function enterRoom(data){
  session={roomId:data.room.id,code:data.room.code,participantId:data.participant.id,token:data.token};
  saveSession();$("catsPinned").classList.remove("hidden");$("home").classList.add("hidden");$("roomView").classList.remove("hidden");
- $("roomTitle").textContent=data.room.room_name||"Sala de rol";
+ $("roomTitle").textContent=data.room.room_name||"C.A.T.S.";
  $("roomGame").textContent=data.room.game_name||"";
  $("inviteUrl").textContent=inviteLink(data.room.code);$("roomCodeDisplay").textContent=data.room.code;
  $("startForm").classList.remove("hidden");
@@ -890,7 +890,7 @@ function enterRoom(data){
  if(needsName||needsGame){
   $("roomContent").classList.add("hidden");
   $("roomSetup").classList.remove("hidden");
-  $("roomSetup").innerHTML='<h3>Configurar la sala</h3><p>Antes de comenzar, indica tu nombre de jugador'+(isHost?' y el juego.':'.')+'</p><label for="setupPlayerName">Tu nombre</label><input id="setupPlayerName" maxlength="32" placeholder="Tu nombre"><div id="setupGameWrap"><label for="setupGameName">Juego</label><input id="setupGameName" maxlength="80" placeholder="Nombre del juego"></div><div class="actions"><button class="primary" id="roomSetupSave">Continuar</button></div><div id="roomSetupError" class="error" role="alert"></div>';
+  $("roomSetup").innerHTML='<h3>Configurar C.A.T.S.</h3><p>Antes de comenzar, indica tu nombre de jugador'+(isHost?' y el juego.':'.')+'</p><label for="setupPlayerName">Tu nombre</label><input id="setupPlayerName" maxlength="32" placeholder="Tu nombre"><div id="setupGameWrap"><label for="setupGameName">Juego</label><input id="setupGameName" maxlength="80" placeholder="Nombre del juego"></div><div class="actions"><button class="primary" id="roomSetupSave">Continuar</button></div><div id="roomSetupError" class="error" role="alert"></div>';
   $("setupPlayerName").value=profileName||(["Anfitrión","Jugador"].includes(data.participant.display_name)?"":data.participant.display_name);
   if(!isHost)$("setupGameWrap").classList.add("hidden");
   $("roomSetupSave").onclick=saveRoomSetup;
@@ -947,16 +947,16 @@ async function joinRoomByCode(){
  try{const d=await api("join",{code});$("roomCodeInput").value="";showError("homeError","");enterRoom(d)}
  catch(e){showError("homeError",e.message)}
 }
-async function joinRoom(){await enterFromInviteIfPresent();if(!session)showError("homeError","Abre el enlace de invitación o escribe el código de la sala.");}
+async function joinRoom(){await enterFromInviteIfPresent();if(!session)showError("homeError","Abre el enlace de invitación o escribe el código de C.A.T.S..");}
 
 async function refreshRoom(){
  if(!session)return;
  try{
   const d=await api("get",{roomId:session.roomId,token:session.token});roomState=d;
   $("roomTitle").textContent=d.room.room_name||"Partida";$("roomGame").textContent=d.room.game_name||"";$("inviteUrl").textContent=inviteLink(d.room.code);$("roomCodeDisplay").textContent=d.room.code;$("hostBadge").classList.toggle("hidden",!d.me.is_host);
-  $("roomStatus").textContent=d.room.closed?"La sala está cerrada: nadie nuevo puede entrar.":"Comparte el enlace para invitar a los demás. Cada jugador inicia su cuestionario cuando pulsa el botón.";
+  $("roomStatus").textContent=d.room.closed?"Este C.A.T.S. está cerrado: nadie nuevo puede entrar.":"Comparte el enlace para invitar a los demás. Cada jugador inicia su cuestionario cuando pulsa el botón.";
   $("hostRoomControls").classList.toggle("hidden",!d.me.is_host);
-  $("toggleRoomClosed").textContent=d.room.closed?"Reabrir sala":"Cerrar sala";
+  $("toggleRoomClosed").textContent=d.room.closed?"Reabrir C.A.T.S.":"Cerrar C.A.T.S.";
   $("toggleRoomClosed").classList.toggle("danger",!d.room.closed);
   $("participantCount").textContent=d.participants.length+"/12";
   renderParticipants(d);renderReview(d);
@@ -964,7 +964,7 @@ async function refreshRoom(){
   if($("catsScreen").classList.contains("hidden"))questionAnswers={C:normalizeAnswer(mine?.answers?.C),A:normalizeAnswer(mine?.answers?.A),T:normalizeAnswer(mine?.answers?.T),S:normalizeAnswer(mine?.answers?.S),lines:normalizeEntries(mine?.answers?.lines),veils:normalizeEntries(mine?.answers?.veils)};
   $("startForm").textContent=mine?.form_started?"Continuar cuestionario":"Abrir cuestionario";updateFormProgress();
  }catch(e){
-  if(/acceso|sesión|disponible/i.test(e.message)){clearSession();$("roomView").classList.add("hidden");$("home").classList.remove("hidden");showError("homeError","Ya no perteneces a esa sala.");}
+  if(/acceso|sesión|disponible/i.test(e.message)){clearSession();$("roomView").classList.add("hidden");$("home").classList.remove("hidden");showError("homeError","Ya no formas parte de este C.A.T.S.");}
   else $("roomStatus").textContent=e.message;
  }
 }
@@ -1016,17 +1016,17 @@ function renderMatches(players){
  [["Líneas del grupo","lines"],["Velos del grupo","veils"]].forEach(([title,key])=>{const card=document.createElement("section");card.className="match-card";const h=document.createElement("h3");h.textContent=title;card.appendChild(h);const entries=[];players.forEach(p=>normalizeEntries(p.answers?.[key]).forEach(value=>entries.push({name:p.display_name,value})));if(!entries.length){const empty=document.createElement("div");empty.className="match-empty";empty.textContent="Todavía no hay entradas.";card.appendChild(empty)}else{const list=document.createElement("ul");entries.forEach(entry=>{const item=document.createElement("li");item.style.margin="7px 0";const value=document.createElement("span");value.textContent=entry.value;const author=document.createElement("small");author.style.display="block";author.style.color="var(--muted)";author.textContent=entry.name;item.append(value,author);list.appendChild(item)});card.appendChild(list)}safetyGrid.appendChild(card)});box.appendChild(safetyGrid);
 }
 async function kickPlayer(p){
- if(!confirm("¿Expulsar a "+p.display_name+" de la sala? Podrá volver a entrar si conserva el enlace o el código."))return;
+ if(!confirm("¿Expulsar a "+p.display_name+" de C.A.T.S.? Podrá volver a entrar si conserva el enlace o el código."))return;
  try{await api("kick",{roomId:session.roomId,token:session.token,participantId:p.id});await refreshRoom()}catch(e){alert(e.message)}
 }
 async function toggleRoomClosed(){
  if(!roomState?.me?.is_host)return;
  const closing=!roomState.room.closed;
- if(closing&&!confirm("¿Cerrar la sala? Nadie nuevo podrá entrar con el enlace. Los participantes actuales podrán seguir usando la sala."))return;
+ if(closing&&!confirm("¿Cerrar C.A.T.S.? Nadie nuevo podrá entrar con el enlace. Los participantes actuales podrán seguir usando la sala."))return;
  try{await api("set_room_closed",{roomId:session.roomId,token:session.token,closed:closing});await refreshRoom()}catch(e){alert(e.message)}
 }
 async function leaveRoom(){
- if(!confirm("¿Quieres salir de esta sala?"))return;
+ if(!confirm("¿Quieres salir de C.A.T.S.?"))return;
  try{await api("leave",{roomId:session.roomId,token:session.token})}catch(e){console.warn(e)}
  clearSession();$("catsScreen").classList.add("hidden");$("roomView").classList.add("hidden");$("home").classList.remove("hidden");await loadMyRooms();
 }
