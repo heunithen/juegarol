@@ -60,7 +60,7 @@ footer{text-align:center;color:#707987;font-size:11px;padding:15px}
  <div class="panel"><h2>Preparar una partida</h2><p>Crea una sala y comparte su enlace de invitación. Quienes tengan el enlace podrán unirse.</p></div>
  <div class="home-grid">
   <section class="panel"><h3>Crear una sala</h3><p>Primero crea la sala. Después podrás indicar tu nombre y el juego desde su interior.</p><div class="actions"><button class="primary" id="createRoom">Crear sala</button></div></section>
-  <section class="panel"><h3>Unirse a una sala</h3><label for="joinName">Tu nombre</label><input id="joinName" maxlength="32" placeholder="Nombre del jugador"><label for="joinLink">Enlace de invitación</label><input id="joinLink" type="url" placeholder="Pega aquí el enlace que te compartieron"><div class="actions"><button class="primary" id="joinRoom">Entrar a la sala</button></div></section>
+  <section class="panel"><h3>Unirse a una sala</h3><p>Abre el enlace de invitación para entrar directamente. Tu nombre de perfil se utilizará automáticamente.</p><div class="actions"><button class="primary" id="joinRoom">Entrar con enlace</button></div></section>
  </div><div id="homeError" class="error" role="alert"></div>
 </section>
 
@@ -68,12 +68,7 @@ footer{text-align:center;color:#707987;font-size:11px;padding:15px}
  <div class="panel">
   <div class="room-head"><div><div class="room-meta"><span class="badge">SALA DE JUEGO</span><span id="hostBadge" class="badge host hidden">ANFITRIÓN</span></div><h2 id="roomTitle" style="margin:8px 0 0">Partida</h2><p id="roomGame" style="margin:5px 0 0;color:var(--gold)">Juego</p></div><div><div class="muted" style="font-size:11px">ENLACE PARA INVITAR</div><div id="inviteUrl" style="max-width:320px;overflow-wrap:anywhere;color:var(--muted);font-size:12px;margin:6px 0">Enlace de la sala</div><button class="small" id="copyInvite">Copiar enlace</button></div></div>
   <p id="roomStatus">Comparte el enlace para invitar a los demás jugadores.</p>
-  <div id="roomSetup" class="cats-card">
-   <h3>Configurar la sala</h3><p>Antes de comenzar, indica tu nombre y el juego que van a jugar.</p>
-   <label for="setupName">Tu nombre</label><input id="setupName" maxlength="32" placeholder="Nombre del jugador">
-   <label for="setupGame">Juego</label><input id="setupGame" maxlength="80" placeholder="Ej. Dungeons & Dragons, Pathfinder, sistema propio...">
-   <div class="actions"><button class="primary" id="saveRoomSetup">Continuar</button></div><div id="setupMessage" class="error" aria-live="polite"></div>
-  </div>
+  <div id="roomSetup" class="cats-card hidden"></div>
  </div>
  <div id="roomContent" class="hidden">
  <div class="panel"><div class="section-toggle"><h2>Participantes</h2><span id="participantCount" class="badge">0/12</span></div><div id="participants" class="participants"></div><div class="actions"><button id="leaveRoom" class="danger">Salir de la sala</button></div></div>
@@ -141,21 +136,33 @@ async function signIn(){
  const {data,error}=await sb.auth.signInWithPassword({email,password});
  if(error){$("authMessage").textContent=error.message;return;}
  authSession=data.session;authUser=data.user;$("authMessage").textContent="";
- setAuthUI();restoreRoomSession();
+ setAuthUI();await ensureProfile();restoreRoomSession();await enterFromInviteIfPresent();
+}
+async function ensureProfile(){
+ if(!authUser)return "";
+ const {data,error}=await sb.from("cats_profiles").select("display_name").eq("id",authUser.id).maybeSingle();
+ if(error)throw error;
+ const existing=(data?.display_name||"").trim();
+ if(existing)return existing;
+ const fallback=(authUser.user_metadata?.display_name||"").trim();
+ if(!fallback)throw new Error("Esta cuenta no tiene un nombre de jugador configurado. Contacta con el administrador para completar tu perfil.");
+ const {error:saveError}=await sb.from("cats_profiles").upsert({id:authUser.id,display_name:fallback},{onConflict:"id"});
+ if(saveError)throw saveError;
+ return fallback;
 }
 async function signUp(){
  const email=$("authEmail").value.trim(),password=$("authPassword").value,name=$("authName").value.trim();
  if(!name){$("authMessage").textContent="Escribe tu nombre para crear la cuenta.";return;}
  if(password.length<8){$("authMessage").textContent="La contraseña debe tener al menos 8 caracteres.";return;}
  $("authMessage").textContent="Creando cuenta...";
- const {data,error}=await sb.auth.signUp({email,password});
+ const {data,error}=await sb.auth.signUp({email,password,options:{data:{display_name:name}}});
  if(error){$("authMessage").textContent=error.message;return;}
  if(data.session){
   authSession=data.session;authUser=data.user;
   const {error:profileError}=await sb.from("cats_profiles").upsert({id:authUser.id,display_name:name},{onConflict:"id"});
   if(profileError){$("authMessage").textContent="Cuenta creada, pero no se pudo guardar el perfil: "+profileError.message;return;}
   $("authMessage").textContent="Cuenta creada.";
-  setAuthUI();
+  setAuthUI();await enterFromInviteIfPresent();
  }else{
   $("authMessage").textContent="Cuenta creada. Revisa tu correo para confirmar la dirección y luego inicia sesión.";
  }
@@ -196,27 +203,12 @@ function inviteLink(code){const u=new URL(window.location.href);u.search="";u.ha
 function enterRoom(data){
  session={roomId:data.room.id,code:data.room.code,participantId:data.participant.id,token:data.token};
  saveSession();$("home").classList.add("hidden");$("roomView").classList.remove("hidden");
+ $("roomSetup").classList.add("hidden");$("roomContent").classList.remove("hidden");
  $("roomTitle").textContent=data.room.room_name||"Sala C.A.T.S.";$("roomGame").textContent=data.room.game_name||"";
  $("inviteUrl").textContent=inviteLink(data.room.code);
  $("catsForm").classList.add("hidden");$("startForm").classList.remove("hidden");
- const needsSetup=!data.room.game_name||data.room.game_name==="Juego sin especificar"||data.participant.display_name==="Anfitrión";
- $("roomSetup").classList.toggle("hidden",!needsSetup);$("roomContent").classList.toggle("hidden",needsSetup);
- $("setupName").value=needsSetup&&data.participant.display_name!=="Anfitrión"?data.participant.display_name:"";
- $("setupGame").value=data.room.game_name&&data.room.game_name!=="Juego sin especificar"?data.room.game_name:"";
  $("answerC").value="";$("answerA").value="";$("answerT").value="";$("answerS").value="";$("answerC").dataset.loaded="";
  refreshRoom();if(refreshTimer)clearInterval(refreshTimer);refreshTimer=setInterval(refreshRoom,4500);
-}
-async function saveRoomSetup(){
- const name=$("setupName").value.trim(),gameName=$("setupGame").value.trim();
- if(!name||!gameName){$("setupMessage").textContent="Escribe tu nombre y el juego.";return}
- $("setupMessage").textContent="Guardando...";
- try{
-  const d=await api("configure",{roomId:session.roomId,token:session.token,name,gameName});
-  $("roomTitle").textContent=d.room.room_name||"Sala C.A.T.S.";
-  $("roomGame").textContent=d.room.game_name||gameName;
-  $("roomSetup").classList.add("hidden");$("roomContent").classList.remove("hidden");
-  await refreshRoom();
- }catch(e){$("setupMessage").textContent=e.message}
 }
 async function createRoom(){
  showError("homeError","");
@@ -233,18 +225,25 @@ function getInviteCode(value){
   return (url.searchParams.get("sala")||"").toUpperCase().replace(/[^A-Z0-9]/g,"").slice(0,6);
  }catch{return ""}
 }
+let joiningInvite=false;
+async function enterFromInviteIfPresent(){
+ const code=new URLSearchParams(window.location.search).get("sala");
+ if(!authUser||!code||session||joiningInvite)return;
+ joiningInvite=true;showError("homeError","");
+ try{const d=await api("join",{code});enterRoom(d);history.replaceState({},document.title,window.location.pathname);}
+ catch(e){showError("homeError",e.message)}
+ finally{joiningInvite=false}
+}
 async function joinRoom(){
- showError("homeError","");
- const code=getInviteCode($("joinLink").value);
- if(!code){showError("homeError","Pega un enlace de invitación válido.");return}
- try{const d=await api("join",{name:$("joinName").value,code});enterRoom(d)}catch(e){showError("homeError",e.message)}
+ await enterFromInviteIfPresent();
+ if(!session)showError("homeError","Abre el enlace de invitación para entrar a la sala.");
 }
 async function refreshRoom(){
  if(!session)return;
  try{
   const d=await api("get",{roomId:session.roomId,token:session.token});roomState=d;
   $("roomTitle").textContent=d.room.room_name||"Partida";$("roomGame").textContent=d.room.game_name||"";$("inviteUrl").textContent=inviteLink(d.room.code);$("hostBadge").classList.toggle("hidden",!d.me.is_host);
-  $("roomStatus").textContent=d.room.closed?"La sala está cerrada.":"Comparte el código para que se unan más jugadores. Cada participante puede responder cuando quiera.";
+  $("roomStatus").textContent=d.room.closed?"La sala está cerrada.":"Comparte el enlace para invitar a los demás. Cada jugador inicia su cuestionario cuando pulsa el botón.";
   $("participantCount").textContent=d.participants.length+"/12";
   renderParticipants(d);renderReview(d);
   const mine=d.participants.find(p=>p.id===session.participantId);
@@ -311,9 +310,8 @@ function buildOptions(){
   items.forEach(item=>{const b=document.createElement("button");b.type="button";b.className="option";b.textContent=item;b.onclick=()=>{textarea.value=item;[...box.children].forEach(x=>x.classList.remove("selected"));b.classList.add("selected")};box.appendChild(b)});
  });
 }
-$("createRoom").onclick=createRoom;$("joinRoom").onclick=joinRoom;$("saveRoomSetup").onclick=saveRoomSetup;
+$("createRoom").onclick=createRoom;$("joinRoom").onclick=joinRoom;
 const inviteFromUrl=new URLSearchParams(window.location.search).get("sala");
-if(inviteFromUrl){$("joinLink").value=window.location.href;}
 $("copyInvite").onclick=async()=>{try{await navigator.clipboard.writeText(inviteLink(session.code));$("copyInvite").textContent="Enlace copiado"}catch{$("copyInvite").textContent="No se pudo copiar"}setTimeout(()=>$("copyInvite").textContent="Copiar enlace",1600)};
 $("startForm").onclick=startForm;
 $("leaveRoom").onclick=leaveRoom;$("saveAnswers").onclick=saveAnswers;$("refreshRoom").onclick=refreshRoom;
@@ -322,12 +320,12 @@ setAuthUI();
 sb.auth.getSession().then(({data})=>{
  authSession=data.session;authUser=data.session?.user||null;
  setAuthUI();
- if(authUser)restoreRoomSession();
+ if(authUser){restoreRoomSession();ensureProfile().then(enterFromInviteIfPresent).catch(e=>showError("homeError",e.message));}
 });
 sb.auth.onAuthStateChange((_event,newSession)=>{
  authSession=newSession;authUser=newSession?.user||null;
  setAuthUI();
- if(authUser&&!session)restoreRoomSession();
+ if(authUser&&!session){restoreRoomSession();ensureProfile().then(enterFromInviteIfPresent).catch(e=>showError("homeError",e.message));}
 });
 
 // Generador aleatorio auxiliar
