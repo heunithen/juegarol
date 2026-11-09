@@ -1109,7 +1109,7 @@ const originalTables=[
  ["Una persona específica.","Un grupo de personas o una comunidad.","Un objeto valioso o irreemplazable.","Un arma o herramienta especial.","Un lugar o territorio.","Un recurso natural o material escaso.","Una fuente de energía o poder.","Un conocimiento o secreto.","Un documento, registro o prueba.","Una criatura o ser extraordinario.","Una organización o institución.","Una alianza o acuerdo con alguien."],
  ["Provocar una catástrofe o destrucción masiva.","Desencadenar una guerra o conflicto armado.","Derrocar un gobierno o autoridad.","Someter a una población o civilización.","Reorganizar el equilibrio de poder entre distintas facciones.","Liberar una amenaza desconocida.","Transformar permanentemente un lugar o entorno.","Provocar el colapso económico de una región.","Obligar a una población a abandonar su hogar.","Alterar las leyes naturales o la realidad.","Desatar una rebelión, persecución o conflicto social.","Cambiar radicalmente el futuro de una sociedad."]
 ];
-const genreTables={
+var genreTables={
  "Fantasía medieval":[
  ["Un monarca o señor feudal.","Una orden de caballería.","Un ejército invasor.","Un dragón o bestia legendaria."],
  ["Reclamar un trono.","Recuperar una reliquia perdida.","Vengar una traición.","Proteger un reino amenazado."],
@@ -1179,7 +1179,7 @@ const genreTables={
 };
 function rollAll(){
  const genre=$("randomGenre").value,tone=$("randomTone").value;
- const tables=genreTables[genre]||originalTables;
+ const tables=(genreTables||{})[genre]||originalTables;
  const values=tables.map(table=>table[Math.floor(Math.random()*table.length)]);
  const story=$("story");story.replaceChildren();
  const style=document.createElement("p");style.className="muted";style.textContent="Género: "+genre+" · Tono: "+tone;
