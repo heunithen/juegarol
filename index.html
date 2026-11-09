@@ -317,6 +317,7 @@ async function saveProfile(){
   if(error)throw error;
   profileName=name;$("profileMessage").textContent="";
   setAuthUI();await restoreRoomSession();await enterFromInviteIfPresent();await loadWantedPosts();
+   await loadEvents();
  }catch(e){$("profileMessage").textContent="No se pudo guardar el perfil: "+e.message;}
  finally{$("saveProfile").disabled=false;}
 }
@@ -360,9 +361,96 @@ function updateWantedFormAccess(){
  const gate=$("wantedFormGate");
  gate.textContent=authUser?"":"Para subir una propuesta debes iniciar sesión o crear una cuenta. Puedes revisar las propuestas sin iniciar sesión.";
 }
+
+function eventDateLabel(value){const d=new Date(value+"T12:00:00");return d.toLocaleDateString("es-CL",{day:"numeric",month:"long",year:"numeric"})}
+function eventTimeLabel(value){return value?String(value).slice(0,5):""}
+function safeEventLink(value){try{const u=new URL(value);return ["http:","https:"].includes(u.protocol)?u.href:""}catch{return ""}}
+function makeEventCard(ev){
+ const card=document.createElement("article");card.className="event-card";
+ const flyer=safeEventLink(ev.flyer_url);
+ if(flyer){const img=document.createElement("img");img.src=flyer;img.alt="Flyer de "+ev.title;img.loading="lazy";img.referrerPolicy="no-referrer";card.appendChild(img)}
+ const body=document.createElement("div");body.className="event-card-body";
+ const title=document.createElement("h3");title.textContent=ev.title;body.appendChild(title);
+ const meta=document.createElement("div");meta.className="event-meta";
+ [ev.event_type,ev.modality,eventDateLabel(ev.event_date),eventTimeLabel(ev.start_time)+(ev.end_time?"–"+eventTimeLabel(ev.end_time):""),ev.is_free?"Gratuito":"$"+Number(ev.price||0).toLocaleString("es-CL")+" CLP"].forEach(v=>{const tag=document.createElement("span");tag.textContent=v;meta.appendChild(tag)});
+ body.appendChild(meta);
+ const desc=document.createElement("p");desc.textContent=ev.description;body.appendChild(desc);
+ const organizer=document.createElement("p");organizer.textContent="Organiza: "+ev.organizer_name;body.appendChild(organizer);
+ const place=document.createElement("p");place.textContent=[ev.venue,ev.commune,ev.region].filter(Boolean).join(", ")||(ev.modality==="Online"?"Online":"Ubicación por confirmar");body.appendChild(place);
+ if(ev.contact){const contact=document.createElement("p");contact.textContent="Contacto: "+ev.contact;body.appendChild(contact)}
+ const link=safeEventLink(ev.registration_url);if(link){const a=document.createElement("a");a.href=link;a.target="_blank";a.rel="noopener noreferrer";a.className="community-link";a.textContent="Inscripción e información ↗";body.appendChild(a)}
+ card.appendChild(body);return card;
+}
+function statusEventLabel(status){return ({pending:"Pendiente de revisión",approved:"Aprobada",rejected:"Rechazada"})[status]||status}
+async function loadEvents(){
+ const list=$("eventsPublicList");if(!list)return;
+ $("eventsPublicMessage").textContent="Cargando eventos...";list.innerHTML="";
+ try{
+  const result=await publicApi("list_events");
+  if(!result.events.length)$("eventsPublicMessage").textContent="Todavía no hay eventos aprobados próximos.";
+  else $("eventsPublicMessage").textContent="";
+  result.events.forEach(ev=>list.appendChild(makeEventCard(ev)));
+ }catch(e){$("eventsPublicMessage").textContent="No se pudieron cargar los eventos: "+e.message}
+ const form=$("eventForm");
+ if(authUser){form.classList.remove("hidden");$("eventAccessMessage").textContent="Completa los datos y envía tu propuesta para revisión."; $("eventOrganizer").value=$("eventOrganizer").value||profileName}
+ else{form.classList.add("hidden");$("eventAccessMessage").textContent="Inicia sesión para proponer un evento."}
+ if(!authUser){$("myEventsList").textContent="Inicia sesión para consultar tus propuestas."; $("eventAdminPanel").classList.add("hidden");return}
+ try{
+  const mine=await publicApi("list_my_events");const target=$("myEventsList");target.innerHTML="";
+  if(!mine.events.length)target.textContent="Todavía no has enviado propuestas.";
+  mine.events.forEach(ev=>{const row=document.createElement("div");row.className="event-admin-row";const title=document.createElement("strong");title.textContent=ev.title;const status=document.createElement("span");status.className="event-status";status.textContent=" · "+statusEventLabel(ev.status);const date=document.createElement("p");date.textContent=eventDateLabel(ev.event_date);row.append(title,status,date);if(ev.review_note){const note=document.createElement("p");note.textContent="Observación del administrador: "+ev.review_note;row.appendChild(note)}target.appendChild(row)})
+ }catch(e){$("myEventsList").textContent="No se pudieron cargar tus propuestas: "+e.message}
+ try{
+  const admin=await publicApi("list_admin_events");$("eventAdminPanel").classList.remove("hidden");
+  const target=$("eventAdminList");target.innerHTML="";
+  if(!admin.events.length)$("eventAdminMessage").textContent="No hay propuestas pendientes.";
+  else $("eventAdminMessage").textContent="Propuestas por revisar: "+admin.events.length;
+  admin.events.forEach(ev=>{
+   const row=document.createElement("div");row.className="event-admin-row";
+   const title=document.createElement("h3");title.textContent=ev.title;row.appendChild(title);
+   const info=document.createElement("p");info.textContent=ev.organizer_name+" · "+ev.event_type+" · "+eventDateLabel(ev.event_date)+" · "+eventTimeLabel(ev.start_time)+" · "+ev.modality;row.appendChild(info);
+   const desc=document.createElement("p");desc.textContent=ev.description;row.appendChild(desc);
+   const location=document.createElement("p");location.textContent=[ev.venue,ev.commune,ev.region].filter(Boolean).join(", ");row.appendChild(location);
+   const cost=document.createElement("p");cost.textContent=ev.is_free?"Gratuito":"Entrada: $"+Number(ev.price||0).toLocaleString("es-CL")+" CLP";row.appendChild(cost);
+   if(safeEventLink(ev.flyer_url)){const a=document.createElement("a");a.href=safeEventLink(ev.flyer_url);a.target="_blank";a.rel="noopener noreferrer";a.textContent="Ver flyer ↗";row.appendChild(a)}
+   if(safeEventLink(ev.registration_url)){const a=document.createElement("a");a.href=safeEventLink(ev.registration_url);a.target="_blank";a.rel="noopener noreferrer";a.textContent=" · Enlace de inscripción ↗";row.appendChild(a)}
+   const actions=document.createElement("div");actions.className="event-admin-actions";
+   const approve=document.createElement("button");approve.type="button";approve.className="primary";approve.textContent="Aprobar";approve.onclick=()=>reviewEvent(ev.id,"approved");
+   const reject=document.createElement("button");reject.type="button";reject.className="danger";reject.textContent="Rechazar";reject.onclick=()=>reviewEvent(ev.id,"rejected");
+   actions.append(approve,reject);row.appendChild(actions);target.appendChild(row);
+  });
+ }catch(e){$("eventAdminPanel").classList.add("hidden")}
+}
+async function reviewEvent(eventId,status){
+ let reviewNote="";
+ if(status==="rejected"){reviewNote=window.prompt("Motivo del rechazo (opcional):","")||""}
+ try{await publicApi("review_event",{eventId,status,reviewNote});await loadEvents()}
+ catch(e){$("eventAdminMessage").textContent=e.message}
+}
+$("eventCost").onchange=()=>{$("eventPriceWrap").classList.toggle("hidden",$("eventCost").value!=="paid");$("eventPrice").required=$("eventCost").value==="paid"};
+$("eventForm").onsubmit=async ev=>{
+ ev.preventDefault();if(!authUser){$("eventFormMessage").textContent="Inicia sesión para enviar una propuesta.";return}
+ const button=$("submitEvent");button.disabled=true;$("eventFormMessage").textContent="Enviando a revisión...";
+ const isFree=$("eventCost").value==="free";
+ try{
+  await publicApi("create_event",{
+   title:$("eventTitle").value,organizerName:$("eventOrganizer").value,description:$("eventDescription").value,
+   eventType:$("eventType").value,modality:$("eventModality").value,venue:$("eventVenue").value,
+   region:$("eventRegion").value,commune:$("eventCommune").value,eventDate:$("eventDate").value,
+   startTime:$("eventStart").value,endTime:$("eventEnd").value,isFree,price:isFree?null:Number($("eventPrice").value),
+   flyerUrl:$("eventFlyer").value,registrationUrl:$("eventRegistration").value,contact:$("eventContact").value
+  });
+  $("eventForm").reset();$("eventPriceWrap").classList.add("hidden");$("eventPrice").required=false;
+  $("eventFormMessage").textContent="Propuesta enviada. Quedará visible cuando un administrador la apruebe.";
+  await loadEvents();
+ }catch(e){$("eventFormMessage").textContent="No se pudo enviar: "+e.message}
+ finally{button.disabled=false}
+};
+$("refreshEvents").onclick=loadEvents;
+
 function setHomeTab(tab){
- const tabs={rooms:"tabRooms",wanted:"tabWanted",communities:"tabCommunities"};
- const panels={rooms:"homeTabRooms",wanted:"homeTabWanted",communities:"homeTabCommunities"};
+ const tabs={rooms:"tabRooms",wanted:"tabWanted",events:"tabEvents",communities:"tabCommunities"};
+ const panels={rooms:"homeTabRooms",wanted:"homeTabWanted",events:"homeTabEvents",communities:"homeTabCommunities"};
  Object.entries(tabs).forEach(([key,id])=>{
   const active=key===tab;
   $(id).classList.toggle("active",active);
@@ -746,6 +834,7 @@ function buildOptions(){}
 $("tabRooms").onclick=()=>setHomeTab("rooms");
 $("tabWanted").onclick=()=>showWantedView("home");
 $("tabCommunities").onclick=()=>setHomeTab("communities");
+$("tabEvents").onclick=()=>{setHomeTab("events");loadEvents()};
 $("createRoom").onclick=createRoom;$("refreshMyRooms").onclick=loadMyRooms;$("backToRooms").onclick=backToMyRooms;$("mainBanner").onclick=returnToPortal;$("mainBanner").onkeydown=ev=>{if(ev.key==="Enter"||ev.key===" "){ev.preventDefault();returnToPortal()}};
 const inviteFromUrl=new URLSearchParams(window.location.search).get("sala");
 $("copyInvite").onclick=async()=>{try{await navigator.clipboard.writeText(inviteLink(session.code));$("copyInvite").textContent="Enlace copiado"}catch{$("copyInvite").textContent="No se pudo copiar"}setTimeout(()=>$("copyInvite").textContent="Copiar enlace",1600)};
@@ -754,10 +843,11 @@ $("leaveRoom").onclick=leaveRoom;$("refreshRoom").onclick=refreshRoom;
 buildOptions();
 setAuthUI();
 loadWantedPosts();
+loadEvents();
 sb.auth.getSession().then(async({data})=>{
  authSession=data.session;authUser=data.session?.user||null;
  if(authUser){
-  try{await ensureProfile();setAuthUI();await restoreRoomSession();await enterFromInviteIfPresent();}
+  try{await ensureProfile();setAuthUI();await restoreRoomSession();await enterFromInviteIfPresent();await loadEvents();}
   catch(e){setAuthUI();$("profileMessage").textContent=e.message;}
  }else setAuthUI();
 });
@@ -767,7 +857,7 @@ sb.auth.onAuthStateChange((_event,newSession)=>{
  setAuthUI();
  setTimeout(async()=>{
   if(!authUser||authUser.id!==newSession.user.id)return;
-  try{await ensureProfile();setAuthUI();await loadWantedPosts();if(!session){await restoreRoomSession();await enterFromInviteIfPresent();}}
+  try{await ensureProfile();setAuthUI();await loadWantedPosts();await loadEvents();if(!session){await restoreRoomSession();await enterFromInviteIfPresent();}}
   catch(e){setAuthUI();$("profileMessage").textContent=e.message;}
  },0);
 });
