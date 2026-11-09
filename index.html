@@ -154,9 +154,15 @@ header{background:#000;border-bottom:1px solid var(--line);padding:12px 22px}
   <div class="actions"><button class="primary" id="createRoom">Ocupar C.A.T.S.</button></div><div class="join-room-box"><label for="roomCodeInput">Entrar a C.A.T.S. con código</label><div class="actions"><input id="roomCodeInput" maxlength="6" autocomplete="off" placeholder="Código de 6 caracteres" aria-label="Código de C.A.T.S."><button id="joinRoomCode" type="button">Unirse</button></div></div>
  </section>
  <section class="panel" id="randomTools">
-  <div><h2>Generador aleatorio</h2><p>¿El grupo no sabe qué jugar o se quedaron sin ideas? Utiliza el generador aleatorio para encontrar inspiración y descubrir nuevas posibilidades para tu próxima partida.</p></div>
-  <div class="random-result" style="margin-top:14px"><div id="story" class="story">Pulsa el dado para generar una idea de aventura.</div></div>
-  <div class="actions"><button class="primary" id="generate" type="button" aria-label="Generar aventura aleatoria" title="Generar aventura aleatoria" style="font-size:24px;min-width:54px">⚅</button></div>
+  <div><h2>Generador de aventuras con ChatGPT</h2><p>Define el género y el tono para crear una premisa abierta, cuatro personajes no jugadores y cuatro lugares. Las ideas son un punto de partida: el grupo decide cómo continúa la historia.</p></div>
+  <div class="form-grid" style="margin-top:14px">
+   <label>Género<select id="randomGenre"><option>Fantasía medieval</option><option>Fantasía oscura</option><option>Ciencia ficción</option><option>Terror</option><option>Misterio</option><option>Investigación</option><option>Aventura</option><option>Western</option><option>Postapocalíptico</option><option>Horror cósmico</option><option>Comedia</option><option>Otro / mezcla</option></select></label>
+   <label>Tono<select id="randomTone"><option>Heroico</option><option>Épico</option><option>Sombrío</option><option>Oscuro</option><option>Misterioso</option><option>Humorístico</option><option>Dramático</option><option>Aventurero</option><option>Supervivencia</option></select></label>
+  </div>
+  <label for="randomNotes">Indicaciones adicionales (opcional)</label>
+  <textarea id="randomNotes" rows="3" maxlength="1200" placeholder="Ej.: una ciudad construida sobre un leviatán dormido; evitar viajes en el tiempo..."></textarea>
+  <div class="random-result" style="margin-top:14px"><div id="story" class="story">Configura el género y el tono y pulsa el botón para generar una propuesta.</div></div>
+  <div class="actions"><button class="primary" id="generate" type="button">Generar con ChatGPT</button><span id="randomStatus" class="muted" role="status" aria-live="polite"></span></div>
  </section>
  <div id="homeError" class="error" role="alert"></div>
  </div>
@@ -1098,18 +1104,41 @@ sb.auth.onAuthStateChange((_event,newSession)=>{
 initializePublicSite().catch(error=>{setAuthUI();showError("homeError","No se pudo cargar el sitio: "+(error?.message||"Error desconocido"));authInitialized=true;});
 $("adminAccess").onclick=()=>{adminLoginOpen=true;$("home").classList.add("hidden");$("authPanel").classList.remove("hidden");$("authMessage").textContent="";};
 $("cancelAdminAccess").onclick=()=>{adminLoginOpen=false;$("authPanel").classList.add("hidden");$("home").classList.remove("hidden");};
-// Generador aleatorio auxiliar
-const tables=[
-{items:["Un individuo poderoso o influyente.","Una organización clandestina.","Una facción militar o fuerza armada.","Una criatura o monstruo.","Una especie o población hostil.","Una entidad sobrenatural.","Una autoridad política o religiosa.","Una civilización o sociedad extranjera.","Un grupo criminal o mercenario.","Una inteligencia artificial o máquina autónoma.","Una fuerza natural o fenómeno ambiental.","Una fuerza desconocida o inexplicable."]},
-{items:["Obtener algo que no posee.","Recuperar algo que perdió.","Vengarse de alguien.","Destruir o eliminar algo.","Imponer su voluntad sobre otros.","Proteger algo o a alguien.","Escapar de una situación o amenaza.","Cambiar el orden establecido.","Descubrir un secreto o conocimiento.","Conseguir reconocimiento, autoridad o legitimidad.","Expandir su influencia o territorio.","Evitar que algo o alguien alcance su objetivo."]},
-{items:["Una persona específica.","Un grupo de personas o una comunidad.","Un objeto valioso o irreemplazable.","Un arma o herramienta especial.","Un lugar o territorio.","Un recurso natural o material escaso.","Una fuente de energía o poder.","Un conocimiento o secreto.","Un documento, registro o prueba.","Una criatura o ser extraordinario.","Una organización o institución.","Una alianza o acuerdo con alguien."]},
-{items:["Provocar una catástrofe o destrucción masiva.","Desencadenar una guerra o conflicto armado.","Derrocar un gobierno o autoridad.","Someter a una población o civilización.","Reorganizar el equilibrio de poder entre distintas facciones.","Liberar una amenaza desconocida.","Transformar permanentemente un lugar o entorno.","Provocar el colapso económico de una región.","Obligar a una población a abandonar su hogar.","Alterar las leyes naturales o la realidad.","Desatar una rebelión, persecución o conflicto social.","Cambiar radicalmente el futuro de una sociedad."]}
-];
-function rollAll(){
- const values=tables.map(table=>table.items[Math.floor(Math.random()*table.items.length)]);
- $("story").textContent="El conflicto gira en torno a "+values[0]+". El objetivo es "+values[1]+". Para alcanzarlo, hace falta "+values[2]+". Si se consigue, podría "+values[3]+".";
+// Generador de aventuras con ChatGPT mediante la Edge Function de Supabase.
+function addAdventureSection(parent,title,items){
+ const heading=document.createElement("h3");heading.textContent=title;parent.appendChild(heading);
+ const list=document.createElement("div");list.className="random-generated-list";
+ for(const item of items){
+  const card=document.createElement("article");card.className="random-generated-item";
+  const name=document.createElement("strong");name.textContent=item.name;
+  const description=document.createElement("p");description.textContent=item.description;
+  card.append(name,description);list.appendChild(card);
+ }
+ parent.appendChild(list);
 }
-$("generate").onclick=rollAll;
+$("generate").onclick=async()=>{
+ const button=$("generate"),status=$("randomStatus"),story=$("story");
+ button.disabled=true;status.textContent="Generando propuesta…";
+ story.textContent="ChatGPT está preparando la premisa, los personajes y los lugares.";
+ try{
+  const {data,error}=await sb.functions.invoke("generate-random-adventure",{body:{
+   genre:$("randomGenre").value,tone:$("randomTone").value,notes:$("randomNotes").value,
+   dieRoll:Math.floor(Math.random()*6)+1
+  }});
+  if(error)throw error;
+  if(!data||typeof data.premise!=="string"||!Array.isArray(data.npcs)||!Array.isArray(data.places))throw new Error(data?.error||"La respuesta recibida está incompleta.");
+  story.replaceChildren();
+  const heading=document.createElement("h3");heading.textContent="Premisa";
+  const premise=document.createElement("p");premise.textContent=data.premise;story.append(heading,premise);
+  addAdventureSection(story,"Personajes no jugadores",data.npcs);
+  addAdventureSection(story,"Lugares",data.places);
+  status.textContent="Propuesta generada.";
+ }catch(error){
+  console.error("Error al generar aventura:",error);
+  story.textContent=error?.context?.error||error?.message||"No se pudo generar la propuesta. Inténtalo nuevamente.";
+  status.textContent="No se pudo completar la generación.";
+ }finally{button.disabled=false;}
+};
 </script>
 </body></html>
 <style>
@@ -1126,4 +1155,8 @@ $("generate").onclick=rollAll;
 #accountBar #signOut{display:inline-block;min-width:0;margin:0;padding:3px 6px;border:0;border-radius:0;background:transparent;color:var(--muted);font-size:11px;font-weight:400;line-height:1.4;text-decoration:underline;text-underline-offset:2px;cursor:pointer;box-shadow:none}
 #accountBar #signOut:hover{background:transparent;color:var(--text);border:0}
 @media(max-width:760px){#accountBar.account-header{width:100%;margin:0 auto 10px;padding:0;transform:none}}
+</style>
+
+<style>
+#randomTools .form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}#randomTools label{display:block;margin:8px 0;color:var(--muted);font-size:13px}#randomTools select,#randomTools textarea{width:100%;margin-top:5px;background:#171c23;color:var(--text);border:1px solid var(--line);border-radius:8px;padding:10px;font:inherit}#randomTools textarea{resize:vertical}#randomTools .random-generated-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:10px 0 18px}#randomTools .random-generated-item{padding:11px;background:#191e26;border:1px solid var(--line);border-radius:9px}#randomTools .random-generated-item strong{color:var(--gold)}#randomTools .random-generated-item p{margin:5px 0 0;font-size:13px;color:var(--muted)}#randomTools #story h3{color:var(--gold);margin:15px 0 5px}#randomTools #story>p{margin:5px 0 12px}#randomTools #generate:disabled{opacity:.6;cursor:wait}@media(max-width:600px){#randomTools .form-grid,#randomTools .random-generated-list{grid-template-columns:1fr}}
 </style>
