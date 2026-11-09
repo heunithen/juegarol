@@ -24,7 +24,7 @@ button.primary{background:var(--gold);border-color:var(--gold);color:#211b10}
 button.danger{border-color:#794848;color:#f0b0b0}button.small{padding:5px 8px;font-size:12px}
 .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}.row>*{flex:1}
 .home-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}.home-grid .panel{margin:0}
-.home-tabs{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 18px;padding:6px;background:#1d222b;border:1px solid var(--line);border-radius:11px}.home-tab{flex:1;min-width:130px;background:transparent;border-color:transparent;color:var(--muted)}.home-tab.active{background:#3a3325;border-color:#8b713e;color:var(--gold)}
+
 .hidden{display:none!important}.muted{color:var(--muted)}.error{color:#f0a0a0;margin-top:10px}.success{color:var(--green)}
 .code{font:700 30px/1.2 ui-monospace,monospace;letter-spacing:.18em;color:var(--gold);padding:8px 0}
 .room-head{display:flex;justify-content:space-between;gap:14px;align-items:center;flex-wrap:wrap}
@@ -52,7 +52,7 @@ footer{text-align:center;color:#707987;font-size:11px;padding:15px}
 </style>
 </head>
 <body>
-<header><h1>C.A.T.S.</h1><p>Una herramienta para construir juntos el concepto de una partida de rol.</p><span class="site-version">Versión 1.4.0</span></header>
+<header><h1>C.A.T.S.</h1><p>Una herramienta para construir juntos el concepto de una partida de rol.</p><span class="site-version">Versión 1.5.0</span></header>
 <main>
 <section id="authPanel" class="panel">
  <h2>Acceso a C.A.T.S.</h2>
@@ -66,19 +66,22 @@ footer{text-align:center;color:#707987;font-size:11px;padding:15px}
 <section id="accountBar" class="panel hidden"><div class="row"><div><b id="accountEmail"></b><p>Sesión iniciada</p></div><button id="signOut" class="danger">Cerrar sesión</button></div></section>
 <section id="profileSetup" class="panel hidden"><h2>Configurar nombre de jugador</h2><p>Elige el nombre que aparecerá en las salas y junto a tus respuestas.</p><label for="profileNameInput">Nombre de jugador</label><input id="profileNameInput" maxlength="32" placeholder="Tu nombre"><div class="actions"><button class="primary" id="saveProfile">Guardar nombre</button></div><div id="profileMessage" class="error" role="alert"></div></section>
 <section id="home" class="hidden">
- <nav class="home-tabs" aria-label="Secciones principales">
-  <button type="button" class="home-tab active" id="tabMyRooms" data-tab="rooms">Mis salas</button>
-  <button type="button" class="home-tab" id="tabCreateRoom" data-tab="create">Crear sala</button>
-  <button type="button" class="home-tab" id="tabRandomTools" data-tab="random">Generador aleatorio</button>
- </nav>
+ <section id="homeCreatePanel" class="panel">
+  <h2>Crear una sala</h2><p>Crea una sala y comparte el enlace de invitación. Cualquier usuario registrado que tenga el enlace podrá unirse. Después podrás indicar el juego desde el interior de la sala.</p>
+  <div class="actions"><button class="primary" id="createRoom">Crear una sala</button></div>
+ </section>
  <section id="homeRoomsPanel" class="panel my-rooms">
   <div class="section-toggle"><div><h2>Mis salas</h2><p>Salas en las que participas como anfitrión o jugador.</p></div><button class="small" id="refreshMyRooms">Actualizar</button></div>
   <div id="myRoomsList" class="my-rooms-list"><p>Cargando tus salas...</p></div>
  </section>
- <section id="homeCreatePanel" class="panel hidden">
-  <h2>Crear una sala</h2><p>Crea una sala y comparte el enlace de invitación. Cualquier usuario registrado que tenga el enlace podrá unirse. Después podrás indicar el juego desde el interior de la sala.</p>
-  <div class="actions"><button class="primary" id="createRoom">Crear una sala</button></div>
- </section>
+ <section class="panel" id="randomTools">
+ <div class="section-toggle"><div><h2>Generador aleatorio</h2><p>Una herramienta para cuando el grupo no sabe qué jugar.</p></div><button id="toggleTable">Mostrar herramienta</button></div>
+ <div id="tableTools" class="hidden">
+  <div class="panel" style="margin-top:12px"><h3>Aventura generada</h3><div id="story" class="story">Pulsa «Generar propuesta» para obtener una idea.</div><div id="rolls" class="rolls"></div></div>
+  <div class="actions"><button class="primary" id="generate">⚄ Generar propuesta</button><button id="reset">Limpiar</button></div>
+  <div class="table-wrap"><table><thead><tr><th>1. Una amenaza...</th><th>2. Que quiere...</th><th>3. Para conseguirlo...</th><th>4. Lo que podría suceder...</th></tr></thead><tbody id="rows"></tbody></table></div>
+ </div>
+</section>
  <div id="homeError" class="error" role="alert"></div>
 </section>
 
@@ -118,24 +121,17 @@ const optionSets={
 };
 function showError(el,msg){$(el).textContent=msg||""}
 
-let homeTab="rooms";
-function showHomeTab(tab){
- homeTab=tab;
- $("homeRoomsPanel").classList.toggle("hidden",tab!=="rooms");
- $("homeCreatePanel").classList.toggle("hidden",tab!=="create");
- $("randomTools").classList.toggle("hidden",tab!=="random");
- document.querySelectorAll(".home-tab").forEach(button=>button.classList.toggle("active",button.dataset.tab===tab));
-}
 function setAuthUI(){
  const logged=!!authUser;
  $("authPanel").classList.toggle("hidden",logged);
  $("accountBar").classList.toggle("hidden",!logged);
  $("profileSetup").classList.add("hidden");
- $("home").classList.toggle("hidden",!logged);
+ $("home").classList.remove("hidden");
+ $("homeCreatePanel").classList.toggle("hidden",!logged);
+ $("homeRoomsPanel").classList.toggle("hidden",!logged);
  $("roomView").classList.toggle("hidden",!logged||!session);
  $("accountEmail").textContent=authUser?.email||"";
- if(logged)showHomeTab(homeTab);
- else $("randomTools").classList.remove("hidden");
+
  if(!logged){profileName="";if(refreshTimer)clearInterval(refreshTimer);refreshTimer=null;session=null;roomState=null;}
 }
 async function signInWithGoogle(){
@@ -453,7 +449,6 @@ async function startForm(){try{await api("start_form",{roomId:session.roomId,tok
 async function saveAnswers(){}
 function buildOptions(){}
 $("createRoom").onclick=createRoom;$("refreshMyRooms").onclick=loadMyRooms;$("backToRooms").onclick=backToMyRooms;
-$("tabMyRooms").onclick=()=>showHomeTab("rooms");$("tabCreateRoom").onclick=()=>showHomeTab("create");$("tabRandomTools").onclick=()=>showHomeTab("random");
 const inviteFromUrl=new URLSearchParams(window.location.search).get("sala");
 $("copyInvite").onclick=async()=>{try{await navigator.clipboard.writeText(inviteLink(session.code));$("copyInvite").textContent="Enlace copiado"}catch{$("copyInvite").textContent="No se pudo copiar"}setTimeout(()=>$("copyInvite").textContent="Copiar enlace",1600)};
 $("startForm").onclick=startForm;$("closeCats").onclick=closeQuestionnaire;$("questionNext").onclick=goQuestionNext;$("questionPrev").onclick=goQuestionPrev;$("chatForm").onsubmit=sendChatMessage;
