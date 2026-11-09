@@ -57,7 +57,7 @@ footer{text-align:center;color:#707987;font-size:11px;padding:15px}
 </style>
 </head>
 <body>
-<header id="mainBanner" role="button" tabindex="0" aria-label="Volver al portal de inicio"><img class="main-banner-image" src="arte/banner.png" alt="Red de Roleros"><span class="site-version">Versión 1.30.0</span></header>
+<header id="mainBanner" role="button" tabindex="0" aria-label="Volver al portal de inicio"><img class="main-banner-image" src="arte/banner.png" alt="Red de Roleros"><span class="site-version">Versión 1.31.0</span></header>
 <main>
 <section id="authPanel" class="panel">
  <h2>Acceso a Red de Roleros</h2>
@@ -152,7 +152,7 @@ footer{text-align:center;color:#707987;font-size:11px;padding:15px}
      <div><label for="eventModality">Modalidad *</label><select id="eventModality" required><option value="">Selecciona</option><option>Presencial</option><option>Online</option><option>Híbrido</option></select></div>
      <div><label for="eventDate">Fecha *</label><input id="eventDate" type="date" required></div><div><label for="eventStart">Hora de inicio *</label><input id="eventStart" type="time" required></div><div><label for="eventEnd">Hora de término</label><input id="eventEnd" type="time"></div>
      <div><label for="eventRegion">Región</label><input id="eventRegion" maxlength="80" placeholder="Ej. Valparaíso"></div><div><label for="eventCommune">Comuna</label><input id="eventCommune" maxlength="80" placeholder="Ej. Viña del Mar"></div>
-     <div class="full"><label for="eventVenue">Dirección o lugar (o plataforma si es online)</label><input id="eventVenue" maxlength="180" placeholder="Dirección, recinto, Discord, etc."></div>
+     <div class="full"><label for="eventVenue">Dirección o lugar (o plataforma si es online)</label><input id="eventVenue" maxlength="180" required placeholder="Dirección, recinto, Discord, etc."></div>
      <div><label for="eventCost">Costo *</label><select id="eventCost" required><option value="free">Gratuito</option><option value="paid">Pagado</option></select></div><div id="eventPriceWrap" class="hidden"><label for="eventPrice">Valor de entrada (CLP) *</label><input id="eventPrice" type="number" min="1" step="1"></div>
      <div class="full"><label for="eventFlyer">Enlace al flyer (imagen)</label><input id="eventFlyer" type="url" maxlength="500" placeholder="https://..."></div><div><label for="eventRegistration">Enlace de inscripción o información</label><input id="eventRegistration" type="url" maxlength="500" placeholder="https://..."></div><div><label for="eventContact">Contacto</label><input id="eventContact" maxlength="200" placeholder="Correo, Instagram, WhatsApp, etc."></div>
      <div class="full actions"><button class="primary" id="submitEvent" type="submit">Enviar a revisión</button></div><div class="full" id="eventFormMessage" role="status" aria-live="polite"></div>
@@ -427,6 +427,7 @@ async function reviewEvent(eventId,status){
  try{await publicApi("review_event",{eventId,status,reviewNote});await loadEvents()}
  catch(e){$("eventAdminMessage").textContent=e.message}
 }
+$("eventModality").onchange=()=>{const local=$("eventModality").value!=="Online";$("eventRegion").required=local;$("eventCommune").required=local};
 $("eventCost").onchange=()=>{$("eventPriceWrap").classList.toggle("hidden",$("eventCost").value!=="paid");$("eventPrice").required=$("eventCost").value==="paid"};
 $("eventForm").onsubmit=async ev=>{
  ev.preventDefault();if(!authUser){$("eventFormMessage").textContent="Inicia sesión para enviar una propuesta.";return}
