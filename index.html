@@ -54,7 +54,7 @@ footer{text-align:center;color:#707987;font-size:11px;padding:15px}
 </style>
 </head>
 <body>
-<header id="mainBanner" role="button" tabindex="0" aria-label="Volver al portal de inicio"><h1>C.A.T.S.</h1><p>Una herramienta para construir juntos el concepto de una partida de rol.</p><span class="site-version">Versión 1.18.0</span></header>
+<header id="mainBanner" role="button" tabindex="0" aria-label="Volver al portal de inicio"><h1>C.A.T.S.</h1><p>Una herramienta para construir juntos el concepto de una partida de rol.</p><span class="site-version">Versión 1.19.0</span></header>
 <main>
 <section id="authPanel" class="panel">
  <h2>Acceso a C.A.T.S.</h2>
@@ -105,7 +105,8 @@ footer{text-align:center;color:#707987;font-size:11px;padding:15px}
   <div id="wantedPublishView" class="hidden">
    <div class="section-toggle"><h3>Sube una propuesta</h3><button type="button" class="small" id="wantedBackFromPublish">Volver</button></div>
   <form id="wantedForm" class="hidden">
-   <input type="hidden" id="wantedEditPostId" value="">\n    <p class="muted" id="wantedDailyLimitNote">Puedes publicar hasta 3 propuestas nuevas al día. Editar una propuesta existente no consume otro cupo; eliminarla no recupera el cupo diario.</p>
+   <input type="hidden" id="wantedEditPostId" value="">
+    <p class="muted" id="wantedDailyLimitNote">Puedes publicar hasta 3 propuestas nuevas al día. Editar una propuesta existente no consume otro cupo; eliminarla no recupera el cupo diario.</p>
    <div class="home-grid">
     <div><label for="wantedGame">Juego</label><select id="wantedGame" required><option value="">Selecciona un juego y su edición</option><optgroup label="Dungeons & Dragons"><option>Dungeons & Dragons 3.5</option><option>Dungeons & Dragons 4.ª edición</option><option>Dungeons & Dragons 5.ª edición (2014)</option><option>Dungeons & Dragons 5.ª edición revisada (2024)</option></optgroup><optgroup label="Pathfinder"><option>Pathfinder 1.ª edición</option><option>Pathfinder 2.ª edición (reglas originales)</option><option>Pathfinder 2.ª edición Remaster</option></optgroup><optgroup label="La llamada de Cthulhu"><option>La llamada de Cthulhu 1.ª edición</option><option>La llamada de Cthulhu 2.ª edición</option><option>La llamada de Cthulhu 3.ª edición</option><option>La llamada de Cthulhu 4.ª edición</option><option>La llamada de Cthulhu 5.ª edición</option><option>La llamada de Cthulhu 6.ª edición</option><option>La llamada de Cthulhu 7.ª edición</option></optgroup><optgroup label="Vampiro: La Mascarada"><option>Vampiro: La Mascarada 1.ª edición</option><option>Vampiro: La Mascarada 2.ª edición</option><option>Vampiro: La Mascarada edición revisada (3.ª)</option><option>Vampiro: La Mascarada 20.º aniversario (V20)</option><option>Vampiro: La Mascarada 5.ª edición (V5)</option></optgroup><option>Cyberpunk RED</option><option>Warhammer Fantasy Roleplay</option><option>Starfinder</option><option>Savage Worlds</option><option>Daggerheart</option><option>Blades in the Dark</option><option>Dungeon World</option><option>Fate</option><option>Mork Borg</option><option>Old-School Essentials</option><option>GURPS</option><option>Genesys</option><option>Shadowrun</option><option>Lancer</option><option>Sistema propio</option><option>Otro</option></select></div>
     <div id="wantedCustomGameWrap" class="hidden"><label for="wantedCustomGame">Nombre del juego</label><input id="wantedCustomGame" maxlength="80" placeholder="Especifica el juego"></div>
@@ -337,7 +338,9 @@ function renderWantedPosts(data){
   const author=document.createElement("p");author.textContent="Publicado por "+post.display_name+" · "+new Date(post.created_at).toLocaleDateString("es-CL");
   const location=document.createElement("p");location.textContent="📍 "+post.commune+", "+post.region;
   const contact=document.createElement("p");contact.className="wanted-contact";contact.textContent="Contacto ("+post.contact_method+"): "+post.contact_value;
-  card.append(title,role,type,mode);\n  if(post.mine){const own=document.createElement("span");own.className="wanted-own-tag";own.textContent="TU PROPUESTA";card.appendChild(own)}\n  card.append(author,location,contact);
+  card.append(title,role,type,mode);
+  if(post.mine){const own=document.createElement("span");own.className="wanted-own-tag";own.textContent="TU PROPUESTA";card.appendChild(own)}
+  card.append(author,location,contact);
   if(post.notes){const notes=document.createElement("p");notes.textContent="Notas: "+post.notes;card.appendChild(notes)}
   if(post.mine){
    const actions=document.createElement("div");actions.className="actions";
