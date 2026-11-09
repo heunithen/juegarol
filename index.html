@@ -1595,7 +1595,7 @@ function rollAll(){
  style.className="muted";
  style.textContent="Género: "+genre+" · Tono: "+tone+" · Opciones por tabla: "+tables.map(t=>t.length).join(" / ");
  const premise=document.createElement("p");
- premise.textContent="El conflicto nace de: "+values[0]+" El propósito es: "+values[1]+" Para lograrlo será necesario: "+values[2]+" Si el conflicto llega a resolverse, sus consecuencias podrían ser: "+values[3];
+ premise.textContent=values[0]+". "+values[1]+". Para conseguirlo, "+values[2]+". Esto podría provocar "+values[3]+".";
  story.append(style,premise);
 }
 // El botón se conecta desde un listener aislado al final del documento.
