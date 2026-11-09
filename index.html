@@ -1186,8 +1186,35 @@ function rollAll(){
  const premise=document.createElement("p");premise.textContent="El conflicto gira en torno a "+values[0]+". El objetivo es "+values[1]+". Para alcanzarlo, hace falta "+values[2]+". Si se consigue, podría "+values[3]+".";
  story.append(style,premise);
 }
-$("generate").onclick=rollAll;
+// El botón se conecta desde un listener aislado al final del documento.
 </script>
+<script>
+/* Listener aislado para el dado del generador. */
+(()=>{
+ const connect=()=>{
+  const button=document.getElementById("generate");
+  if(!button||button.dataset.randomBound==="1")return;
+  button.dataset.randomBound="1";
+  button.addEventListener("click",()=>{
+   try{
+    if(typeof rollAll==="function")rollAll();
+    else{
+     const output=document.getElementById("story");
+     if(output)output.textContent="No se pudo iniciar el generador. Recarga la página e inténtalo nuevamente.";
+     console.error("No está disponible la función rollAll.");
+    }
+   }catch(error){
+    const output=document.getElementById("story");
+    if(output)output.textContent="Error al generar la premisa: "+(error?.message||"error desconocido");
+    console.error("Error en el generador de premisas:",error);
+   }
+  });
+ };
+ if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",connect,{once:true});
+ else connect();
+})();
+</script>
+
 
 
 </body></html>
