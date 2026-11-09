@@ -862,7 +862,8 @@ async function resumeRoom(roomId,button){
  catch(err){showError("homeError",err.message);await loadMyRooms()}
  finally{if(button&&button.isConnected)button.disabled=false}
 }
-function backToMyRooms(){
+async function backToMyRooms(){
+ if(session){try{await api("leave",{roomId:session.roomId,token:session.token})}catch(e){console.warn(e)}}
  clearSession();$("catsScreen").classList.add("hidden");$("roomView").classList.add("hidden");$("home").classList.remove("hidden");setHomeTab("rooms");
 }
 async function returnToPortal(){
@@ -1015,7 +1016,7 @@ function renderMatches(players){
  [["Líneas del grupo","lines"],["Velos del grupo","veils"]].forEach(([title,key])=>{const card=document.createElement("section");card.className="match-card";const h=document.createElement("h3");h.textContent=title;card.appendChild(h);const entries=[];players.forEach(p=>normalizeEntries(p.answers?.[key]).forEach(value=>entries.push({name:p.display_name,value})));if(!entries.length){const empty=document.createElement("div");empty.className="match-empty";empty.textContent="Todavía no hay entradas.";card.appendChild(empty)}else{const list=document.createElement("ul");entries.forEach(entry=>{const item=document.createElement("li");item.style.margin="7px 0";const value=document.createElement("span");value.textContent=entry.value;const author=document.createElement("small");author.style.display="block";author.style.color="var(--muted)";author.textContent=entry.name;item.append(value,author);list.appendChild(item)});card.appendChild(list)}safetyGrid.appendChild(card)});box.appendChild(safetyGrid);
 }
 async function kickPlayer(p){
- if(!confirm("¿Expulsar a "+p.display_name+" de la sala? No podrá volver a entrar, aunque conserve el enlace."))return;
+ if(!confirm("¿Expulsar a "+p.display_name+" de la sala? Podrá volver a entrar si conserva el enlace o el código."))return;
  try{await api("kick",{roomId:session.roomId,token:session.token,participantId:p.id});await refreshRoom()}catch(e){alert(e.message)}
 }
 async function toggleRoomClosed(){
