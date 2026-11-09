@@ -163,23 +163,15 @@ header{background:#000;border-bottom:1px solid var(--line);padding:12px 22px}
  <section id="rpgMusic" class="rpg-music-bar" aria-label="Reproductor de música">
   <div class="rpg-music-compact">
    <div class="rpg-music-info">
-    <label for="rpgMusicPlaylist">Lista de reproducción</label>
-    <select id="rpgMusicPlaylist">
-     <option value="PLAMGM1hSRIUojpGz2TlXyBesgmgQnV3Hi">Lista 1</option>
-     <option value="PLBD52E8E1408D64B5">Lista 2</option>
-     <option value="PL965C264E02026EDD">Lista 3</option>
-     <option value="PLuiE5nl-czOHWZ2PxifUOKKAz4BSJbA56">Lista 4</option>
-     <option value="PLlxWRGc5d5vh-eGUFiDsm7qR1wBWX10i1">Lista 5</option>
-    </select>
-    <div class="rpg-music-now"><span class="rpg-music-label">SONANDO</span><span id="rpgMusicTrack" aria-live="polite">Selecciona una lista y pulsa reproducir.</span></div>
+    <div class="rpg-music-now"><span class="rpg-music-label">SONANDO</span><span id="rpgMusicTrack" aria-live="polite">Preparando la biblioteca musical…</span></div>
     <div class="rpg-music-controls">
      <button type="button" id="rpgMusicPrev" class="small" aria-label="Canción anterior" title="Canción anterior">⏮</button>
      <button type="button" id="rpgMusicPlay" class="small" aria-label="Reproducir música">▶</button>
      <button type="button" id="rpgMusicPause" class="small" aria-label="Pausar música">Ⅱ</button>
-     <button type="button" id="rpgMusicNext" class="small" aria-label="Canción siguiente" title="Canción siguiente">⏭</button>
+     <button type="button" id="rpgMusicNext" class="small" aria-label="Canción aleatoria siguiente" title="Canción aleatoria siguiente">⏭</button>
      <label class="rpg-music-volume" for="rpgMusicVolume" title="Volumen">♪</label>
      <input id="rpgMusicVolume" type="range" min="0" max="100" value="65" aria-label="Volumen de música" title="Volumen">
-     <a id="rpgMusicOpen" href="https://www.youtube.com/playlist?list=PLAMGM1hSRIUojpGz2TlXyBesgmgQnV3Hi" target="_blank" rel="noopener noreferrer" title="Abrir lista en YouTube">Abrir lista ↗</a>
+     <a id="rpgMusicOpen" href="https://www.youtube.com/playlist?list=PLAMGM1hSRIUojpGz2TlXyBesgmgQnV3Hi" target="_blank" rel="noopener noreferrer" title="Abrir lista de origen">Ver lista ↗</a>
     </div>
    </div>
    <div class="rpg-music-frame" aria-hidden="true"><div id="rpgMusicPlayer"></div></div>
@@ -226,7 +218,7 @@ header{background:#000;border-bottom:1px solid var(--line);padding:12px 22px}
     <article class="welcome-item">
      <img class="welcome-section-banner" src="arte/eventos.webp?v=1.52.20" alt="Eventos de rol">
      <h3>Eventos</h3><p>Encuentra jornadas, convenciones, encuentros, partidas especiales, torneos y talleres. Si organizas una actividad, puedes proponerla para que sea revisada y publicada en el portal.</p><button type="button" class="small" id="welcomeGoEvents">Ver eventos</button></article>
-    <article class="welcome-item"><img class="welcome-section-banner" src="arte/herramientas.webp?v=1.52.29" alt="Herramientas para preparar partidas"><h3>Herramientas</h3><p>Prepara tus partidas con C.A.T.S., una herramienta colaborativa para acordar el concepto, el objetivo, el tono, la temática y los límites de la mesa. También puedes usar el Generador de premisas aleatorias para inspirarte cuando no sepas qué aventura dirigir.</p><button type="button" class="small" id="welcomeGoRooms">Abrir herramientas</button></article>
+    <article class="welcome-item"><img class="welcome-section-banner" src="arte/herramientas.webp?v=1.52.30" alt="Herramientas para preparar partidas"><h3>Herramientas</h3><p>Prepara tus partidas con C.A.T.S., una herramienta colaborativa para acordar el concepto, el objetivo, el tono, la temática y los límites de la mesa. También puedes usar el Generador de premisas aleatorias para inspirarte cuando no sepas qué aventura dirigir.</p><button type="button" class="small" id="welcomeGoRooms">Abrir herramientas</button></article>
     <article class="welcome-item"><img class="welcome-section-banner" src="arte/comunidades.webp?v=1.52.29" alt="Comunidades roleras"><h3>Comunidades</h3><p>Conoce clubes, agrupaciones, proyectos y comunidades roleras de Chile. Visita sus perfiles y redes para descubrir sus actividades y formas de participar.</p><button type="button" class="small" id="welcomeGoCommunities">Conocer comunidades</button></article>
     <article class="welcome-item"><img class="welcome-section-banner" src="arte/rol%20gratis.webp?v=1.52.29" alt="Juegos de rol gratuitos"><h3>¡Rol gratis!</h3><p>Descubre juegos de rol completos que puedes consultar o descargar gratuitamente, en español y en inglés, con enlaces a sus autores o distribuidores originales.</p><button type="button" class="small" id="welcomeGoFreeRpg">Explorar juegos</button></article>
     <article class="welcome-item"><img class="welcome-section-banner" src="arte/quienes%20somos.webp?v=1.52.29" alt="Quiénes somos"><h3>¿Quiénes somos?</h3><p>Conoce el propósito de Red de Roleros, nuestro proyecto y cómo puedes enviarnos sugerencias para mejorar el portal.</p><button type="button" class="small" id="welcomeGoAbout">Conócenos</button></article>
@@ -1872,7 +1864,7 @@ function rollAll(){
 <style>
 #rpgMusic.rpg-music-bar{display:flex;align-items:center;gap:10px;width:100%;min-height:34px;height:34px;padding:3px max(12px,calc((100% - 1100px)/2));background:#202630;border-bottom:1px solid var(--line);border-top:1px solid #343d49}
 #rpgMusic .rpg-music-compact{display:flex;align-items:center;gap:8px;width:100%;min-width:0}
-#rpgMusic .rpg-music-info{display:grid;grid-template-columns:minmax(110px,165px) minmax(80px,1fr) auto;align-items:center;gap:8px;width:100%;min-width:0}
+#rpgMusic .rpg-music-info{display:grid;grid-template-columns:minmax(80px,1fr) auto;align-items:center;gap:8px;width:100%;min-width:0}
 #rpgMusic label{display:none}
 #rpgMusic select{width:100%;min-width:0;background:#171c23;color:var(--text);border:1px solid var(--line);border-radius:5px;padding:3px 6px;font:11px system-ui;height:26px}
 #rpgMusic .rpg-music-now{display:flex;align-items:center;gap:6px;min-width:0;margin:0}
@@ -1885,12 +1877,17 @@ function rollAll(){
 #rpgMusic .rpg-music-controls a{font-size:9px;color:var(--muted);margin-left:2px;white-space:nowrap}
 #rpgMusic .rpg-music-frame{position:fixed;left:-10000px;top:0;width:200px;height:200px;overflow:hidden;pointer-events:none;opacity:0}
 #rpgMusic #rpgMusicPlayer{width:200px;height:200px}
-@media(max-width:600px){#rpgMusic.rpg-music-bar{min-height:34px;height:auto;padding:4px 8px}#rpgMusic .rpg-music-info{grid-template-columns:minmax(85px,115px) minmax(0,1fr) auto;gap:5px}#rpgMusic .rpg-music-controls a{display:none}#rpgMusic #rpgMusicTrack{font-size:9px}}
+@media(max-width:600px){#rpgMusic.rpg-music-bar{min-height:34px;height:auto;padding:4px 8px}#rpgMusic .rpg-music-info{grid-template-columns:minmax(0,1fr) auto;gap:5px}#rpgMusic .rpg-music-controls a{display:none}#rpgMusic #rpgMusicTrack{font-size:9px}}
 </style>
 <script>
 (function(){
- const playlist=document.getElementById('rpgMusicPlaylist');
- if(!playlist)return;
+ const playlists=[
+  'PLAMGM1hSRIUojpGz2TlXyBesgmgQnV3Hi',
+  'PLBD52E8E1408D64B5',
+  'PL965C264E02026EDD',
+  'PLuiE5nl-czOHWZ2PxifUOKKAz4BSJbA56',
+  'PLlxWRGc5d5vh-eGUFiDsm7qR1wBWX10i1'
+ ];
  const title=document.getElementById('rpgMusicTrack');
  const playBtn=document.getElementById('rpgMusicPlay');
  const pauseBtn=document.getElementById('rpgMusicPause');
@@ -1898,45 +1895,65 @@ function rollAll(){
  const nextBtn=document.getElementById('rpgMusicNext');
  const volume=document.getElementById('rpgMusicVolume');
  const openLink=document.getElementById('rpgMusicOpen');
- let player=null,ready=false,shuffleTimer=null;
+ let player=null,ready=false,waitingForPlaylist=false,lastVideo='',lastPlaylist=playlists[0];
+ let history=[],historyIndex=-1;
  function updateTitle(){
   if(!player||!ready)return;
   const data=player.getVideoData&&player.getVideoData();
   if(data&&data.title)title.textContent=data.title;
  }
- function enableShuffle(){
-  if(!player||!ready)return;
-  try{player.setShuffle(true);}catch(e){}
+ function randomItem(items){
+  if(!items||!items.length)return null;
+  let choices=items.filter(id=>id&&id!==lastVideo);
+  if(!choices.length)choices=items.filter(Boolean);
+  return choices.length?choices[Math.floor(Math.random()*choices.length)]:null;
  }
- function queueSelectedPlaylist(){
+ function loadRandomFromPlaylist(pushHistory=true){
   if(!player||!ready)return;
-  title.textContent='Cargando lista aleatoria…';
-  player.cuePlaylist({list:playlist.value,listType:'playlist',index:0});
-  clearTimeout(shuffleTimer);
-  shuffleTimer=setTimeout(enableShuffle,900);
+  const playlist=playlists[Math.floor(Math.random()*playlists.length)];
+  lastPlaylist=playlist;
+  if(openLink)openLink.href='https://www.youtube.com/playlist?list='+playlist;
+  title.textContent='Buscando una canción al azar entre las cinco listas…';
+  waitingForPlaylist=true;
+  player.cuePlaylist({list:playlist,listType:'playlist',index:0});
+  player.__pushRandomHistory=pushHistory;
  }
- function updatePlaylistLink(){
-  if(openLink)openLink.href='https://www.youtube.com/playlist?list='+playlist.value;
+ function chooseFromLoadedPlaylist(){
+  const items=player.getPlaylist&&player.getPlaylist();
+  const videoId=randomItem(items);
+  waitingForPlaylist=false;
+  if(!videoId){
+   title.textContent='No se pudieron cargar canciones de esta lista. Intentando otra…';
+   setTimeout(()=>loadRandomFromPlaylist(false),900);
+   return;
+  }
+  lastVideo=videoId;
+  if(player.__pushRandomHistory!==false){
+   history=history.slice(0,historyIndex+1);
+   history.push(videoId);
+   historyIndex=history.length-1;
+  }
+  player.loadVideoById(videoId);
  }
  function initPlayer(){
   if(!window.YT||!window.YT.Player){setTimeout(initPlayer,250);return;}
   player=new YT.Player('rpgMusicPlayer',{
    width:'200',height:'200',
-   playerVars:{listType:'playlist',list:playlist.value,controls:0,rel:0,playsinline:1,iv_load_policy:3,enablejsapi:1},
+   playerVars:{controls:0,rel:0,playsinline:1,iv_load_policy:3,enablejsapi:1},
    events:{
     onReady:function(){
      ready=true;
      player.setVolume(Number(volume.value));
-     title.textContent='Lista preparada en modo aleatorio. Pulsa reproducir.';
-     queueSelectedPlaylist();
+     loadRandomFromPlaylist();
     },
     onStateChange:function(e){
-     if(e.data===YT.PlayerState.CUED)enableShuffle();
-     updateTitle();
-     if(e.data===YT.PlayerState.PLAYING)setTimeout(updateTitle,350);
+     if(e.data===YT.PlayerState.CUED&&waitingForPlaylist)chooseFromLoadedPlaylist();
+     if(e.data===YT.PlayerState.PLAYING)setTimeout(updateTitle,300);
+     if(e.data===YT.PlayerState.ENDED)loadRandomFromPlaylist();
     },
-    onError:function(e){
-     title.textContent='YouTube no permite reproducir esta lista (código '+e.data+'). Usa «Abrir lista».';
+    onError:function(){
+     title.textContent='No se pudo reproducir esta canción. Buscando otra…';
+     setTimeout(()=>loadRandomFromPlaylist(),700);
     }
    }
   });
@@ -1947,18 +1964,20 @@ function rollAll(){
  }else if(window.YT&&window.YT.Player)initPlayer();
  playBtn.addEventListener('click',function(){
   if(!ready){title.textContent='Cargando reproductor… espera un momento y vuelve a pulsar.';return;}
-  player.playVideo();
-  setTimeout(updateTitle,700);
+  if(player.getPlayerState()===YT.PlayerState.PAUSED)player.playVideo();
+  else if(player.getPlayerState()!==YT.PlayerState.PLAYING)player.playVideo();
  });
  pauseBtn.addEventListener('click',function(){if(ready)player.pauseVideo();});
- prevBtn.addEventListener('click',function(){if(ready){player.previousVideo();setTimeout(updateTitle,450);}});
- nextBtn.addEventListener('click',function(){if(ready){player.nextVideo();setTimeout(updateTitle,450);}});
- volume.addEventListener('input',function(){if(ready)player.setVolume(Number(volume.value));});
- updatePlaylistLink();
- playlist.addEventListener('change',function(){
-  updatePlaylistLink();
-  queueSelectedPlaylist();
+ prevBtn.addEventListener('click',function(){
+  if(!ready)return;
+  if(historyIndex>0){
+   historyIndex--;
+   lastVideo=history[historyIndex];
+   player.loadVideoById(lastVideo);
+  }else loadRandomFromPlaylist();
  });
+ nextBtn.addEventListener('click',function(){if(ready)loadRandomFromPlaylist();});
+ volume.addEventListener('input',function(){if(ready)player.setVolume(Number(volume.value));});
 })();;
 </script>
 </body></html>
