@@ -114,7 +114,7 @@ header{background:#000;border-bottom:1px solid var(--line);padding:12px 22px}
 <body>
 <header id="mainBanner" role="button" tabindex="0" aria-label="Volver al portal de inicio">
  <div class="header-layout">
-  <div class="header-brand"><img class="main-banner-image" src="arte/banner.png" alt="Red de Roleros"><span class="site-version">Versión 1.47.5</span></div>
+  <div class="header-brand"><img class="main-banner-image" src="arte/banner.png" alt="Red de Roleros"><span class="site-version">Versión 1.47.6</span></div>
   
  </div>
 </header>
@@ -1578,16 +1578,19 @@ function rollAll(){
  const genre=$("randomGenre").value.trim(),tone=$("randomTone").value;
  const story=$("story");
  story.replaceChildren();
- const tables=genre==="Otro / mezcla"?originalTables:(genreTables&&genreTables[genre]);
- if(!Array.isArray(tables)||tables.length!==4||tables.some(table=>!Array.isArray(table)||table.length===0)){
-  story.textContent="No se encontraron las cuatro tablas del género seleccionado («"+genre+"»). Recarga la página e inténtalo nuevamente.";
-  console.error("Tablas no disponibles para el género:",genre,Object.keys(genreTables||{}));
+ const genreKey=Object.keys(genreTables||{}).find(key=>key.trim().toLocaleLowerCase("es")===genre.toLocaleLowerCase("es"));
+ const tables=genre==="Otro / mezcla"?originalTables:(genreKey?genreTables[genreKey]:null);
+ const valid=Array.isArray(tables)&&tables.length===4&&tables.every(table=>Array.isArray(table)&&table.length>0);
+ if(!valid){
+  const details=Array.isArray(tables)?"Se detectaron "+tables.length+" tablas.":"No se encontró una entrada para este género.";
+  story.textContent="Error en las tablas de «"+genre+"». "+details+" Géneros disponibles: "+Object.keys(genreTables||{}).join(", ")+".";
+  console.error("Estructura inválida del generador:",{genre,genreKey,tables});
   return;
  }
  const values=tables.map(table=>table[Math.floor(Math.random()*table.length)]);
  const style=document.createElement("p");
  style.className="muted";
- style.textContent="Género: "+genre+" · Tono: "+tone+" · Tablas temáticas: "+tables.map(t=>t.length).join(" / ");
+ style.textContent="Género: "+genre+" · Tono: "+tone+" · Opciones por tabla: "+tables.map(t=>t.length).join(" / ");
  const premise=document.createElement("p");
  premise.textContent="El conflicto nace de: "+values[0]+" El propósito es: "+values[1]+" Para lograrlo será necesario: "+values[2]+" Si el conflicto llega a resolverse, sus consecuencias podrían ser: "+values[3];
  story.append(style,premise);
