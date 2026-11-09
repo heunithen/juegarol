@@ -103,6 +103,9 @@ async function api(action,data={}){
  return json;
 }
 function saveSession(){localStorage.setItem(STORAGE_KEY,JSON.stringify(session))}
+function draftKey(){return session?"cats_draft_"+session.roomId+"_"+session.participantId:null}
+function saveDraft(){if(!session)return;localStorage.setItem(draftKey(),JSON.stringify({C:$("answerC").value,A:$("answerA").value,T:$("answerT").value,S:$("answerS").value}))}
+function loadDraft(){if(!session)return;try{const d=JSON.parse(localStorage.getItem(draftKey())||"null");if(d){$("answerC").value=d.C||"";$("answerA").value=d.A||"";$("answerT").value=d.T||"";$("answerS").value=d.S||""}}catch{}}
 function clearSession(){localStorage.removeItem(STORAGE_KEY);session=null;roomState=null;if(refreshTimer)clearInterval(refreshTimer);refreshTimer=null}
 function enterRoom(data){
  session={roomId:data.room.id,code:data.room.code,participantId:data.participant.id,token:data.token};
@@ -169,7 +172,7 @@ async function saveAnswers(){
  const answers={C:$("answerC").value.trim(),A:$("answerA").value.trim(),T:$("answerT").value.trim(),S:$("answerS").value.trim()};
  if(Object.values(answers).some(v=>!v)){ $("saveMessage").textContent="Completa los cuatro apartados antes de guardar.";return}
  $("saveMessage").textContent="Guardando...";
- try{await api("submit",{roomId:session.roomId,token:session.token,answers});$("saveMessage").textContent="Respuestas guardadas. Ya puedes revisar las de los demás jugadores.";await refreshRoom()}catch(e){$("saveMessage").textContent=e.message}
+ try{await api("submit",{roomId:session.roomId,token:session.token,answers});saveDraft();$("saveMessage").textContent="Respuestas guardadas. Ya puedes revisar las de los demás jugadores.";await refreshRoom()}catch(e){$("saveMessage").textContent=e.message}
 }
 function buildOptions(){
  Object.entries(optionSets).forEach(([key,items])=>{
@@ -181,7 +184,7 @@ $("createRoom").onclick=createRoom;$("joinRoom").onclick=joinRoom;$("joinCode").
 $("copyCode").onclick=async()=>{try{await navigator.clipboard.writeText(session.code);$("copyCode").textContent="Copiado"}catch{$("copyCode").textContent="No se pudo copiar"}setTimeout(()=>$("copyCode").textContent="Copiar código",1600)};
 $("leaveRoom").onclick=leaveRoom;$("saveAnswers").onclick=saveAnswers;$("refreshRoom").onclick=refreshRoom;
 buildOptions();
-try{const stored=JSON.parse(localStorage.getItem(STORAGE_KEY)||"null");if(stored&&stored.roomId&&stored.token){session=stored;$("home").classList.add("hidden");$("roomView").classList.remove("hidden");$("roomCode").textContent=stored.code;$("roomTitle").textContent="Sala "+stored.code;refreshRoom();refreshTimer=setInterval(refreshRoom,4500)}}catch{clearSession()}
+try{const stored=JSON.parse(localStorage.getItem(STORAGE_KEY)||"null");if(stored&&stored.roomId&&stored.token){session=stored;$("home").classList.add("hidden");$("roomView").classList.remove("hidden");$("roomCode").textContent=stored.code;$("roomTitle").textContent="Sala "+stored.code;loadDraft();refreshRoom();refreshTimer=setInterval(refreshRoom,4500)}}catch{clearSession()}
 
 // Generador aleatorio auxiliar
 const tables=[
