@@ -368,12 +368,22 @@ function setAuthUI(){
 
  if(!logged){profileName="";if(refreshTimer)clearInterval(refreshTimer);refreshTimer=null;session=null;roomState=null;}
 }
+function showPasswordRecovery(){
+ $("passwordRecovery").classList.remove("hidden");
+ $("authPanel").classList.add("hidden");
+ $("profileSetup").classList.add("hidden");
+ $("home").classList.add("hidden");
+ $("accountBar").classList.add("hidden");
+ $("roomView").classList.add("hidden");
+ $("recoveryMessage").textContent="Enlace verificado. Elige tu nueva contraseña.";
+}
 async function sendPasswordRecovery(){
  const email=$("authEmail").value.trim(),message=$("authMessage");
  if(!email){message.textContent="Introduce tu correo electrónico para enviarte el enlace.";return;}
  $("forgotPassword").disabled=true;message.textContent="Enviando enlace de recuperación...";
  try{
-  const {error}=await sb.auth.resetPasswordForEmail(email,{redirectTo:window.location.origin+window.location.pathname});
+  const recoveryUrl=new URL(window.location.pathname,window.location.origin);recoveryUrl.searchParams.set("password_recovery","1");
+  const {error}=await sb.auth.resetPasswordForEmail(email,{redirectTo:recoveryUrl.toString()});
   if(error)throw error;
   message.textContent="Si el correo corresponde a una cuenta, recibirás un enlace para restablecer la contraseña. Revisa también el correo no deseado.";
  }catch(e){message.textContent="No se pudo enviar el enlace: "+(e?.message||"Error desconocido");}
@@ -389,7 +399,9 @@ async function saveNewPassword(){
   if(error)throw error;
   $("passwordRecovery").classList.add("hidden");
   $("newPassword").value="";$("confirmNewPassword").value="";
-  message.textContent="";authSession=(await sb.auth.getSession()).data.session;authUser=authSession?.user||null;
+  message.textContent="";
+  const cleanUrl=new URL(window.location.href);cleanUrl.searchParams.delete("password_recovery");window.history.replaceState({},document.title,cleanUrl.toString());
+  authSession=(await sb.auth.getSession()).data.session;authUser=authSession?.user||null;
   setAuthUI();await ensureProfile();setAuthUI();await restoreRoomSession();await loadWantedPosts();await loadEvents();
   $("authMessage").textContent="Contraseña actualizada. Ya puedes entrar con tu nueva contraseña.";
  }catch(e){message.textContent="No se pudo actualizar la contraseña: "+(e?.message||"Error desconocido");}
@@ -1078,6 +1090,11 @@ loadWantedPosts();
 loadEvents();
 sb.auth.getSession().then(async({data})=>{
  authSession=data.session;authUser=data.session?.user||null;
+ if(new URLSearchParams(window.location.search).get("password_recovery")==="1"){
+  if(authSession){showPasswordRecovery();}
+  else{$("recoveryMessage").textContent="No se pudo validar el enlace. Solicita uno nuevo e inténtalo otra vez.";$("passwordRecovery").classList.remove("hidden");$("authPanel").classList.add("hidden");}
+  return;
+ }
  if(authUser){
   try{await ensureProfile();setAuthUI();await restoreRoomSession();await enterFromInviteIfPresent();await loadEvents();}
   catch(e){setAuthUI();$("profileMessage").textContent=e.message;}
@@ -1085,12 +1102,8 @@ sb.auth.getSession().then(async({data})=>{
 });
 sb.auth.onAuthStateChange((_event,newSession)=>{
  authSession=newSession;authUser=newSession?.user||null;profileName="";
- if(_event==="PASSWORD_RECOVERY"){
-  $("passwordRecovery").classList.remove("hidden");
-  $("authPanel").classList.add("hidden");
-  $("home").classList.add("hidden");
-  $("accountBar").classList.add("hidden");
-  $("recoveryMessage").textContent="Enlace verificado. Elige tu nueva contraseña.";
+ if(_event==="PASSWORD_RECOVERY"||new URLSearchParams(window.location.search).get("password_recovery")==="1"){
+  showPasswordRecovery();
   return;
  }
  if(!authUser){setAuthUI();return;}
