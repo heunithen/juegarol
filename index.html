@@ -113,7 +113,7 @@ header{background:#000;border-bottom:1px solid var(--line);padding:12px 22px}
 <body>
 <header id="mainBanner" role="button" tabindex="0" aria-label="Volver al portal de inicio">
  <div class="header-layout">
-  <div class="header-brand"><img class="main-banner-image" src="arte/banner.png" alt="Red de Roleros"><span class="site-version">Versión 1.46.5</span></div>
+  <div class="header-brand"><img class="main-banner-image" src="arte/banner.png" alt="Red de Roleros"><span class="site-version">Versión 1.46.6</span></div>
   
  </div>
 </header>
@@ -1097,16 +1097,11 @@ $("copyInvite").onclick=async()=>{try{await navigator.clipboard.writeText(invite
 $("startForm").onclick=startForm;$("closePinned").onclick=()=>{$("catsPinned").classList.add("hidden")};$("closeCats").onclick=closeQuestionnaire;$("questionNext").onclick=goQuestionNext;$("questionPrev").onclick=goQuestionPrev;$("chatForm").onsubmit=sendChatMessage;
 $("leaveRoom").onclick=leaveRoom;$("refreshRoom").onclick=refreshRoom;$("toggleRoomClosed").onclick=toggleRoomClosed;
 buildOptions();
-$("authPanel").classList.add("hidden");
-$("accountBar").classList.add("hidden");
+setAuthUI();
 loadWantedPosts();
 loadEvents();
-// getSession es la única fuente para resolver la sesión inicial.
-// INITIAL_SESSION se ignora en el listener para evitar procesarla dos veces.
-sb.auth.getSession().then(async({data,error})=>{
- if(error)console.error("No se pudo recuperar la sesión:",error.message);
- authSession=data?.session||null;
- authUser=authSession?.user||null;
+sb.auth.getSession().then(async({data})=>{
+ authSession=data.session;authUser=data.session?.user||null;
  if(new URLSearchParams(window.location.search).get("password_recovery")==="1"){
   if(authSession){showPasswordRecovery();}
   else{
@@ -1117,26 +1112,12 @@ sb.auth.getSession().then(async({data,error})=>{
   return;
  }
  if(authUser){
-  try{
-   await ensureProfile();
-   setAuthUI();
-   await restoreRoomSession();
-   await enterFromInviteIfPresent();
-   await loadEvents();
-  }catch(e){
-   setAuthUI();
-   $("profileMessage").textContent=e?.message||"No se pudo cargar el perfil.";
-  }
+  try{await ensureProfile();setAuthUI();await restoreRoomSession();await enterFromInviteIfPresent();await loadEvents();}
+  catch(e){setAuthUI();$("profileMessage").textContent=e.message;}
  }else setAuthUI();
-}).catch(error=>{
- console.error("Error al recuperar la sesión:",error?.message||error);
- setAuthUI();
 });
 sb.auth.onAuthStateChange((_event,newSession)=>{
- if(_event==="INITIAL_SESSION")return;
- authSession=newSession||null;
- authUser=newSession?.user||null;
- profileName="";
+ authSession=newSession;authUser=newSession?.user||null;profileName="";
  if(_event==="PASSWORD_RECOVERY"||new URLSearchParams(window.location.search).get("password_recovery")==="1"){
   if(authSession)showPasswordRecovery();
   return;
@@ -1144,17 +1125,9 @@ sb.auth.onAuthStateChange((_event,newSession)=>{
  if(!authUser){setAuthUI();return;}
  setAuthUI();
  setTimeout(async()=>{
-  if(!authUser||authUser.id!==newSession?.user?.id)return;
-  try{
-   await ensureProfile();
-   setAuthUI();
-   await loadWantedPosts();
-   await loadEvents();
-   if(!session){await restoreRoomSession();await enterFromInviteIfPresent();}
-  }catch(e){
-   setAuthUI();
-   $("profileMessage").textContent=e?.message||"No se pudo cargar el perfil.";
-  }
+  if(!authUser||authUser.id!==newSession.user.id)return;
+  try{await ensureProfile();setAuthUI();await loadWantedPosts();await loadEvents();if(!session){await restoreRoomSession();await enterFromInviteIfPresent();}}
+  catch(e){setAuthUI();$("profileMessage").textContent=e.message;}
  },0);
 });
 // Generador aleatorio auxiliar
