@@ -42,16 +42,16 @@ tbody tr:hover{background:#2b323e}
 <body>
 <header>
 <h1>Generador de aventuras</h1>
-<p>Combina siete elementos generales para crear el punto de partida de una aventura. Lanza cada dado por separado o genera una combinación completa.</p>
+<p>Combina cuatro elementos generales para crear el punto de partida de una aventura. Lanza cada dado por separado o genera una combinación completa.</p>
 </header>
 <main>
 <section class="result" aria-live="polite">
 <h2>Aventura generada</h2>
-<div id="story" class="story">Pulsa «Generar aventura completa» para construir un conflicto conectado y sus complicaciones.</div>
+<div id="story" class="story">Pulsa «Generar aventura» para generar un conflicto.</div>
 <div id="rolls" class="rolls"></div>
 </section>
 <div class="actions">
-<button class="primary" id="generate">⚄ Generar aventura completa</button>
+<button class="primary" id="generate">⚄ Generar aventura</button>
 <button id="reroll">↻ Volver a generar</button>
 <button id="reset">Limpiar resultados</button>
 </div>
@@ -59,18 +59,15 @@ tbody tr:hover{background:#2b323e}
 <div class="table-wrap">
 <table>
 <thead><tr>
-<th style="width:14%">1. Una amenaza...<span>1d12 · ¿Qué provoca el conflicto?</span></th>
-<th style="width:13%">2. Que quiere...<span>1d12 · Motivación</span></th>
-<th style="width:13%">3. Para conseguirlo...<span>1d12 · Elemento central</span></th>
-<th style="width:14%">4. Lo que podría...<span>1d12 · Consecuencia</span></th>
-<th style="width:13%">5. Todo comienza cuando...<span>1d10 · Inicio</span></th>
-<th style="width:14%">6. Pero...<span>1d12 · Complicación</span></th>
-<th style="width:14%">7. Además...<span>1d10 · Giro inesperado</span></th>
+<th style="width:25%">1. Una amenaza...<span>1d12</span></th>
+<th style="width:25%">2. Que quiere...<span>1d12</span></th>
+<th style="width:25%">3. Para conseguirlo...<span>1d12</span></th>
+<th style="width:25%">4. Lo que podría...<span>1d12</span></th>
 </tr></thead>
 <tbody id="rows"></tbody>
 </table>
 </div>
-<p class="hint">Las primeras cuatro columnas plantean el conflicto y sus posibles consecuencias. Las tres últimas añaden el inicio, una complicación y un giro. Los resultados son ideas generales que puedes interpretar y conectar libremente.</p>
+<p class="hint">Los cuatro resultados plantean una amenaza, lo que busca, lo que necesita y las posibles consecuencias de conseguirlo. Interpreta y conecta las ideas libremente.</p>
 </main>
 <script>
 const tables = [
@@ -130,47 +127,9 @@ const tables = [
 "Desencadenar una crisis que se extenderá progresivamente.",
 "Cambiar radicalmente el futuro de una sociedad."
 ]},
-{title:"Todo comienza cuando",die:10,items:[
-"Los personajes reciben una petición de ayuda.",
-"Les ofrecen una recompensa por intervenir.",
-"Descubren algo que debería permanecer oculto.",
-"Son testigos de un acontecimiento inesperado.",
-"Alguien cercano les pide ayuda.",
-"Se ven involucrados accidentalmente.",
-"Son acusados de algo que no hicieron.",
-"Encuentran algo que cambia sus planes.",
-"Reciben una advertencia sobre un peligro inminente.",
-"La amenaza los convierte en sus objetivos."
-]},
-{title:"Pero",die:12,items:[
-"Existe un plazo limitado para actuar.",
-"Alguien cercano está involucrado.",
-"La información disponible es falsa o incompleta.",
-"Existe un traidor entre los aliados.",
-"Hay intereses enfrentados entre los involucrados.",
-"La amenaza es mucho más poderosa de lo esperado.",
-"Los personajes no son los únicos que buscan el objetivo.",
-"El objetivo está protegido por alguien inesperado.",
-"Resolver el problema exige un sacrificio importante.",
-"La amenaza tiene motivos legítimos para actuar.",
-"Las consecuencias ya han comenzado a manifestarse.",
-"Los personajes están siendo manipulados por alguien."
-]},
-{title:"Además",die:10,items:[
-"Aparece un aliado inesperado.",
-"Surge una segunda amenaza.",
-"Se descubre una antigua conexión con el conflicto.",
-"Existe una recompensa oculta.",
-"Aparece una oportunidad para cambiar el curso de los acontecimientos.",
-"Un enemigo ofrece su colaboración.",
-"Se descubre que existe un objetivo mayor.",
-"Alguien importante conoce la verdad.",
-"El objetivo tiene propiedades o características inesperadas.",
-"La amenaza no es la verdadera responsable del problema."
-]}
 ];
-const labels=["Amenaza","Motivación","Elemento central","Consecuencia","Inicio","Complicación","Giro"];
-let current=Array(7).fill(null);
+const labels=["Amenaza","Qué quiere","Qué necesita","Consecuencia"];
+let current=Array(4).fill(null);
 const tbody=document.getElementById("rows");
 function buildTable(){
  tbody.innerHTML="";
@@ -196,14 +155,14 @@ function render(){
  const s=document.getElementById("story");
  if(current.every(v=>v!==null)){
   const v=current.map((n,i)=>tables[i].items[n-1]);
-  s.textContent="La amenaza: "+v[0]+"\nQuiere: "+v[1]+"\nPara conseguirlo: "+v[2]+"\nSi lo consigue: "+v[3]+"\n\nLa aventura comienza cuando "+v[4].charAt(0).toLowerCase()+v[4].slice(1)+"\nPero: "+v[5]+"\nAdemás: "+v[6];
+  s.textContent="La amenaza: "+v[0]+"\\nQuiere: "+v[1]+"\\nPara conseguirlo: "+v[2]+"\\nLo que podría suceder: "+v[3];
  }else if(current.some(v=>v!==null)){
   s.textContent="Resultados parciales. Lanza los dados que faltan o genera una aventura completa.";
- }else{s.textContent="Pulsa «Generar aventura completa» para construir un conflicto conectado y sus complicaciones.";}
+ }else{s.textContent="Pulsa «Generar aventura» para generar un conflicto.";}
 }
 document.getElementById("generate").onclick=rollAll;
 document.getElementById("reroll").onclick=rollAll;
-document.getElementById("reset").onclick=()=>{current=Array(7).fill(null);render();};
+document.getElementById("reset").onclick=()=>{current=Array(4).fill(null);render();};
 buildTable();
 </script>
 </body>
