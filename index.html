@@ -341,7 +341,7 @@ const SUPABASE_URL="https://mvbbqgiakysxyacfkarh.supabase.co";
 const SUPABASE_KEY="sb_publishable_5T4XYf4LS3MsHVKEYdLQ1Q_TwUWGVUC";
 const API=SUPABASE_URL+"/functions/v1/cats-room";
 const STORAGE_KEY="cats_room_session_v1";
-const sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+const sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY,{auth:{autoRefreshToken:true,persistSession:true,detectSessionInUrl:true,storageKey:"red_de_roleros_auth_v1"}});
 let authSession=null, authUser=null, profileName="";
 let session=null, roomState=null, refreshTimer=null;
 const $=id=>document.getElementById(id);
@@ -1131,16 +1131,36 @@ function renderRandomAdventure(data){
 }
 async function rollAll(){
  const button=$("generate"),status=$("randomStatus"),box=$("story");
- if(!authSession?.access_token){status.textContent="Inicia sesión para utilizar el generador.";return}
- button.disabled=true;status.textContent="La IA está preparando la partida...";box.innerHTML="<p class='muted'>Generando premisa, PNJ y lugares...</p>";
- const dieRoll=Math.floor(Math.random()*6)+1;
+ button.disabled=true;
+ status.textContent="Comprobando sesión...";
+ box.innerHTML="<p class='muted'>Preparando la generación...</p>";
  try{
-  const response=await fetch(SUPABASE_URL+"/functions/v1/generate-random-adventure",{method:"POST",headers:{"Content-Type":"application/json","apikey":SUPABASE_KEY,"Authorization":"Bearer "+authSession.access_token},body:JSON.stringify({genre:$("randomGenre").value,tone:$("randomTone").value,notes:$("randomNotes").value.trim(),dieRoll})});
+  const {data,error:sessionError}=await sb.auth.getSession();
+  if(sessionError)throw sessionError;
+  authSession=data.session;authUser=data.session?.user||null;
+  if(!authSession?.access_token){
+   status.textContent="Tu sesión no está activa. Inicia sesión y vuelve a intentarlo.";
+   box.innerHTML="<p class='error'>No se encontró una sesión válida de Supabase.</p>";
+   setAuthUI();
+   return;
+  }
+  status.textContent="La IA está preparando la partida...";
+  box.innerHTML="<p class='muted'>Generando premisa, PNJ y lugares...</p>";
+  const dieRoll=Math.floor(Math.random()*6)+1;
+  const response=await fetch(SUPABASE_URL+"/functions/v1/generate-random-adventure",{
+   method:"POST",
+   headers:{"Content-Type":"application/json","apikey":SUPABASE_KEY,"Authorization":"Bearer "+authSession.access_token},
+   body:JSON.stringify({genre:$("randomGenre").value,tone:$("randomTone").value,notes:$("randomNotes").value.trim(),dieRoll})
+  });
   const result=await response.json().catch(()=>({error:"El servidor devolvió una respuesta no válida."}));
-  if(!response.ok)throw new Error(result.error||"No se pudo generar la partida.");
+  if(!response.ok)throw new Error(result.error||("Error HTTP "+response.status));
+  if(!result||typeof result.premise!=="string"||!Array.isArray(result.npcs)||!Array.isArray(result.places))throw new Error("La respuesta de la IA llegó incompleta.");
   renderRandomAdventure(result);status.textContent="Partida generada.";
- }catch(error){box.innerHTML="";const p=document.createElement("p");p.className="error";p.textContent=error.message;box.appendChild(p);status.textContent="No se pudo completar la generación."}
- finally{button.disabled=false}
+ }catch(error){
+  box.innerHTML="";
+  const p=document.createElement("p");p.className="error";p.textContent=error?.message||"Error desconocido al generar.";box.appendChild(p);
+  status.textContent="No se pudo completar la generación.";
+ }finally{button.disabled=false}
 }
 $("generate").onclick=rollAll;
 </script>
