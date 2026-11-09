@@ -1145,7 +1145,7 @@ function addAdventureSection(parent,title,items){
    if(result.error){
     let message=result.error.message||"Error al llamar a la función.";
     const context=result.error.context;
-    if(context&&typeof context.json==="function"){try{const body=await context.json();if(body?.error)message=body.error;}catch{}}
+    if(context&&typeof context.json==="function"){try{const body=await context.json();message=[body?.error,body?.detail,body?.api_status?("HTTP "+body.api_status):"",body?.api_type,body?.api_code,body?.api_param?("parámetro: "+body.api_param):""].filter(Boolean).join(" — ")||message;}catch{}}
     throw new Error(message);
    }
    const data=result.data;
