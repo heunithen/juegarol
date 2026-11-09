@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#171a20">
+<title>Generador de aventuras</title>
+<style>
+:root{color-scheme:dark;--bg:#171a20;--panel:#222731;--panel2:#292f3a;--line:#414957;--gold:#e2b65d;--text:#f1eee7;--muted:#aeb6c2;--green:#9bc7a5}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:15px/1.5 system-ui,-apple-system,Segoe UI,sans-serif}
+header{padding:34px 22px 24px;text-align:center;background:linear-gradient(140deg,#252b35,#171a20);border-bottom:1px solid var(--line)}
+h1{margin:0;color:var(--gold);font:700 clamp(27px,4vw,42px)/1.15 Georgia,serif;letter-spacing:.04em}
+header p{margin:10px auto 0;color:var(--muted);max-width:760px}
+main{max-width:1600px;margin:auto;padding:24px 18px 60px}
+.actions{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin:0 0 22px}
+button{border:1px solid var(--line);border-radius:8px;padding:10px 15px;background:var(--panel2);color:var(--text);font:600 14px system-ui;cursor:pointer;transition:.15s}
+button:hover{border-color:var(--gold);transform:translateY(-1px)}
+button.primary{background:var(--gold);border-color:var(--gold);color:#211b10}
+button.small{padding:6px 9px;font-size:12px}
+.result{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:20px;margin-bottom:24px}
+.result h2,.table-title{font:700 21px Georgia,serif;color:var(--gold);margin:0 0 14px}
+.story{font:17px/1.65 Georgia,serif;min-height:55px}
+.rolls{display:flex;flex-wrap:wrap;gap:8px;margin-top:15px}
+.roll-chip{background:#171c23;border:1px solid var(--line);border-radius:7px;padding:6px 9px;color:var(--muted);font-size:12px}
+.roll-chip b{color:var(--gold)}
+.table-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:10px;background:var(--panel)}
+table{border-collapse:collapse;width:100%;min-width:1320px;table-layout:fixed}
+th,td{padding:12px 11px;text-align:left;vertical-align:top;border-right:1px solid var(--line);border-bottom:1px solid var(--line)}
+th{background:#303744;color:var(--gold);font:700 14px Georgia,serif;position:sticky;top:0;z-index:1}
+th span{display:block;color:var(--muted);font:12px system-ui;margin-top:3px}
+td{font-size:13px;color:#e1e4e9}
+tr:last-child td{border-bottom:0}td:last-child,th:last-child{border-right:0}
+tbody tr:hover{background:#2b323e}
+.num{display:inline-flex;align-items:center;justify-content:center;min-width:23px;height:23px;margin-right:5px;border-radius:50%;background:#3b4350;color:var(--gold);font-size:11px;font-weight:700}
+.cell-head{display:flex;justify-content:space-between;align-items:center;gap:5px;margin-bottom:7px}
+.cell-head button{flex:none}
+.empty{color:#68717e;text-align:center}
+.hint{color:var(--muted);font-size:13px;margin:12px 2px 0}
+@media(max-width:700px){main{padding:16px 10px 40px}.result{padding:15px}.story{font-size:16px}}
+</style>
+</head>
+<body>
+<header>
+<h1>Generador de aventuras</h1>
+<p>Combina siete elementos narrativos en una sola tabla. Lanza cada dado por separado o genera una aventura completa.</p>
+</header>
+<main>
+<section class="result" aria-live="polite">
+<h2>Aventura generada</h2>
+<div id="story" class="story">Pulsa «Generar aventura» para crear un conflicto y sus complicaciones.</div>
+<div id="rolls" class="rolls"></div>
+</section>
+<div class="actions">
+<button class="primary" id="generate">⚄ Generar aventura completa</button>
+<button id="reroll">↻ Volver a generar</button>
+<button id="reset">Limpiar resultados</button>
+</div>
+<h2 class="table-title">Tabla única de generación</h2>
+<div class="table-wrap">
+<table>
+<thead><tr>
+<th style="width:14%">1. Una amenaza...<span>1d12 · ¿Qué provoca el conflicto?</span></th>
+<th style="width:13%">2. Que quiere...<span>1d12 · Motivación</span></th>
+<th style="width:13%">3. Para conseguirlo...<span>1d12 · Elemento central</span></th>
+<th style="width:14%">4. Lo que podría...<span>1d12 · Consecuencia</span></th>
+<th style="width:13%">5. Todo comienza cuando...<span>1d10 · Inicio</span></th>
+<th style="width:14%">6. Pero...<span>1d12 · Complicación</span></th>
+<th style="width:14%">7. Además...<span>1d10 · Giro inesperado</span></th>
+</tr></thead>
+<tbody id="rows"></tbody>
+</table>
+</div>
+<p class="hint">La tabla reúne las siete listas en una misma cuadrícula. Las columnas de inicio y giro tienen diez resultados; las otras cinco tienen doce. Usa los botones de cada encabezado para lanzar solo ese dado.</p>
+</main>
+<script>
+const tables = [
+{title:"Una amenaza",die:12,items:[
+"Un individuo poderoso o influyente.","Una organización clandestina.","Una facción militar o fuerza armada.","Una criatura o monstruo.","Una especie o población hostil.","Una entidad sobrenatural.","Una autoridad política o religiosa.","Una civilización o sociedad extranjera.","Un grupo criminal o mercenario.","Una inteligencia artificial o máquina autónoma.","Una fuerza natural o fenómeno ambiental.","Una fuerza desconocida o inexplicable."]},
+{title:"Que quiere",die:12,items:[
+"Obtener algo que no posee.","Recuperar algo que perdió.","Vengarse de alguien.","Destruir o eliminar algo.","Controlar o dominar algo.","Proteger o preservar algo.","Escapar de una situación o amenaza.","Transformar o cambiar algo.","Descubrir un secreto o conocimiento.","Demostrar su superioridad o legitimidad.","Expandir su influencia o territorio.","Impedir que algo suceda."]},
+{title:"Para conseguirlo",die:12,items:[
+"Una persona específica.","Un grupo de personas o comunidad.","Un objeto único o reliquia.","Un arma o herramienta especial.","Un lugar o territorio.","Un recurso natural o material escaso.","Una fuente de energía o poder.","Un conocimiento o secreto.","Un documento, registro o prueba.","Una criatura o ser extraordinario.","Una organización o institución.","Un acontecimiento o fenómeno específico."]},
+{title:"Lo que podría",die:12,items:[
+"Provocar una catástrofe o destrucción masiva.","Desencadenar una guerra o conflicto armado.","Provocar la caída de un gobierno o autoridad.","Someter a una población o civilización.","Alterar el equilibrio de poder.","Liberar una amenaza desconocida.","Provocar una transformación irreversible.","Desestabilizar el orden social.","Poner en peligro a una comunidad o población.","Alterar las leyes naturales o la realidad.","Desencadenar una crisis que se extenderá progresivamente.","Cambiar radicalmente el futuro de una sociedad."]},
+{title:"Todo comienza cuando",die:10,items:[
+"Los personajes reciben una petición de ayuda.","Les ofrecen una recompensa por intervenir.","Descubren algo que debería permanecer oculto.","Son testigos de un acontecimiento inesperado.","Alguien cercano les pide ayuda.","Se ven involucrados accidentalmente.","Son acusados de algo que no hicieron.","Encuentran algo que cambia sus planes.","Reciben una advertencia sobre un peligro inminente.","La amenaza los convierte en sus objetivos."]},
+{title:"Pero",die:12,items:[
+"Existe un plazo limitado para actuar.","Alguien cercano está involucrado.","La información disponible es falsa o incompleta.","Existe un traidor entre los aliados.","Hay intereses enfrentados entre los involucrados.","La amenaza es mucho más poderosa de lo esperado.","Los personajes no son los únicos que buscan el objetivo.","El objetivo está protegido por alguien inesperado.","Resolver el problema exige un sacrificio importante.","La amenaza tiene motivos legítimos para actuar.","Las consecuencias ya han comenzado a manifestarse.","Los personajes están siendo manipulados por alguien."]},
+{title:"Además",die:10,items:[
+"Aparece un aliado inesperado.","Surge una segunda amenaza.","Se descubre una antigua conexión con el conflicto.","Existe una recompensa oculta.","Aparece una oportunidad para cambiar el curso de los acontecimientos.","Un enemigo ofrece su colaboración.","Se descubre que existe un objetivo mayor.","Alguien importante conoce la verdad.","El objetivo tiene propiedades o características inesperadas.","La amenaza no es la verdadera responsable del problema."]}
+];
+const labels=["Amenaza","Motivación","Objetivo","Consecuencia","Inicio","Complicación","Giro"];
+let current=Array(7).fill(null);
+const tbody=document.getElementById("rows");
+function buildTable(){
+ tbody.innerHTML="";
+ for(let i=0;i<12;i++){
+  const tr=document.createElement("tr");
+  tables.forEach((t,j)=>{
+   const td=document.createElement("td");
+   if(i>=t.items.length){td.className="empty";td.textContent="—";tr.appendChild(td);return;}
+   const wrap=document.createElement("div");wrap.className="cell-head";
+   const n=document.createElement("span");n.className="num";n.textContent=i+1;wrap.appendChild(n);
+   const b=document.createElement("button");b.className="small";b.textContent="Tirar";b.setAttribute("aria-label","Lanzar "+labels[j]);b.onclick=()=>rollOne(j);wrap.appendChild(b);
+   const txt=document.createElement("div");txt.textContent=t.items[i];
+   td.append(wrap,txt);tr.appendChild(td);
+  });
+  tbody.appendChild(tr);
+ }
+}
+function rollOne(j){current[j]=Math.floor(Math.random()*tables[j].die)+1;render();}
+function rollAll(){current=tables.map(t=>Math.floor(Math.random()*t.die)+1);render();}
+function render(){
+ const out=document.getElementById("rolls");out.innerHTML="";
+ current.forEach((v,i)=>{if(v===null)return;const chip=document.createElement("span");chip.className="roll-chip";chip.innerHTML="<b>"+labels[i]+" "+v+"/"+tables[i].die+"</b>";out.appendChild(chip);});
+ const s=document.getElementById("story");
+ if(current.every(v=>v!==null)){
+  const v=current.map((n,i)=>tables[i].items[n-1]);
+  s.textContent=v[4]+" "+v[0]+" "+v[1].toLowerCase()+" para conseguir "+v[2].toLowerCase()+". Si lo consigue, podría "+v[3].toLowerCase()+". "+v[5]+"; "+v[6].toLowerCase()+".";
+ }else if(current.some(v=>v!==null)){
+  s.textContent="Resultados parciales. Lanza los dados que faltan o genera una aventura completa.";
+ }else{s.textContent="Pulsa «Generar aventura» para crear un conflicto y sus complicaciones.";}
+}
+document.getElementById("generate").onclick=rollAll;
+document.getElementById("reroll").onclick=rollAll;
+document.getElementById("reset").onclick=()=>{current=Array(7).fill(null);render();};
+buildTable();
+</script>
+</body>
+</html>
