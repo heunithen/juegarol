@@ -52,7 +52,7 @@ footer{text-align:center;color:#707987;font-size:11px;padding:15px}
 .wanted-warning{padding:11px 13px;border:1px solid #8b5555;border-left:4px solid #d98282;border-radius:8px;background:#382629;color:#f0c4c4;font-size:12px}.wanted-popular,.wanted-posts-wrap{margin-top:20px;padding-top:16px;border-top:1px solid var(--line)}.wanted-posts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:10px}.wanted-post{background:#191e26;border:1px solid var(--line);border-radius:10px;padding:14px;min-width:0}.wanted-post h4{margin:0 0 6px;color:var(--gold);font:700 17px Georgia,serif}.wanted-post p{font-size:13px;overflow-wrap:anywhere}.wanted-post .wanted-tag{display:inline-block;border:1px solid #8b713e;border-radius:20px;padding:3px 8px;color:var(--gold);font-size:11px;margin:3px 4px 6px 0}.wanted-post .wanted-contact{padding:8px;background:#242b35;border-radius:7px;color:var(--text)}.wanted-bar{display:grid;grid-template-columns:minmax(100px,1fr) 3fr auto;gap:10px;align-items:center;margin:8px 0;font-size:12px}.wanted-bar-track{height:9px;border-radius:9px;background:#171c23;overflow:hidden}.wanted-bar-fill{height:100%;background:var(--gold)}select{width:100%;background:#171c23;border:1px solid var(--line);border-radius:8px;color:var(--text);font:15px system-ui;padding:11px 12px;outline:none}select:focus{border-color:var(--gold)}@media(max-width:700px){.wanted-posts{grid-template-columns:1fr}.wanted-bar{grid-template-columns:1fr auto}.wanted-bar-track{grid-column:1/-1;grid-row:2}}.wanted-choice-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin:18px 0}.wanted-choice{display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:8px;min-height:125px;padding:20px;text-align:left}.wanted-choice strong{font:700 20px Georgia,serif;color:var(--gold)}.wanted-choice span{font-size:13px;font-weight:400;color:var(--muted)}.wanted-choice.primary strong{color:#211b10}.wanted-choice.primary span{color:#3a3020}.wanted-review-layout{display:grid;grid-template-columns:minmax(0,1fr) 260px;gap:18px;align-items:start}.wanted-review-layout .wanted-popular{margin:0;padding:14px;background:#191e26;border:1px solid var(--line);border-radius:10px}.wanted-review-layout .wanted-posts-wrap{margin:0;padding:0;border:0}.wanted-back{margin-bottom:12px}@media(max-width:700px){.wanted-choice-grid,.wanted-review-layout{grid-template-columns:1fr}.wanted-review-layout .wanted-popular{grid-row:1}}</style>
 </head>
 <body>
-<header id="mainBanner" role="button" tabindex="0" aria-label="Volver al portal de inicio"><h1>C.A.T.S.</h1><p>Una herramienta para construir juntos el concepto de una partida de rol.</p><span class="site-version">Versión 1.12.0</span></header>
+<header id="mainBanner" role="button" tabindex="0" aria-label="Volver al portal de inicio"><h1>C.A.T.S.</h1><p>Una herramienta para construir juntos el concepto de una partida de rol.</p><span class="site-version">Versión 1.13.0</span></header>
 <main>
 <section id="authPanel" class="panel">
  <h2>Acceso a C.A.T.S.</h2>
@@ -256,6 +256,8 @@ function updateWantedFormAccess(){
  gate.textContent=authUser?"":"Para subir una propuesta debes iniciar sesión o crear una cuenta. Puedes revisar las propuestas sin iniciar sesión.";
 }
 function showWantedView(view){
+ const focused=view!=="home";
+ ["homeCreatePanel","homeRoomsPanel","randomTools","homeError"].forEach(id=>$(id).classList.toggle("hidden",focused));
  $("wantedHomeView").classList.toggle("hidden",view!=="home");
  $("wantedPublishView").classList.toggle("hidden",view!=="publish");
  $("wantedReviewView").classList.toggle("hidden",view!=="review");
@@ -264,6 +266,7 @@ function showWantedView(view){
  if(view==="publish"&&!authUser){
   $("wantedPublishView").classList.add("hidden");
   $("wantedHomeView").classList.remove("hidden");
+  ["homeCreatePanel","homeRoomsPanel","randomTools","homeError"].forEach(id=>$(id).classList.remove("hidden"));
   $("wantedFormGate").textContent="Para subir una propuesta debes iniciar sesión o crear una cuenta.";
  }
 }
@@ -347,7 +350,7 @@ async function publishWantedPost(ev){
  const button=$("publishWanted");button.disabled=true;$("wantedFormMessage").textContent=postId?"Guardando cambios...":"Publicando...";
  try{
   await api(postId?"update_wanted_post":"create_wanted_post",postId?{...payload,postId}:payload);
-  resetWantedEditor();$("wantedFormMessage").textContent=postId?"Publicación actualizada.":"Publicación creada.";await loadWantedPosts();showWantedView("review");
+  resetWantedEditor();showWantedView("home");$("wantedFormGate").textContent=postId?"Publicación actualizada correctamente.":"Propuesta publicada correctamente.";
  }catch(err){$("wantedFormMessage").textContent=err.message}
  finally{button.disabled=false}
 }
@@ -428,7 +431,7 @@ async function returnToPortal(){
  if(session&&!$("catsScreen").classList.contains("hidden")){
   try{await saveCurrentQuestion()}catch(err){$("questionSaveStatus").textContent="No se pudo guardar. No se volvió al portal: "+err.message;return}
  }
- clearSession();$("catsScreen").classList.add("hidden");$("roomView").classList.add("hidden");$("home").classList.remove("hidden");await loadMyRooms();
+ clearSession();$("catsScreen").classList.add("hidden");$("roomView").classList.add("hidden");$("home").classList.remove("hidden");resetWantedEditor();showWantedView("home");await loadMyRooms();
 }
 function saveSession(){localStorage.setItem(STORAGE_KEY,JSON.stringify(session))}
 function draftKey(){return session?"cats_draft_"+session.roomId+"_"+session.participantId:null}
