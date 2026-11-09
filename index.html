@@ -422,7 +422,7 @@ async function signIn(){
    await enterFromInviteIfPresent();
    await loadWantedPosts();
   }catch(e){
-   $("profileMessage").textContent="Sesión iniciada, pero hubo un problema al cargar tu perfil o tus salas: "+(e?.message||"Error desconocido");
+   $("profileMessage").textContent="Sesión iniciada, pero hubo un problema al cargar tu perfil o C.A.T.S.: "+(e?.message||"Error desconocido");
    setAuthUI();
   }
  }catch(e){
@@ -500,7 +500,7 @@ async function restoreRoomSession(){
  const d=await api("get",{roomId:saved.roomId,token:saved.token});
  const participant=(d.participants||[]).find(p=>p.id===saved.participantId);if(!participant)throw new Error("Participante no encontrado");
  enterRoom({room:d.room,participant,token:saved.token,restored:true});
- }catch(e){clearSession();console.warn("No se pudo restaurar la sala:",e.message)}
+ }catch(e){clearSession();console.warn("No se pudo restaurar C.A.T.S.:",e.message)}
 }
 $("signIn").onclick=signIn;$("signUp").onclick=()=>{if(!signUpMode)setSignUpMode(true);else signUp();};$("cancelSignUp").onclick=()=>setSignUpMode(false);$("googleSignIn").onclick=signInWithGoogle;$("forgotPassword").onclick=sendPasswordRecovery;$("saveNewPassword").onclick=saveNewPassword;$("signOut").onclick=signOut;$("saveProfile").onclick=saveProfile;$("joinRoomCode").onclick=joinRoomByCode;
 
@@ -815,34 +815,34 @@ async function api(action,data={}){
 }
 async function loadMyRooms(){
  const box=$("myRoomsList");if(!box||!authUser)return;
- box.innerHTML="<p>Cargando tus salas...</p>";
+ box.innerHTML="<p>Cargando C.A.T.S....</p>";
  try{
   const data=await api("list_rooms"),rooms=data.rooms||[];box.innerHTML="";
-  if(!rooms.length){box.innerHTML="<p>Aún no participas en ninguna sala. Crea una o entra mediante un enlace de invitación.</p>";return}
+  if(!rooms.length){box.innerHTML="<p>Todavía no estás participando en C.A.T.S. Ocupa uno o entra mediante un enlace de invitación.</p>";return}
   rooms.forEach(item=>{
    const room=item.room,p=item.participant,closed=!!room.closed;
    const card=document.createElement("article");card.className="my-room-card"+(closed?" closed":"");
    const info=document.createElement("div"),title=document.createElement("h3"),meta=document.createElement("p"),date=document.createElement("p");
    title.textContent=room.game_name&&room.game_name!=="Juego sin especificar"?room.game_name:(room.room_name||"C.A.T.S.");
-   meta.textContent=(p.is_host?"Anfitrión":"Participante")+" · Código "+room.code+" · "+(closed?"Sala cerrada":"Sala abierta");
+   meta.textContent=(p.is_host?"Anfitrión":"Participante")+" · Código "+room.code+" · "+(closed?"C.A.T.S. cerrado":"C.A.T.S. abierto");
    date.textContent="Te uniste el "+new Date(p.joined_at).toLocaleDateString("es-CL");
    info.append(title,meta,date);
    const actions=document.createElement("div");actions.className="room-actions";
    if(!closed){
-    const enter=document.createElement("button");enter.className="primary";enter.textContent="Entrar a la sala";
+    const enter=document.createElement("button");enter.className="primary";enter.textContent="Entrar a C.A.T.S.";
     enter.onclick=()=>resumeRoom(room.id,enter);actions.appendChild(enter);
    }
    const remove=document.createElement("button");remove.className="danger small";remove.textContent=p.is_host?"Eliminar sala":"Salir de C.A.T.S.";
-   remove.title=p.is_host?"Eliminar C.A.T.S. y todos sus datos":"Salir y quitar la sala de Mis salas";
+   remove.title=p.is_host?"Eliminar C.A.T.S. y todos sus datos":"Salir de C.A.T.S.";
    remove.onclick=()=>removeRoomFromList(room.id,!!p.is_host,remove);actions.appendChild(remove);
    card.append(info,actions);box.appendChild(card);
   });
- }catch(err){box.innerHTML="";const msg=document.createElement("p");msg.className="error";msg.textContent="No se pudieron cargar tus salas: "+err.message;box.appendChild(msg)}
+ }catch(err){box.innerHTML="";const msg=document.createElement("p");msg.className="error";msg.textContent="No se pudo cargar C.A.T.S.: "+err.message;box.appendChild(msg)}
 }
 async function removeRoomFromList(roomId,isHost,button){
  const question=isHost
-  ?"¿Eliminar esta sala definitivamente? Se borrarán los participantes, respuestas y mensajes. Esta acción no se puede deshacer."
-  :"¿Salir de esta sala? Dejará de aparecer en Mis salas, pero seguirá disponible para los demás.";
+  ?"¿Eliminar este C.A.T.S. definitivamente? Se borrarán los participantes, respuestas y mensajes. Esta acción no se puede deshacer."
+  :"¿Salir de C.A.T.S.? Seguirá disponible para los demás.";
  if(!confirm(question))return;
  if(button)button.disabled=true;
  try{
@@ -1022,7 +1022,7 @@ async function kickPlayer(p){
 async function toggleRoomClosed(){
  if(!roomState?.me?.is_host)return;
  const closing=!roomState.room.closed;
- if(closing&&!confirm("¿Cerrar C.A.T.S.? Nadie nuevo podrá entrar con el enlace. Los participantes actuales podrán seguir usando la sala."))return;
+ if(closing&&!confirm("¿Cerrar C.A.T.S.? Nadie nuevo podrá entrar con el enlace. Los participantes actuales podrán seguir usando C.A.T.S."))return;
  try{await api("set_room_closed",{roomId:session.roomId,token:session.token,closed:closing});await refreshRoom()}catch(e){alert(e.message)}
 }
 async function leaveRoom(){
