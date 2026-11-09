@@ -42,7 +42,7 @@ tbody tr:hover{background:#2b323e}
 <body>
 <header>
 <h1>Generador de aventuras</h1>
-<p>Genera una aventura conectando quién actúa, qué busca, cuál es su objetivo y qué consecuencias tendría. Los demás resultados introducen a los personajes y complican el conflicto.</p>
+<p>Combina siete elementos generales para crear el punto de partida de una aventura. Lanza cada dado por separado o genera una combinación completa.</p>
 </header>
 <main>
 <section class="result" aria-live="polite">
@@ -59,116 +59,117 @@ tbody tr:hover{background:#2b323e}
 <div class="table-wrap">
 <table>
 <thead><tr>
-<th style="width:14%">1. Quién mueve los hilos<span>1d12 · ¿Quién impulsa el conflicto?</span></th>
-<th style="width:13%">2. Qué pretende hacer<span>1d12 · Acción principal</span></th>
-<th style="width:13%">3. Cuál es su objetivo<span>1d12 · ¿Sobre qué actúa?</span></th>
-<th style="width:14%">4. Qué ocurrirá si lo consigue<span>1d12 · Consecuencia</span></th>
-<th style="width:13%">5. Cómo entran los personajes<span>1d10 · Punto de partida</span></th>
-<th style="width:14%">6. Qué se interpone<span>1d12 · Obstáculo</span></th>
-<th style="width:14%">7. Qué más sucede<span>1d10 · Giro adicional</span></th>
+<th style="width:14%">1. Una amenaza...<span>1d12 · ¿Qué provoca el conflicto?</span></th>
+<th style="width:13%">2. Que quiere...<span>1d12 · Motivación</span></th>
+<th style="width:13%">3. Para conseguirlo...<span>1d12 · Elemento central</span></th>
+<th style="width:14%">4. Lo que podría...<span>1d12 · Consecuencia</span></th>
+<th style="width:13%">5. Todo comienza cuando...<span>1d10 · Inicio</span></th>
+<th style="width:14%">6. Pero...<span>1d12 · Complicación</span></th>
+<th style="width:14%">7. Además...<span>1d10 · Giro inesperado</span></th>
 </tr></thead>
 <tbody id="rows"></tbody>
 </table>
 </div>
-<p class="hint">Las cuatro primeras columnas forman el núcleo causal: quién actúa, qué intenta hacer, cuál es su objetivo y qué consecuencias tendría. Las tres últimas incorporan a los personajes y añaden obstáculos o giros. Cada columna puede lanzarse por separado.</p>
+<p class="hint">Las primeras cuatro columnas plantean el conflicto y sus posibles consecuencias. Las tres últimas añaden el inicio, una complicación y un giro. Los resultados son ideas generales que puedes interpretar y conectar libremente.</p>
 </main>
 <script>
 const tables = [
-{title:"Quién mueve los hilos",die:12,items:[
-"Una facción militar que actúa fuera de la autoridad oficial.",
-"Una casa noble o familia poderosa enfrentada a sus rivales.",
-"Una organización clandestina con agentes infiltrados.",
-"Un gobierno que intenta conservar el poder a cualquier precio.",
-"Una orden religiosa que interpreta una profecía como una amenaza.",
-"Una compañía comercial que busca monopolizar un recurso.",
-"Un grupo rebelde que prepara un levantamiento.",
-"Una comunidad aislada que protege un secreto antiguo.",
-"Un círculo de estudiosos que ha cruzado límites prohibidos.",
-"Una banda criminal que controla los bajos fondos.",
-"Un ser sobrenatural que influye en los acontecimientos a través de intermediarios.",
-"Un dirigente carismático que ha convencido a otros de seguirlo."
+{title:"Una amenaza",die:12,items:[
+"Un individuo poderoso o influyente.",
+"Una organización clandestina.",
+"Una facción militar o fuerza armada.",
+"Una criatura o monstruo.",
+"Una especie o población hostil.",
+"Una entidad sobrenatural.",
+"Una autoridad política o religiosa.",
+"Una civilización o sociedad extranjera.",
+"Un grupo criminal o mercenario.",
+"Una inteligencia artificial o máquina autónoma.",
+"Una fuerza natural o fenómeno ambiental.",
+"Una fuerza desconocida o inexplicable."
 ]},
-{title:"Qué pretende hacer",die:12,items:[
-"apoderarse de",
-"recuperar",
-"destruir",
-"ocultar",
-"activar",
-"liberar",
-"controlar",
-"trasladar",
-"proteger",
-"silenciar a quienes conocen",
-"impedir que otros encuentren",
-"utilizar"
+{title:"Qué quiere",die:12,items:[
+"Obtener algo que no posee.",
+"Recuperar algo que perdió.",
+"Vengarse de alguien.",
+"Destruir o eliminar algo.",
+"Controlar o dominar algo.",
+"Proteger o preservar algo.",
+"Escapar de una situación o amenaza.",
+"Transformar o cambiar algo.",
+"Descubrir un secreto o conocimiento.",
+"Demostrar su superioridad o legitimidad.",
+"Expandir su influencia o territorio.",
+"Impedir que algo suceda."
 ]},
-{title:"Cuál es su objetivo",die:12,items:[
-"una ciudad, fortaleza o asentamiento estratégico.",
-"una persona cuya identidad o linaje resulta decisivo.",
-"un artefacto antiguo con una función desconocida.",
-"un documento que demuestra quién tiene derecho al poder.",
-"una fuente de energía o recurso que se está agotando.",
-"un conocimiento capaz de cambiar el equilibrio entre las facciones.",
-"una criatura que permanece encerrada o dormida.",
-"una ruta, paso o frontera que permite controlar el territorio.",
-"una instalación abandonada que aún conserva sus sistemas activos.",
-"una comunidad que guarda una tradición o capacidad única.",
-"un mecanismo que mantiene sellado un peligro.",
-"un lugar donde ocurrió un acontecimiento que alguien quiere borrar."
+{title:"Para conseguirlo",die:12,items:[
+"Una persona específica.",
+"Un grupo de personas o comunidad.",
+"Un objeto único o reliquia.",
+"Un arma o herramienta especial.",
+"Un lugar o territorio.",
+"Un recurso natural o material escaso.",
+"Una fuente de energía o poder.",
+"Un conocimiento o secreto.",
+"Un documento, registro o prueba.",
+"Una criatura o ser extraordinario.",
+"Una organización o institución.",
+"Un acontecimiento o fenómeno específico."
 ]},
-{title:"Qué ocurrirá si lo consigue",die:12,items:[
-"la región quedará expuesta a una destrucción masiva.",
-"estallará una guerra entre facciones que hasta ahora mantenían una paz frágil.",
-"una población perderá su hogar y quedará bajo el dominio de sus enemigos.",
-"se liberará algo que llevaba generaciones encerrado.",
-"un gobierno legítimo será derrocado y sustituido por un régimen represivo.",
-"un recurso esencial dejará de estar disponible para el resto de la población.",
-"saldrá a la luz una verdad capaz de provocar persecuciones y venganzas.",
-"se romperá el equilibrio que mantenía contenida una fuerza peligrosa.",
-"una comunidad entera será sometida o desplazada.",
-"el territorio sufrirá una transformación irreversible.",
-"comenzará una crisis que se extenderá mucho más allá de la región.",
-"quienes conocen el verdadero alcance del plan serán eliminados."
+{title:"Lo que podría suceder",die:12,items:[
+"Provocar una catástrofe o destrucción masiva.",
+"Desencadenar una guerra o conflicto armado.",
+"Provocar la caída de un gobierno o autoridad.",
+"Someter a una población o civilización.",
+"Alterar el equilibrio de poder.",
+"Liberar una amenaza desconocida.",
+"Provocar una transformación irreversible.",
+"Desestabilizar el orden social.",
+"Poner en peligro a una comunidad o población.",
+"Alterar las leyes naturales o la realidad.",
+"Desencadenar una crisis que se extenderá progresivamente.",
+"Cambiar radicalmente el futuro de una sociedad."
 ]},
-{title:"Cómo entran los personajes",die:10,items:[
-"Una persona cercana les pide ayuda para encontrar a alguien que ha desaparecido.",
-"Reciben el encargo de proteger a un testigo que teme por su vida.",
-"Encuentran un objeto que varias facciones están buscando.",
-"Son contratados para investigar un incidente aparentemente aislado.",
-"Un aliado les entrega información y desaparece antes de poder explicarla.",
-"Son acusados de participar en un delito que no cometieron.",
-"Presencian un ataque que parece no tener un motivo claro.",
-"Una autoridad les ordena recuperar algo antes de que llegue el enemigo.",
-"Un desconocido les advierte que alguien está preparando una operación secreta.",
-"La amenaza los ataca directamente para obligarlos a actuar."
+{title:"Todo comienza cuando",die:10,items:[
+"Los personajes reciben una petición de ayuda.",
+"Les ofrecen una recompensa por intervenir.",
+"Descubren algo que debería permanecer oculto.",
+"Son testigos de un acontecimiento inesperado.",
+"Alguien cercano les pide ayuda.",
+"Se ven involucrados accidentalmente.",
+"Son acusados de algo que no hicieron.",
+"Encuentran algo que cambia sus planes.",
+"Reciben una advertencia sobre un peligro inminente.",
+"La amenaza los convierte en sus objetivos."
 ]},
-{title:"Qué se interpone",die:12,items:[
-"El plazo para actuar es mucho más corto de lo que creían.",
-"La persona que los contrató les ocultó una parte importante de la historia.",
-"Un aliado trabaja en secreto para la facción responsable.",
-"La información que necesitan está repartida entre enemigos que no cooperan.",
-"El objetivo cambia de ubicación y nadie sabe quién lo trasladó.",
-"Una segunda facción persigue el mismo objetivo, pero por motivos distintos.",
-"Para avanzar tendrán que negociar con alguien a quien perjudicaron.",
-"La amenaza tiene apoyo entre la población y no todos quieren detenerla.",
-"Los personajes han sido incriminados y ahora las autoridades los persiguen.",
-"Cada avance pone en peligro a alguien que intentan proteger.",
-"El plan ya está en marcha y detenerlo exige renunciar a algo importante.",
-"Alguien manipula sus decisiones para conducirlos hacia el resultado que desea."
+{title:"Pero",die:12,items:[
+"Existe un plazo limitado para actuar.",
+"Alguien cercano está involucrado.",
+"La información disponible es falsa o incompleta.",
+"Existe un traidor entre los aliados.",
+"Hay intereses enfrentados entre los involucrados.",
+"La amenaza es mucho más poderosa de lo esperado.",
+"Los personajes no son los únicos que buscan el objetivo.",
+"El objetivo está protegido por alguien inesperado.",
+"Resolver el problema exige un sacrificio importante.",
+"La amenaza tiene motivos legítimos para actuar.",
+"Las consecuencias ya han comenzado a manifestarse.",
+"Los personajes están siendo manipulados por alguien."
 ]},
-{title:"Qué más sucede",die:10,items:[
-"Un rival ofrece colaborar, pero exige algo a cambio.",
-"Surge una nueva amenaza que también quiere aprovechar el conflicto.",
-"El supuesto responsable está intentando evitar una catástrofe mayor.",
-"Un personaje descubre que tiene un vínculo personal con el objetivo.",
-"El objetivo resulta ser una parte de algo mucho más grande.",
-"Un aliado cambia de bando cuando conoce la verdad.",
-"Se descubre que el conflicto comenzó mucho antes de lo que todos creían.",
-"La persona que parecía estar en peligro es quien dirige una parte del plan.",
-"Una oportunidad inesperada permite resolver el conflicto sin derrotar a la amenaza.",
-"La amenaza principal es solo el instrumento de alguien que permanece oculto."
-]}];
-const labels=["Responsable","Propósito","Objetivo","Consecuencia","Inicio","Obstáculo","Giro"];
+{title:"Además",die:10,items:[
+"Aparece un aliado inesperado.",
+"Surge una segunda amenaza.",
+"Se descubre una antigua conexión con el conflicto.",
+"Existe una recompensa oculta.",
+"Aparece una oportunidad para cambiar el curso de los acontecimientos.",
+"Un enemigo ofrece su colaboración.",
+"Se descubre que existe un objetivo mayor.",
+"Alguien importante conoce la verdad.",
+"El objetivo tiene propiedades o características inesperadas.",
+"La amenaza no es la verdadera responsable del problema."
+]}
+];
+const labels=["Amenaza","Motivación","Elemento central","Consecuencia","Inicio","Complicación","Giro"];
 let current=Array(7).fill(null);
 const tbody=document.getElementById("rows");
 function buildTable(){
@@ -195,7 +196,7 @@ function render(){
  const s=document.getElementById("story");
  if(current.every(v=>v!==null)){
   const v=current.map((n,i)=>tables[i].items[n-1]);
-  s.textContent=v[0]+" pretende "+v[1]+" "+v[2]+". Si lo consigue, "+v[3]+".\n\n"+v[4]+" El problema es que "+v[5].charAt(0).toLowerCase()+v[5].slice(1)+" Además, "+v[6].charAt(0).toLowerCase()+v[6].slice(1);
+  s.textContent="La amenaza: "+v[0]+"\nQuiere: "+v[1]+"\nPara conseguirlo: "+v[2]+"\nSi lo consigue: "+v[3]+"\n\nLa aventura comienza cuando "+v[4].charAt(0).toLowerCase()+v[4].slice(1)+"\nPero: "+v[5]+"\nAdemás: "+v[6];
  }else if(current.some(v=>v!==null)){
   s.textContent="Resultados parciales. Lanza los dados que faltan o genera una aventura completa.";
  }else{s.textContent="Pulsa «Generar aventura completa» para construir un conflicto conectado y sus complicaciones.";}
