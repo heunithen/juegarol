@@ -971,7 +971,7 @@ $("tabRooms").onclick=()=>setHomeTab("rooms");
 $("tabWanted").onclick=()=>showWantedView("home");
 $("tabCommunities").onclick=()=>setHomeTab("communities");
 $("tabFreeRpg").onclick=()=>{setHomeTab("freeRpg");renderFreeRpg()};
-$("tabAbout").onclick=()=>{setHomeTab("about");$("adminSuggestionsPanel").classList.toggle("hidden",!authUser||authUser.email!=="ch.munoz@gmail.com");};
+$("tabAbout").onclick=()=>{setHomeTab("about");const admin=!!authUser&&authUser.email==="ch.munoz@gmail.com";$("adminSuggestionsPanel").classList.toggle("hidden",!admin);if(admin)loadAdminSuggestions();};
 $("suggestionMessage").addEventListener("input",()=>$("suggestionCount").textContent=$("suggestionMessage").value.length+"/1000");
 $("suggestionForm").addEventListener("submit",sendSuggestion);
 $("refreshSuggestions").onclick=loadAdminSuggestions;
