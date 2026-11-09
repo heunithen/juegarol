@@ -40,6 +40,8 @@ button.danger{border-color:#794848;color:#f0b0b0}button.small{padding:5px 8px;fo
 th,td{padding:10px;text-align:left;vertical-align:top;border-right:1px solid var(--line);border-bottom:1px solid var(--line)}th{background:#303744;color:var(--gold);font:700 13px Georgia,serif}td{font-size:12px;color:#e1e4e9}tr:last-child td{border-bottom:0}td:last-child,th:last-child{border-right:0}
 .num{display:inline-grid;place-items:center;min-width:22px;height:22px;margin-right:5px;border-radius:50%;background:#3b4350;color:var(--gold);font-size:11px;font-weight:700}.cell-head{display:flex;justify-content:space-between;align-items:center;gap:5px;margin-bottom:6px}
 footer{text-align:center;color:#707987;font-size:11px;padding:15px}
+.room-layout{display:grid;grid-template-columns:minmax(0,1fr) 280px;gap:16px;align-items:stretch}.chat-panel{display:flex;flex-direction:column;min-height:390px}.chat-messages{height:300px;overflow-y:auto;display:flex;flex-direction:column;gap:9px;padding:12px;background:#171c23;border:1px solid var(--line);border-radius:9px}.chat-message{max-width:90%;padding:8px 11px;border-radius:10px;background:#2b3340;align-self:flex-start;overflow-wrap:anywhere}.chat-message.mine{align-self:flex-end;background:#3a3325}.chat-message b{display:block;color:var(--gold);font-size:12px;margin-bottom:2px}.chat-message small{display:block;color:var(--muted);font-size:10px;text-align:right;margin-top:4px}.chat-compose{display:flex;gap:8px;margin-top:10px}.chat-compose input{min-width:0}.online-dot,.offline-dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:7px}.online-dot{background:#76c58a}.offline-dot{background:#737d8a}.cats-launch{margin-top:16px}#catsScreen{position:fixed;inset:0;z-index:50;background:var(--bg);overflow-y:auto;padding:20px}.question-shell{max-width:760px;min-height:calc(100vh - 40px);margin:auto;display:flex;flex-direction:column;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:clamp(16px,4vw,32px)}.question-top,.question-bottom{display:flex;justify-content:space-between;align-items:center;gap:12px}.question-progress{height:5px;background:#171c23;border-radius:9px;margin:22px 0 30px;overflow:hidden}#questionProgressBar{height:100%;width:25%;background:var(--gold);transition:width .2s}.question-body{flex:1}.question-body h2{margin:0}.question-hint{margin:24px 0 12px}.question-options .option{font-size:14px;padding:9px 12px}.question-options .option.selected{background:#4a3d23;border-color:var(--gold);color:var(--gold)}#questionText{min-height:120px}#questionSaveStatus{margin-top:10px;font-size:12px}.question-bottom{margin-top:28px;padding-top:18px;border-top:1px solid var(--line)}@media(max-width:700px){.room-layout{grid-template-columns:1fr}.chat-panel{min-height:350px}.chat-messages{height:240px}#catsScreen{padding:8px}.question-shell{min-height:calc(100vh - 16px);padding:16px}}
+
 @media(max-width:700px){main{padding:16px 10px 40px}.home-grid,.review-grid{grid-template-columns:1fr}.panel{padding:15px}.row>*{flex:1 1 100%}.room-head{align-items:flex-start}}
 </style>
 </head>
@@ -72,23 +74,10 @@ footer{text-align:center;color:#707987;font-size:11px;padding:15px}
   <div id="roomSetup" class="cats-card hidden"></div>
  </div>
  <div id="roomContent" class="hidden">
- <div class="panel"><div class="section-toggle"><h2>Participantes</h2><span id="participantCount" class="badge">0/12</span></div><div id="participants" class="participants"></div><div class="actions"><button id="leaveRoom" class="danger">Salir de la sala</button></div></div>
- <section class="panel">
-  <h2>Tu formulario C.A.T.S.</h2><p>Inicia tu formulario cuando quieras. Mientras tanto, puedes consultar las propuestas que los demás ya hayan guardado.</p>
-  <div class="actions"><button class="primary" id="startForm">Iniciar formulario</button></div>
-  <div id="catsForm" class="hidden">
-   <div class="cats-card"><div class="cats-title"><span class="letter">C</span><div><h3>Concepto</h3><p>¿De qué trata la partida?</p></div></div><div id="optsC" class="options"></div><label for="answerC">Tu concepto</label><textarea id="answerC" maxlength="600" placeholder="Describe el tipo de mundo, género o premisa que te gustaría jugar..."></textarea></div>
-   <div class="cats-card"><div class="cats-title"><span class="letter">A</span><div><h3>Acción / Objetivo</h3><p>¿Qué harán los personajes?</p></div></div><div id="optsA" class="options"></div><label for="answerA">Tu objetivo</label><textarea id="answerA" maxlength="600" placeholder="¿Qué tipo de actividades, misiones o desafíos protagonizarán?"></textarea></div>
-   <div class="cats-card"><div class="cats-title"><span class="letter">T</span><div><h3>Tono</h3><p>¿Qué ambiente tendrá la partida?</p></div></div><div id="optsT" class="options"></div><label for="answerT">El tono</label><textarea id="answerT" maxlength="600" placeholder="Describe el ambiente y el estilo narrativo..."></textarea></div>
-   <div class="cats-card"><div class="cats-title"><span class="letter">S</span><div><h3>Temática</h3><p>¿Qué temas o elementos serán importantes?</p></div></div><div id="optsS" class="options"></div><label for="answerS">Los temas</label><textarea id="answerS" maxlength="600" placeholder="¿Qué temas, conflictos o ideas te gustaría explorar?"></textarea></div>
-   <div class="actions"><button class="primary" id="saveAnswers">Guardar mis respuestas</button></div><div id="saveMessage" class="muted" aria-live="polite"></div>
-  </div>
- </section>
+ <div class="room-layout"><section class="panel chat-panel"><div class="section-toggle"><div><h2>Chat de la sala</h2><p>Conversación compartida de la partida.</p></div><span class="badge" id="chatCount">0 conectados</span></div><div id="chatMessages" class="chat-messages" aria-live="polite"></div><form id="chatForm" class="chat-compose"><input id="chatInput" maxlength="500" autocomplete="off" placeholder="Escribe un mensaje..." aria-label="Mensaje"><button class="primary" type="submit">Enviar</button></form><div id="chatStatus" class="muted" aria-live="polite"></div></section><aside class="panel"><div class="section-toggle"><h2>Conectados</h2><span id="participantCount" class="badge">0/12</span></div><div id="participants" class="participants"></div><div class="actions"><button id="leaveRoom" class="danger">Salir de la sala</button></div></aside></div><section class="panel cats-launch"><h2>Cuestionario C.A.T.S.</h2><p>Responde los cuatro apartados, uno a uno. Cada respuesta se guarda al modificarla.</p><div class="actions"><button class="primary" id="startForm">Abrir cuestionario C.A.T.S.</button><span id="formProgress" class="muted"></span></div></section>
  <section class="panel"><div class="section-toggle"><div><h2>Respuestas de la sala</h2><p>Las respuestas aparecen aquí cuando cada jugador las guarda.</p></div><button class="small" id="refreshRoom">Actualizar</button></div><div id="review" class="review-grid"></div></section>
   </div>
-</section>
-
-<section class="panel" id="randomTools">
+</section><section id="catsScreen" class="hidden"><div class="question-shell"><div class="question-top"><button id="closeCats" type="button">← Volver a la sala</button><span id="questionCounter" class="badge">Pregunta 1 de 4</span></div><div class="question-progress"><div id="questionProgressBar"></div></div><div class="question-body"><div class="cats-title"><span id="questionLetter" class="letter">C</span><div><h2 id="questionTitle">Concepto</h2><p id="questionPrompt">¿De qué trata la partida?</p></div></div><p class="question-hint">Puedes elegir varias opciones y añadir una descripción propia.</p><div id="questionOptions" class="options question-options"></div><label for="questionText">Otra idea o detalle (opcional)</label><textarea id="questionText" maxlength="600" placeholder="Escribe aquí una respuesta propia..."></textarea><div id="questionSaveStatus" class="muted" aria-live="polite">Los cambios se guardan automáticamente.</div></div><div class="question-bottom"><button id="questionPrev" type="button">Anterior</button><button class="primary" id="questionNext" type="button">Siguiente</button></div></div></section><section class="panel" id="randomTools">
  <div class="section-toggle"><div><h2>Generador aleatorio</h2><p>Una herramienta adicional para cuando el grupo no sabe qué jugar.</p></div><button id="toggleTable">Mostrar herramienta</button></div>
  <div id="tableTools" class="hidden">
   <div class="panel" style="margin-top:12px"><h3>Aventura generada</h3><div id="story" class="story">Pulsa «Generar propuesta» para obtener una idea.</div><div id="rolls" class="rolls"></div></div>
@@ -227,8 +216,7 @@ function enterRoom(data){
  $("roomTitle").textContent=data.room.room_name||"Sala C.A.T.S.";
  $("roomGame").textContent=data.room.game_name||"";
  $("inviteUrl").textContent=inviteLink(data.room.code);
- $("catsForm").classList.add("hidden");$("startForm").classList.remove("hidden");
- $("answerC").value="";$("answerA").value="";$("answerT").value="";$("answerS").value="";$("answerC").dataset.loaded="";
+ $("startForm").classList.remove("hidden");
  const isHost=!!data.participant.is_host;
  const needsName=!profileName || ["Anfitrión","Jugador"].includes(data.participant.display_name);
  const needsGame=isHost && (!data.room.game_name || data.room.game_name==="Juego sin especificar");
@@ -297,15 +285,9 @@ async function refreshRoom(){
   $("roomTitle").textContent=d.room.room_name||"Partida";$("roomGame").textContent=d.room.game_name||"";$("inviteUrl").textContent=inviteLink(d.room.code);$("hostBadge").classList.toggle("hidden",!d.me.is_host);
   $("roomStatus").textContent=d.room.closed?"La sala está cerrada.":"Comparte el enlace para invitar a los demás. Cada jugador inicia su cuestionario cuando pulsa el botón.";
   $("participantCount").textContent=d.participants.length+"/12";
-  renderParticipants(d);renderReview(d);
+  renderParticipants(d);renderReview(d);renderChat(d);
   const mine=d.participants.find(p=>p.id===session.participantId);
-  const formActive=!!mine?.form_started;
-  $("catsForm").classList.toggle("hidden",!formActive);
-  $("startForm").classList.toggle("hidden",formActive);
-  if(mine&&mine.submitted&&!$("answerC").dataset.loaded){
-   $("answerC").value=mine.answers.C||"";$("answerA").value=mine.answers.A||"";$("answerT").value=mine.answers.T||"";$("answerS").value=mine.answers.S||"";$("answerC").dataset.loaded="1";
-  }
-  if(mine&&mine.submitted)$("saveMessage").textContent="Tus respuestas están guardadas. Puedes modificarlas y volver a guardarlas.";
+  questionAnswers={C:normalizeAnswer(mine?.answers?.C),A:normalizeAnswer(mine?.answers?.A),T:normalizeAnswer(mine?.answers?.T),S:normalizeAnswer(mine?.answers?.S)};$("startForm").textContent=mine?.form_started?"Continuar cuestionario C.A.T.S.":"Abrir cuestionario C.A.T.S.";updateFormProgress();
  }catch(e){
   if(/acceso|sesión|disponible/i.test(e.message)){clearSession();$("roomView").classList.add("hidden");$("home").classList.remove("hidden");showError("homeError","Ya no perteneces a esa sala.");}
   else $("roomStatus").textContent=e.message;
@@ -315,9 +297,9 @@ function renderParticipants(d){
  const box=$("participants");box.innerHTML="";
  d.participants.forEach(p=>{
   const item=document.createElement("div");item.className="person";
-  const left=document.createElement("div");const name=document.createElement("span");name.className="person-name";name.textContent=p.display_name;left.appendChild(name);
+  const left=document.createElement("div");const name=document.createElement("span");name.className="person-name";const dot=document.createElement("span");dot.className=p.online?"online-dot":"offline-dot";name.append(dot,document.createTextNode(p.display_name));left.appendChild(name);
   const host=document.createElement("span");host.className="badge host";host.textContent="Anfitrión";if(p.is_host)left.append(" ",host);
-  const status=document.createElement("div");status.className="person-status";status.textContent=p.submitted?"C.A.T.S. completado":p.form_started?"Formulario iniciado":"Aún no ha iniciado";left.appendChild(status);item.appendChild(left);
+  const status=document.createElement("div");status.className="person-status";status.textContent=(p.online?"Conectado · ":"Desconectado · ")+(p.submitted?"C.A.T.S. completado":p.form_started?"Formulario iniciado":"Aún no ha iniciado");left.appendChild(status);item.appendChild(left);
   if(d.me.is_host&&!p.is_host){const kick=document.createElement("button");kick.className="danger small";kick.textContent="Expulsar";kick.onclick=()=>kickPlayer(p);item.appendChild(kick)}
   box.appendChild(item);
  });
@@ -329,10 +311,12 @@ function renderReview(d){
  if(!submitted.length){box.innerHTML='<p class="muted">Todavía no hay respuestas guardadas.</p>';return}
  submitted.forEach(p=>{
   const card=document.createElement("article");card.className="review-person";const h=document.createElement("h3");h.textContent=p.display_name;card.appendChild(h);
-  ["C","A","T","S"].forEach(k=>{const line=document.createElement("div");line.className="answer-line";const b=document.createElement("b");b.textContent=labels[k];const span=document.createElement("span");span.textContent=p.answers[k]||"—";line.append(b,span);card.appendChild(line)});
+  ["C","A","T","S"].forEach(k=>{const line=document.createElement("div");line.className="answer-line";const b=document.createElement("b");b.textContent=labels[k];const span=document.createElement("span");const val=normalizeAnswer(p.answers[k]);span.textContent=[...val.selected,val.text].filter(Boolean).join(" · ")||"—";line.append(b,span);card.appendChild(line)});
   box.appendChild(card);
  });
 }
+function renderChat(d){const box=$("chatMessages"),bottom=box.scrollHeight-box.scrollTop-box.clientHeight<60;box.innerHTML="";(d.messages||[]).forEach(m=>{const item=document.createElement("div");item.className="chat-message"+(m.participant_id===session.participantId?" mine":"");const n=document.createElement("b");n.textContent=m.display_name;const body=document.createElement("div");body.textContent=m.message;const t=document.createElement("small");t.textContent=new Date(m.created_at).toLocaleTimeString("es-CL",{hour:"2-digit",minute:"2-digit"});item.append(n,body,t);box.appendChild(item)});$("chatCount").textContent=(d.participants||[]).filter(p=>p.online).length+" conectados";if(bottom)box.scrollTop=box.scrollHeight}
+async function sendChatMessage(ev){ev.preventDefault();const input=$("chatInput"),message=input.value.trim();if(!message)return;$("chatStatus").textContent="Enviando...";try{await api("send_message",{roomId:session.roomId,token:session.token,message});input.value="";$("chatStatus").textContent="";await refreshRoom()}catch(err){$("chatStatus").textContent=err.message}}
 async function kickPlayer(p){
  if(!confirm("¿Expulsar a "+p.display_name+" de la sala?"))return;
  try{await api("kick",{roomId:session.roomId,token:session.token,participantId:p.id});await refreshRoom()}catch(e){alert(e.message)}
@@ -340,33 +324,29 @@ async function kickPlayer(p){
 async function leaveRoom(){
  if(!confirm("¿Quieres salir de esta sala?"))return;
  try{await api("leave",{roomId:session.roomId,token:session.token})}catch(e){console.warn(e)}
- clearSession();$("roomView").classList.add("hidden");$("home").classList.remove("hidden");$("answerC").dataset.loaded="";
+ clearSession();$("catsScreen").classList.add("hidden");$("roomView").classList.add("hidden");$("home").classList.remove("hidden");
 }
-async function startForm(){
- try{
-  await api("start_form",{roomId:session.roomId,token:session.token});
-  $("startForm").classList.add("hidden");$("catsForm").classList.remove("hidden");
-  $("saveMessage").textContent="Formulario iniciado.";
-  await refreshRoom();
- }catch(e){$("saveMessage").textContent=e.message}
-}
-async function saveAnswers(){
- const answers={C:$("answerC").value.trim(),A:$("answerA").value.trim(),T:$("answerT").value.trim(),S:$("answerS").value.trim()};
- if(Object.values(answers).some(v=>!v)){ $("saveMessage").textContent="Completa los cuatro apartados antes de guardar.";return}
- $("saveMessage").textContent="Guardando...";
- try{await api("submit",{roomId:session.roomId,token:session.token,answers});saveDraft();$("saveMessage").textContent="Respuestas guardadas. Ya puedes revisar las de los demás jugadores.";await refreshRoom()}catch(e){$("saveMessage").textContent=e.message}
-}
-function buildOptions(){
- Object.entries(optionSets).forEach(([key,items])=>{
-  const box=$("opts"+key),textarea=$("answer"+key);
-  items.forEach(item=>{const b=document.createElement("button");b.type="button";b.className="option";b.textContent=item;b.onclick=()=>{textarea.value=item;[...box.children].forEach(x=>x.classList.remove("selected"));b.classList.add("selected")};box.appendChild(b)});
- });
-}
+
+const questionDefs=[{key:"C",title:"Concepto",prompt:"¿De qué trata la partida?",options:optionSets.C},{key:"A",title:"Acción / Objetivo",prompt:"¿Qué harán los personajes?",options:optionSets.A},{key:"T",title:"Tono",prompt:"¿Qué ambiente tendrá la partida?",options:optionSets.T},{key:"S",title:"Temática",prompt:"¿Qué temas o elementos serán importantes?",options:optionSets.S}];
+let questionIndex=0,questionAnswers={C:{selected:[],text:""},A:{selected:[],text:""},T:{selected:[],text:""},S:{selected:[],text:""}},answerSaveTimer=null,answerSaveChain=Promise.resolve();
+function normalizeAnswer(v){if(typeof v==="string")return{selected:[],text:v};return{selected:Array.isArray(v?.selected)?v.selected:[],text:typeof v?.text==="string"?v.text:""}}
+function updateFormProgress(){const done=questionDefs.filter(q=>{const x=normalizeAnswer(questionAnswers[q.key]);return x.selected.length||x.text.trim()}).length;$("formProgress").textContent=done+" de 4 apartados respondidos"}
+function openQuestionnaire(){if(!session)return;$("roomView").classList.add("hidden");$("catsScreen").classList.remove("hidden");renderQuestion()}
+function closeQuestionnaire(){$("catsScreen").classList.add("hidden");$("roomView").classList.remove("hidden");refreshRoom()}
+function renderQuestion(){const q=questionDefs[questionIndex],x=normalizeAnswer(questionAnswers[q.key]);$("questionLetter").textContent=q.key;$("questionTitle").textContent=q.title;$("questionPrompt").textContent=q.prompt;$("questionCounter").textContent="Pregunta "+(questionIndex+1)+" de 4";$("questionProgressBar").style.width=((questionIndex+1)*25)+"%";$("questionOptions").innerHTML="";q.options.forEach(label=>{const btn=document.createElement("button");btn.type="button";btn.className="option"+(x.selected.includes(label)?" selected":"");btn.textContent=label;btn.setAttribute("aria-pressed",x.selected.includes(label)?"true":"false");btn.onclick=()=>{const v=normalizeAnswer(questionAnswers[q.key]);v.selected=v.selected.includes(label)?v.selected.filter(t=>t!==label):[...v.selected,label];questionAnswers[q.key]=v;renderQuestionOptions(v);scheduleAnswerSave(q.key)};$("questionOptions").appendChild(btn)});$("questionText").value=x.text;$("questionText").oninput=()=>{questionAnswers[q.key]={...normalizeAnswer(questionAnswers[q.key]),text:$("questionText").value};scheduleAnswerSave(q.key)};$("questionPrev").disabled=questionIndex===0;$("questionNext").textContent=questionIndex===3?"Volver a la sala":"Siguiente";$("questionSaveStatus").textContent="Los cambios se guardan automáticamente."}
+function renderQuestionOptions(x){[...$("questionOptions").children].forEach(btn=>{const on=x.selected.includes(btn.textContent);btn.classList.toggle("selected",on);btn.setAttribute("aria-pressed",on?"true":"false")})}
+function scheduleAnswerSave(key){$("questionSaveStatus").textContent="Guardando...";clearTimeout(answerSaveTimer);answerSaveTimer=setTimeout(()=>saveOneAnswer(key),350)}
+function saveOneAnswer(key){const answer=normalizeAnswer(questionAnswers[key]);answerSaveChain=answerSaveChain.then(async()=>{await api("save_answer",{roomId:session.roomId,token:session.token,key,answer});$("questionSaveStatus").textContent="Respuesta guardada.";updateFormProgress()}).catch(err=>{$("questionSaveStatus").textContent="No se pudo guardar: "+err.message});return answerSaveChain}
+async function goQuestionNext(){clearTimeout(answerSaveTimer);await saveOneAnswer(questionDefs[questionIndex].key);if(questionIndex===3){closeQuestionnaire();return}questionIndex++;renderQuestion()}
+async function goQuestionPrev(){clearTimeout(answerSaveTimer);await saveOneAnswer(questionDefs[questionIndex].key);if(questionIndex>0){questionIndex--;renderQuestion()}}
+async function startForm(){try{await api("start_form",{roomId:session.roomId,token:session.token});openQuestionnaire()}catch(err){$("roomStatus").textContent=err.message}}
+async function saveAnswers(){}
+function buildOptions(){}
 $("createRoom").onclick=createRoom;
 const inviteFromUrl=new URLSearchParams(window.location.search).get("sala");
 $("copyInvite").onclick=async()=>{try{await navigator.clipboard.writeText(inviteLink(session.code));$("copyInvite").textContent="Enlace copiado"}catch{$("copyInvite").textContent="No se pudo copiar"}setTimeout(()=>$("copyInvite").textContent="Copiar enlace",1600)};
-$("startForm").onclick=startForm;
-$("leaveRoom").onclick=leaveRoom;$("saveAnswers").onclick=saveAnswers;$("refreshRoom").onclick=refreshRoom;
+$("startForm").onclick=startForm;$("closeCats").onclick=closeQuestionnaire;$("questionNext").onclick=goQuestionNext;$("questionPrev").onclick=goQuestionPrev;$("chatForm").onsubmit=sendChatMessage;
+$("leaveRoom").onclick=leaveRoom;$("refreshRoom").onclick=refreshRoom;
 buildOptions();
 setAuthUI();
 sb.auth.getSession().then(async({data})=>{
