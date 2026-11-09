@@ -312,7 +312,7 @@ header{background:#000;border-bottom:1px solid var(--line);padding:12px 22px}
 
 <section id="roomView" class="hidden">
  <div class="panel">
-  <div class="room-head"><div><div class="room-meta"><span class="badge">SALA DE JUEGO</span><span id="hostBadge" class="badge host hidden">ANFITRIÓN</span></div><h2 id="roomTitle" style="margin:8px 0 0">Partida</h2><p id="roomGame" style="margin:5px 0 0;color:var(--gold)">Juego</p></div><div><div class="muted" style="font-size:11px">ENLACE PARA INVITAR</div><div id="inviteUrl" style="max-width:320px;overflow-wrap:anywhere;color:var(--muted);font-size:12px;margin:6px 0">Enlace de la sala</div><div class="actions"><button class="small" id="copyInvite">Copiar enlace</button><button class="small" id="backToRooms">Volver al portal</button></div></div></div>
+  <div class="room-head"><div><div class="room-meta"><span class="badge">SALA DE JUEGO</span><span id="hostBadge" class="badge host hidden">ANFITRIÓN</span></div><h2 id="roomTitle" style="margin:8px 0 0">Partida</h2><p id="roomGame" style="margin:5px 0 0;color:var(--gold)">Juego</p></div><div><div class="muted" style="font-size:11px">ENLACE PARA INVITAR</div><div id="inviteUrl" style="max-width:320px;overflow-wrap:anywhere;color:var(--muted);font-size:12px;margin:6px 0">Enlace de la sala</div><div style="margin:8px 0;color:var(--gold);font-weight:700">Código: <span id="roomCodeDisplay"></span></div><div class="actions"><button class="small" id="copyInvite">Copiar enlace</button><button class="small" id="backToRooms">Volver al portal</button></div></div></div>
   <p id="roomStatus">Comparte el enlace para invitar a los demás jugadores.</p>
   <div id="hostRoomControls" class="actions hidden" style="margin:10px 0"><button id="toggleRoomClosed" class="danger small" type="button">Cerrar sala</button><span class="muted">Solo el anfitrión puede gestionar el acceso a la sala.</span></div>
   <div id="roomSetup" class="cats-card hidden"></div>
@@ -501,7 +501,7 @@ async function restoreRoomSession(){
  try{const saved=JSON.parse(raw);if(!saved?.roomId||!saved?.token)throw new Error("Sesión incompleta");
  const d=await api("get",{roomId:saved.roomId,token:saved.token});
  const participant=(d.participants||[]).find(p=>p.id===saved.participantId);if(!participant)throw new Error("Participante no encontrado");
- enterRoom({room:d.room,participant,token:saved.token});
+ enterRoom({room:d.room,participant,token:saved.token,restored:true});
  }catch(e){clearSession();console.warn("No se pudo restaurar la sala:",e.message)}
 }
 $("signIn").onclick=signIn;$("signUp").onclick=()=>{if(!signUpMode)setSignUpMode(true);else signUp();};$("cancelSignUp").onclick=()=>setSignUpMode(false);$("googleSignIn").onclick=signInWithGoogle;$("forgotPassword").onclick=sendPasswordRecovery;$("saveNewPassword").onclick=saveNewPassword;$("signOut").onclick=signOut;$("saveProfile").onclick=saveProfile;$("joinRoomCode").onclick=joinRoomByCode;
@@ -878,10 +878,10 @@ function enterRoom(data){
  saveSession();$("catsPinned").classList.remove("hidden");$("home").classList.add("hidden");$("roomView").classList.remove("hidden");
  $("roomTitle").textContent=data.room.room_name||"Sala de rol";
  $("roomGame").textContent=data.room.game_name||"";
- $("inviteUrl").textContent=inviteLink(data.room.code);
+ $("inviteUrl").textContent=inviteLink(data.room.code);$("roomCodeDisplay").textContent=data.room.code;
  $("startForm").classList.remove("hidden");
  const isHost=!!data.participant.is_host;
- const needsName=!profileName || ["Anfitrión","Jugador"].includes(data.participant.display_name);
+ const needsName=!data.restored;
  const needsGame=isHost && (!data.room.game_name || data.room.game_name==="Juego sin especificar");
  if(needsName||needsGame){
   $("roomContent").classList.add("hidden");
@@ -949,7 +949,7 @@ async function refreshRoom(){
  if(!session)return;
  try{
   const d=await api("get",{roomId:session.roomId,token:session.token});roomState=d;
-  $("roomTitle").textContent=d.room.room_name||"Partida";$("roomGame").textContent=d.room.game_name||"";$("inviteUrl").textContent=inviteLink(d.room.code);$("hostBadge").classList.toggle("hidden",!d.me.is_host);
+  $("roomTitle").textContent=d.room.room_name||"Partida";$("roomGame").textContent=d.room.game_name||"";$("inviteUrl").textContent=inviteLink(d.room.code);$("roomCodeDisplay").textContent=d.room.code;$("hostBadge").classList.toggle("hidden",!d.me.is_host);
   $("roomStatus").textContent=d.room.closed?"La sala está cerrada: nadie nuevo puede entrar.":"Comparte el enlace para invitar a los demás. Cada jugador inicia su cuestionario cuando pulsa el botón.";
   $("hostRoomControls").classList.toggle("hidden",!d.me.is_host);
   $("toggleRoomClosed").textContent=d.room.closed?"Reabrir sala":"Cerrar sala";
@@ -1011,18 +1011,9 @@ function renderMatches(players){
  const safetyGrid=document.createElement("div");safetyGrid.className="match-grid";
  [["Líneas del grupo","lines"],["Velos del grupo","veils"]].forEach(([title,key])=>{const card=document.createElement("section");card.className="match-card";const h=document.createElement("h3");h.textContent=title;card.appendChild(h);const entries=[];players.forEach(p=>normalizeEntries(p.answers?.[key]).forEach(value=>entries.push({name:p.display_name,value})));if(!entries.length){const empty=document.createElement("div");empty.className="match-empty";empty.textContent="Todavía no hay entradas.";card.appendChild(empty)}else{const list=document.createElement("ul");entries.forEach(entry=>{const item=document.createElement("li");item.style.margin="7px 0";const value=document.createElement("span");value.textContent=entry.value;const author=document.createElement("small");author.style.display="block";author.style.color="var(--muted)";author.textContent=entry.name;item.append(value,author);list.appendChild(item)});card.appendChild(list)}safetyGrid.appendChild(card)});box.appendChild(safetyGrid);
 }
-function renderChat(d){const box=$("chatMessages"),bottom=box.scrollHeight-box.scrollTop-box.clientHeight<60;box.innerHTML="";(d.messages||[]).forEach(m=>{const item=document.createElement("div");item.className="chat-message"+(m.participant_id===session.participantId?" mine":"");const n=document.createElement("b");n.textContent=m.display_name;const body=document.createElement("div");body.textContent=m.message;const t=document.createElement("small");t.textContent=new Date(m.created_at).toLocaleTimeString("es-CL",{hour:"2-digit",minute:"2-digit"});item.append(n,body,t);
-   if(roomState?.me?.is_host){const remove=document.createElement("button");remove.type="button";remove.className="danger small";remove.textContent="Eliminar";remove.style.marginTop="6px";remove.onclick=()=>deleteRoomMessage(m);item.appendChild(remove)}
-   box.appendChild(item)});$("chatCount").textContent=(d.participants||[]).filter(p=>p.online).length+" conectados";if(bottom)box.scrollTop=box.scrollHeight}
-function generateRandomAdventureMessage(){const rolls=tables.map(table=>Math.floor(Math.random()*table.items.length));const values=rolls.map((roll,index)=>tables[index].items[roll]);return "🎲 PARTIDA ALEATORIA\n\nEl conflicto gira en torno a "+values[0]+" El objetivo es "+values[1]+" Para alcanzarlo, hace falta "+values[2]+" Si se consigue, podría "+values[3]}
-async function sendChatMessage(ev){ev.preventDefault();const input=$("chatInput"),command=input.value.trim();if(!command)return;const message=/^\/aleatorio$/i.test(command)?generateRandomAdventureMessage():command;$("chatStatus").textContent="Enviando...";try{await api("send_message",{roomId:session.roomId,token:session.token,message});input.value="";$("chatStatus").textContent="";await refreshRoom()}catch(err){$("chatStatus").textContent=err.message}}
 async function kickPlayer(p){
  if(!confirm("¿Expulsar a "+p.display_name+" de la sala? No podrá volver a entrar, aunque conserve el enlace."))return;
  try{await api("kick",{roomId:session.roomId,token:session.token,participantId:p.id});await refreshRoom()}catch(e){alert(e.message)}
-}
-async function deleteRoomMessage(m){
- if(!confirm("¿Eliminar este mensaje del chat?"))return;
- try{await api("delete_message",{roomId:session.roomId,token:session.token,messageId:m.id});await refreshRoom()}catch(e){alert(e.message)}
 }
 async function toggleRoomClosed(){
  if(!roomState?.me?.is_host)return;
