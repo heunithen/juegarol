@@ -155,7 +155,7 @@ function render(){
  const s=document.getElementById("story");
  if(current.every(v=>v!==null)){
   const v=current.map((n,i)=>tables[i].items[n-1]);
-  s.textContent="El conflicto gira en torno a "+v[0]+". La situación está impulsada por el deseo de "+v[1]+". Para conseguirlo, hace falta "+v[2]+". Si se alcanza ese objetivo, podría "+v[3];
+  s.textContent="El conflicto gira en torno a "+v[0]+". El objetivo es "+v[1]+". Para alcanzarlo, hace falta "+v[2]+". Si se consigue, podría "+v[3];
  }else if(current.some(v=>v!==null)){
   s.textContent="Resultados parciales. Lanza los dados que faltan o genera una aventura.";
  }else{s.textContent="Pulsa «Generar aventura» para generar un conflicto.";}
