@@ -32,6 +32,7 @@ button.danger{border-color:#794848;color:#f0b0b0}button.small{padding:5px 8px;fo
 .cats-card{margin:14px 0;padding:17px;border:1px solid var(--line);border-radius:10px;background:#1b2028}.cats-title{display:flex;gap:10px;align-items:center}.letter{display:grid;place-items:center;flex:0 0 35px;height:35px;border-radius:8px;background:#3a3325;color:var(--gold);font-weight:800;font-size:19px}
 .options{display:flex;flex-wrap:wrap;gap:7px;margin:10px 0}.option{font-size:12px;padding:7px 10px;font-weight:500}.option.selected{border-color:var(--gold);background:#3a3325;color:var(--gold)}
 .review-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.review-person{background:#191e26;border:1px solid var(--line);border-radius:10px;padding:14px}.answer-line{padding:9px 0;border-top:1px solid #353d49}.answer-line b{display:block;color:var(--gold);font-size:12px;letter-spacing:.04em}.answer-line span{white-space:pre-wrap;overflow-wrap:anywhere}
+.match-summary{margin-top:20px;border-top:1px solid var(--line);padding-top:18px}.match-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.match-card{background:#191e26;border:1px solid var(--line);border-radius:10px;padding:14px}.match-row{margin:11px 0}.match-label{display:flex;justify-content:space-between;gap:10px;font-size:12px;margin-bottom:5px}.match-label span:first-child{overflow-wrap:anywhere}.match-label b{color:var(--gold);white-space:nowrap}.match-track{height:9px;background:#303744;border-radius:8px;overflow:hidden}.match-fill{height:100%;background:var(--gold);border-radius:8px;min-width:3px}.match-empty{color:var(--muted);font-size:13px}@media(max-width:700px){.match-grid{grid-template-columns:1fr}}
 .section-toggle{display:flex;justify-content:space-between;align-items:center;gap:12px}
 #tableTools{margin-top:12px}.actions{display:flex;gap:9px;flex-wrap:wrap;margin:12px 0}
 .story{font:17px/1.65 Georgia,serif;white-space:pre-line;min-height:45px;color:var(--text)}
@@ -81,7 +82,7 @@ footer{text-align:center;color:#707987;font-size:11px;padding:15px}
  </div>
  <div id="roomContent" class="hidden">
  <div class="room-layout"><section class="panel chat-panel"><div class="section-toggle"><div><h2>Chat de la sala</h2><p>Conversación compartida de la partida.</p></div><span class="badge" id="chatCount">0 conectados</span></div><div id="chatMessages" class="chat-messages" aria-live="polite"></div><form id="chatForm" class="chat-compose"><input id="chatInput" maxlength="500" autocomplete="off" placeholder="Escribe un mensaje..." aria-label="Mensaje"><button class="primary" type="submit">Enviar</button></form><div id="chatStatus" class="muted" aria-live="polite"></div></section><aside class="panel"><div class="section-toggle"><h2>Conectados</h2><span id="participantCount" class="badge">0/12</span></div><div id="participants" class="participants"></div><div class="actions"><button id="leaveRoom" class="danger">Salir de la sala</button></div></aside></div><section class="panel cats-launch"><h2>Cuestionario C.A.T.S.</h2><p>Responde los cuatro apartados, uno a uno. Cada respuesta se guarda al modificarla.</p><div class="actions"><button class="primary" id="startForm">Abrir cuestionario C.A.T.S.</button><span id="formProgress" class="muted"></span></div></section>
- <section class="panel"><div class="section-toggle"><div><h2>Respuestas de la sala</h2><p>Las respuestas aparecen aquí cuando cada jugador las guarda.</p></div><button class="small" id="refreshRoom">Actualizar</button></div><div id="review" class="review-grid"></div></section>
+ <section class="panel"><div class="section-toggle"><div><h2>Respuestas de la sala</h2><p>Las respuestas aparecen aquí cuando cada jugador las guarda.</p></div><button class="small" id="refreshRoom">Actualizar</button></div><div id="review" class="review-grid"></div><div id="matches" class="match-summary"></div></section>
   </div>
 </section><section id="catsScreen" class="hidden"><div class="question-shell"><div class="question-top"><button id="closeCats" type="button">← Volver a la sala</button><span id="questionCounter" class="badge">Pregunta 1 de 4</span></div><div class="question-progress"><div id="questionProgressBar"></div></div><div class="question-body"><div class="cats-title"><span id="questionLetter" class="letter">C</span><div><h2 id="questionTitle">Concepto</h2><p id="questionPrompt">¿De qué trata la partida?</p></div></div><p class="question-hint">Puedes elegir varias opciones y añadir una descripción propia.</p><div id="questionOptions" class="options question-options"></div><label for="questionText">Otra idea o detalle (opcional)</label><textarea id="questionText" maxlength="600" placeholder="Escribe aquí una respuesta propia..."></textarea><div id="questionSaveStatus" class="muted" aria-live="polite">Los cambios se guardan automáticamente.</div></div><div class="question-bottom"><button id="questionPrev" type="button">Anterior</button><button class="primary" id="questionNext" type="button">Siguiente</button></div></div></section><section class="panel" id="randomTools">
  <div class="section-toggle"><div><h2>Generador aleatorio</h2><p>Una herramienta adicional para cuando el grupo no sabe qué jugar.</p></div><button id="toggleTable">Mostrar herramienta</button></div>
@@ -335,12 +336,49 @@ function renderReview(d){
  const box=$("review");box.innerHTML="";
  const labels={C:"CONCEPTO",A:"ACCIÓN / OBJETIVO",T:"TONO",S:"TEMÁTICA"};
  const submitted=d.participants.filter(p=>p.submitted);
- if(!submitted.length){box.innerHTML='<p class="muted">Todavía no hay respuestas guardadas.</p>';return}
+ if(!submitted.length){box.innerHTML='<p class="muted">Todavía no hay respuestas guardadas.</p>';renderMatches([]);return}
  submitted.forEach(p=>{
   const card=document.createElement("article");card.className="review-person";const h=document.createElement("h3");h.textContent=p.display_name;card.appendChild(h);
   ["C","A","T","S"].forEach(k=>{const line=document.createElement("div");line.className="answer-line";const b=document.createElement("b");b.textContent=labels[k];const span=document.createElement("span");const val=normalizeAnswer(p.answers[k]);span.textContent=[...val.selected,val.text].filter(Boolean).join(" · ")||"—";line.append(b,span);card.appendChild(line)});
   box.appendChild(card);
  });
+ renderMatches(submitted);
+}
+function renderMatches(players){
+ const box=$("matches");box.innerHTML="";
+ if(!players.length)return;
+ const labels={C:"Concepto",A:"Acción / objetivo",T:"Tono",S:"Temática"};
+ const heading=document.createElement("h2");heading.textContent="Coincidencias del grupo";box.appendChild(heading);
+ const intro=document.createElement("p");intro.textContent="Frecuencia de cada opción entre quienes completaron el cuestionario. Los textos personalizados solo coinciden cuando son iguales.";box.appendChild(intro);
+ const grid=document.createElement("div");grid.className="match-grid";
+ ["C","A","T","S"].forEach(key=>{
+  const counts=new Map();
+  players.forEach(player=>{
+   const answer=normalizeAnswer(player.answers?.[key]);
+   answer.selected.forEach(value=>{const label=String(value).trim();if(label)counts.set(label,(counts.get(label)||0)+1)});
+   const custom=String(answer.text||"").trim();
+   if(custom){const normalized=custom.toLocaleLowerCase("es").replace(/\s+/g," ");const existing=[...counts.keys()].find(k=>k.startsWith("custom:")&&k.slice(7)===normalized);const mapKey=existing||("custom:"+normalized);counts.set(mapKey,(counts.get(mapKey)||0)+1)}
+  });
+  const entries=[...counts.entries()].map(([key,count])=>({label:key.startsWith("custom:")?key.slice(7):key,count})).sort((a,b)=>b.count-a.count||a.label.localeCompare(b.label,"es"));
+  const card=document.createElement("section");card.className="match-card";
+  const title=document.createElement("h3");title.textContent=labels[key];card.appendChild(title);
+  if(!entries.length){const empty=document.createElement("div");empty.className="match-empty";empty.textContent="Sin respuestas en este apartado.";card.appendChild(empty)}
+  else{
+   const max=entries[0].count;
+   entries.forEach(entry=>{
+    const row=document.createElement("div");row.className="match-row";
+    const label=document.createElement("div");label.className="match-label";
+    const name=document.createElement("span");name.textContent=entry.label;
+    const amount=document.createElement("b");amount.textContent=entry.count+" de "+players.length;
+    label.append(name,amount);
+    const track=document.createElement("div");track.className="match-track";
+    const fill=document.createElement("div");fill.className="match-fill";fill.style.width=(entry.count/max*100)+"%";
+    track.appendChild(fill);row.append(label,track);card.appendChild(row);
+   });
+  }
+  grid.appendChild(card);
+ });
+ box.appendChild(grid);
 }
 function renderChat(d){const box=$("chatMessages"),bottom=box.scrollHeight-box.scrollTop-box.clientHeight<60;box.innerHTML="";(d.messages||[]).forEach(m=>{const item=document.createElement("div");item.className="chat-message"+(m.participant_id===session.participantId?" mine":"");const n=document.createElement("b");n.textContent=m.display_name;const body=document.createElement("div");body.textContent=m.message;const t=document.createElement("small");t.textContent=new Date(m.created_at).toLocaleTimeString("es-CL",{hour:"2-digit",minute:"2-digit"});item.append(n,body,t);box.appendChild(item)});$("chatCount").textContent=(d.participants||[]).filter(p=>p.online).length+" conectados";if(bottom)box.scrollTop=box.scrollHeight}
 async function sendChatMessage(ev){ev.preventDefault();const input=$("chatInput"),message=input.value.trim();if(!message)return;$("chatStatus").textContent="Enviando...";try{await api("send_message",{roomId:session.roomId,token:session.token,message});input.value="";$("chatStatus").textContent="";await refreshRoom()}catch(err){$("chatStatus").textContent=err.message}}
