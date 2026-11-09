@@ -59,20 +59,21 @@ footer{text-align:center;color:#707987;font-size:11px;padding:15px}
 <section id="home" class="hidden">
  <div class="panel"><h2>Preparar una partida</h2><p>Crea una sala e invita a tus jugadores con un código, o entra a una sala existente.</p></div>
  <div class="home-grid">
-  <section class="panel"><h3>Crear una sala</h3><label for="createName">Tu nombre</label><input id="createName" maxlength="32" placeholder="Nombre del jugador"><div class="actions"><button class="primary" id="createRoom">Crear sala</button></div></section>
-  <section class="panel"><h3>Unirse a una sala</h3><label for="joinName">Tu nombre</label><input id="joinName" maxlength="32" placeholder="Nombre del jugador"><label for="joinCode">Código de invitación</label><input id="joinCode" maxlength="6" placeholder="ABC123" style="text-transform:uppercase"><div class="actions"><button class="primary" id="joinRoom">Entrar a la sala</button></div></section>
+  <section class="panel"><h3>Crear una sala</h3><label for="createName">Tu nombre</label><input id="createName" maxlength="32" placeholder="Nombre del jugador"><label for="createRoomName">Nombre de la partida</label><input id="createRoomName" maxlength="80" placeholder="Ej. La corona de ceniza"><label for="createGameName">Juego</label><input id="createGameName" maxlength="80" placeholder="Ej. Dungeons & Dragons, Pathfinder, sistema propio..."><div class="actions"><button class="primary" id="createRoom">Crear sala</button></div></section>
+  <section class="panel"><h3>Unirse a una sala</h3><label for="joinName">Tu nombre</label><input id="joinName" maxlength="32" placeholder="Nombre del jugador"><label for="joinLink">Enlace de invitación</label><input id="joinLink" type="url" placeholder="Pega aquí el enlace que te compartieron"><div class="actions"><button class="primary" id="joinRoom">Entrar a la sala</button></div></section>
  </div><div id="homeError" class="error" role="alert"></div>
 </section>
 
 <section id="roomView" class="hidden">
  <div class="panel">
-  <div class="room-head"><div><div class="room-meta"><span class="badge">SALA DE JUEGO</span><span id="hostBadge" class="badge host hidden">ANFITRIÓN</span></div><h2 id="roomTitle" style="margin:8px 0 0">Sala</h2></div><div><div class="muted" style="font-size:11px">CÓDIGO DE INVITACIÓN</div><div id="roomCode" class="code">------</div><button class="small" id="copyCode">Copiar código</button></div></div>
-  <p id="roomStatus">Comparte el código para invitar a los demás jugadores.</p>
+  <div class="room-head"><div><div class="room-meta"><span class="badge">SALA DE JUEGO</span><span id="hostBadge" class="badge host hidden">ANFITRIÓN</span></div><h2 id="roomTitle" style="margin:8px 0 0">Partida</h2><p id="roomGame" style="margin:5px 0 0;color:var(--gold)">Juego</p></div><div><div class="muted" style="font-size:11px">ENLACE PARA INVITAR</div><div id="inviteUrl" style="max-width:320px;overflow-wrap:anywhere;color:var(--muted);font-size:12px;margin:6px 0">Enlace de la sala</div><button class="small" id="copyInvite">Copiar enlace</button></div></div>
+  <p id="roomStatus">Comparte el enlace para invitar a los demás jugadores.</p>
  </div>
  <div class="panel"><div class="section-toggle"><h2>Participantes</h2><span id="participantCount" class="badge">0/12</span></div><div id="participants" class="participants"></div><div class="actions"><button id="leaveRoom" class="danger">Salir de la sala</button></div></div>
  <section class="panel">
-  <h2>Tu formulario C.A.T.S.</h2><p>Responde a tu ritmo. Puedes empezar inmediatamente y guardar tus respuestas cuando completes los cuatro apartados.</p>
-  <div id="catsForm">
+  <h2>Tu formulario C.A.T.S.</h2><p>Inicia tu formulario cuando quieras. Mientras tanto, puedes consultar las propuestas que los demás ya hayan guardado.</p>
+  <div class="actions"><button class="primary" id="startForm">Iniciar formulario</button></div>
+  <div id="catsForm" class="hidden">
    <div class="cats-card"><div class="cats-title"><span class="letter">C</span><div><h3>Concepto</h3><p>¿De qué trata la partida?</p></div></div><div id="optsC" class="options"></div><label for="answerC">Tu concepto</label><textarea id="answerC" maxlength="600" placeholder="Describe el tipo de mundo, género o premisa que te gustaría jugar..."></textarea></div>
    <div class="cats-card"><div class="cats-title"><span class="letter">A</span><div><h3>Acción / Objetivo</h3><p>¿Qué harán los personajes?</p></div></div><div id="optsA" class="options"></div><label for="answerA">Tu objetivo</label><textarea id="answerA" maxlength="600" placeholder="¿Qué tipo de actividades, misiones o desafíos protagonizarán?"></textarea></div>
    <div class="cats-card"><div class="cats-title"><span class="letter">T</span><div><h3>Tono</h3><p>¿Qué ambiente tendrá la partida?</p></div></div><div id="optsT" class="options"></div><label for="answerT">El tono</label><textarea id="answerT" maxlength="600" placeholder="Describe el ambiente y el estilo narrativo..."></textarea></div>
@@ -183,27 +184,49 @@ function draftKey(){return session?"cats_draft_"+session.roomId+"_"+session.part
 function saveDraft(){if(!session)return;localStorage.setItem(draftKey(),JSON.stringify({C:$("answerC").value,A:$("answerA").value,T:$("answerT").value,S:$("answerS").value}))}
 function loadDraft(){if(!session)return;try{const d=JSON.parse(localStorage.getItem(draftKey())||"null");if(d){$("answerC").value=d.C||"";$("answerA").value=d.A||"";$("answerT").value=d.T||"";$("answerS").value=d.S||""}}catch{}}
 function clearSession(){localStorage.removeItem(STORAGE_KEY);session=null;roomState=null;if(refreshTimer)clearInterval(refreshTimer);refreshTimer=null}
+function inviteLink(code){const u=new URL(window.location.href);u.search="";u.hash="";u.searchParams.set("sala",code);return u.toString()}
 function enterRoom(data){
  session={roomId:data.room.id,code:data.room.code,participantId:data.participant.id,token:data.token};
- saveSession();$("home").classList.add("hidden");$("roomView").classList.remove("hidden");$("roomCode").textContent=data.room.code;$("roomTitle").textContent="Sala "+data.room.code;
- $("answerC").value="";$("answerA").value="";$("answerT").value="";$("answerS").value="";
+ saveSession();$("home").classList.add("hidden");$("roomView").classList.remove("hidden");
+ $("roomTitle").textContent=data.room.room_name||"Partida";$("roomGame").textContent=data.room.game_name||"";
+ $("inviteUrl").textContent=inviteLink(data.room.code);
+ $("catsForm").classList.add("hidden");$("startForm").classList.remove("hidden");
+ $("answerC").value="";$("answerA").value="";$("answerT").value="";$("answerS").value="";$("answerC").dataset.loaded="";
  refreshRoom();if(refreshTimer)clearInterval(refreshTimer);refreshTimer=setInterval(refreshRoom,4500);
 }
 async function createRoom(){
- showError("homeError","");try{const d=await api("create",{name:$("createName").value});enterRoom(d)}catch(e){showError("homeError",e.message)}
+ showError("homeError","");
+ try{
+  const d=await api("create",{name:$("createName").value,roomName:$("createRoomName").value,gameName:$("createGameName").value});
+  enterRoom(d);
+ }catch(e){showError("homeError",e.message)}
+}
+function getInviteCode(value){
+ const raw=String(value||"").trim();
+ if(!raw)return "";
+ try{
+  const url=new URL(raw,window.location.origin);
+  return (url.searchParams.get("sala")||"").toUpperCase().replace(/[^A-Z0-9]/g,"").slice(0,6);
+ }catch{return ""}
 }
 async function joinRoom(){
- showError("homeError","");try{const d=await api("join",{name:$("joinName").value,code:$("joinCode").value});enterRoom(d)}catch(e){showError("homeError",e.message)}
+ showError("homeError","");
+ const code=getInviteCode($("joinLink").value);
+ if(!code){showError("homeError","Pega un enlace de invitación válido.");return}
+ try{const d=await api("join",{name:$("joinName").value,code});enterRoom(d)}catch(e){showError("homeError",e.message)}
 }
 async function refreshRoom(){
  if(!session)return;
  try{
   const d=await api("get",{roomId:session.roomId,token:session.token});roomState=d;
-  $("roomCode").textContent=d.room.code;$("hostBadge").classList.toggle("hidden",!d.me.is_host);
+  $("roomTitle").textContent=d.room.room_name||"Partida";$("roomGame").textContent=d.room.game_name||"";$("inviteUrl").textContent=inviteLink(d.room.code);$("hostBadge").classList.toggle("hidden",!d.me.is_host);
   $("roomStatus").textContent=d.room.closed?"La sala está cerrada.":"Comparte el código para que se unan más jugadores. Cada participante puede responder cuando quiera.";
   $("participantCount").textContent=d.participants.length+"/12";
   renderParticipants(d);renderReview(d);
   const mine=d.participants.find(p=>p.id===session.participantId);
+  const formActive=!!mine?.form_started;
+  $("catsForm").classList.toggle("hidden",!formActive);
+  $("startForm").classList.toggle("hidden",formActive);
   if(mine&&mine.submitted&&!$("answerC").dataset.loaded){
    $("answerC").value=mine.answers.C||"";$("answerA").value=mine.answers.A||"";$("answerT").value=mine.answers.T||"";$("answerS").value=mine.answers.S||"";$("answerC").dataset.loaded="1";
   }
@@ -219,7 +242,7 @@ function renderParticipants(d){
   const item=document.createElement("div");item.className="person";
   const left=document.createElement("div");const name=document.createElement("span");name.className="person-name";name.textContent=p.display_name;left.appendChild(name);
   const host=document.createElement("span");host.className="badge host";host.textContent="Anfitrión";if(p.is_host)left.append(" ",host);
-  const status=document.createElement("div");status.className="person-status";status.textContent=p.submitted?"C.A.T.S. completado":"Aún no ha respondido";left.appendChild(status);item.appendChild(left);
+  const status=document.createElement("div");status.className="person-status";status.textContent=p.submitted?"C.A.T.S. completado":p.form_started?"Formulario iniciado":"Aún no ha iniciado";left.appendChild(status);item.appendChild(left);
   if(d.me.is_host&&!p.is_host){const kick=document.createElement("button");kick.className="danger small";kick.textContent="Expulsar";kick.onclick=()=>kickPlayer(p);item.appendChild(kick)}
   box.appendChild(item);
  });
@@ -244,6 +267,14 @@ async function leaveRoom(){
  try{await api("leave",{roomId:session.roomId,token:session.token})}catch(e){console.warn(e)}
  clearSession();$("roomView").classList.add("hidden");$("home").classList.remove("hidden");$("answerC").dataset.loaded="";
 }
+async function startForm(){
+ try{
+  await api("start_form",{roomId:session.roomId,token:session.token});
+  $("startForm").classList.add("hidden");$("catsForm").classList.remove("hidden");
+  $("saveMessage").textContent="Formulario iniciado.";
+  await refreshRoom();
+ }catch(e){$("saveMessage").textContent=e.message}
+}
 async function saveAnswers(){
  const answers={C:$("answerC").value.trim(),A:$("answerA").value.trim(),T:$("answerT").value.trim(),S:$("answerS").value.trim()};
  if(Object.values(answers).some(v=>!v)){ $("saveMessage").textContent="Completa los cuatro apartados antes de guardar.";return}
@@ -256,8 +287,11 @@ function buildOptions(){
   items.forEach(item=>{const b=document.createElement("button");b.type="button";b.className="option";b.textContent=item;b.onclick=()=>{textarea.value=item;[...box.children].forEach(x=>x.classList.remove("selected"));b.classList.add("selected")};box.appendChild(b)});
  });
 }
-$("createRoom").onclick=createRoom;$("joinRoom").onclick=joinRoom;$("joinCode").addEventListener("input",e=>e.target.value=e.target.value.toUpperCase().replace(/[^A-Z0-9]/g,"").slice(0,6));
-$("copyCode").onclick=async()=>{try{await navigator.clipboard.writeText(session.code);$("copyCode").textContent="Copiado"}catch{$("copyCode").textContent="No se pudo copiar"}setTimeout(()=>$("copyCode").textContent="Copiar código",1600)};
+$("createRoom").onclick=createRoom;$("joinRoom").onclick=joinRoom;
+const inviteFromUrl=new URLSearchParams(window.location.search).get("sala");
+if(inviteFromUrl){$("joinLink").value=window.location.href;}
+$("copyInvite").onclick=async()=>{try{await navigator.clipboard.writeText(inviteLink(session.code));$("copyInvite").textContent="Enlace copiado"}catch{$("copyInvite").textContent="No se pudo copiar"}setTimeout(()=>$("copyInvite").textContent="Copiar enlace",1600)};
+$("startForm").onclick=startForm;
 $("leaveRoom").onclick=leaveRoom;$("saveAnswers").onclick=saveAnswers;$("refreshRoom").onclick=refreshRoom;
 buildOptions();
 setAuthUI();
