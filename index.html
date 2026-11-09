@@ -79,10 +79,35 @@ main{padding:18px 16px 48px}
  .home-tabs{gap:4px}
  .home-tab{flex:1 1 calc(50% - 4px);padding:9px 7px;font-size:13px}
 }
+
+/* Encabezado integrado: marca y cuenta */
+header{background:#000;border-bottom:1px solid var(--line);padding:12px 22px}
+.header-layout{width:min(100%,1400px);margin:0 auto;display:flex;align-items:center;justify-content:center;gap:26px}
+.header-brand{flex:1 1 760px;min-width:0;text-align:center}
+.main-banner-image{width:min(100%,900px);max-height:190px}
+.site-version{margin-top:6px}
+.account-header{flex:0 1 310px;min-width:235px;display:flex;align-items:center;gap:14px;justify-content:space-between;text-align:left;padding:13px 15px;border:1px solid #414957;border-radius:12px;background:#171a20}
+.account-header.hidden{display:none!important}
+.account-header-info{min-width:0;display:flex;flex-direction:column;gap:3px}
+.account-header-info b{color:var(--text);overflow-wrap:anywhere;font-size:14px}
+.account-header-info small{color:var(--muted);font-size:12px}
+.account-header #signOut{flex:0 0 auto;padding:8px 11px;font-size:12px}
+@media(max-width:760px){
+ header{padding:10px 12px}
+ .header-layout{flex-direction:column;gap:9px}
+ .header-brand{flex:0 1 auto;width:100%}
+ .main-banner-image{max-height:145px}
+ .account-header{width:min(100%,520px);min-width:0;flex:0 1 auto}
+}
 </style>
 </head>
 <body>
-<header id="mainBanner" role="button" tabindex="0" aria-label="Volver al portal de inicio"><img class="main-banner-image" src="arte/banner.png" alt="Red de Roleros"><span class="site-version">Versión 1.38.0</span></header>
+<header id="mainBanner" role="button" tabindex="0" aria-label="Volver al portal de inicio">
+ <div class="header-layout">
+  <div class="header-brand"><img class="main-banner-image" src="arte/banner.png" alt="Red de Roleros"><span class="site-version">Versión 1.39.0</span></div>
+  <section id="accountBar" class="account-header hidden"><div class="account-header-info"><b id="accountEmail"></b><small id="accountEmailSecondary">Sesión iniciada</small></div><button id="signOut" class="danger" type="button">Cerrar sesión</button></section>
+ </div>
+</header>
 <main>
 <section id="authPanel" class="panel">
  <h2>Acceso a Red de Roleros</h2>
@@ -93,7 +118,7 @@ main{padding:18px 16px 48px}
  <div class="actions"><button class="primary" id="signIn">Iniciar sesión</button><button id="signUp">Crear cuenta</button><button id="googleSignIn">Continuar con Google</button></div>
  <div id="authMessage" class="muted" aria-live="polite"></div>
 </section>
-<section id="accountBar" class="panel hidden"><div class="row"><div><b id="accountEmail"></b><p>Sesión iniciada</p></div><button id="signOut" class="danger">Cerrar sesión</button></div></section>
+
 <section id="profileSetup" class="panel hidden"><h2>Configurar nombre de jugador</h2><p>Elige el nombre que aparecerá en las salas y junto a tus respuestas.</p><label for="profileNameInput">Nombre de jugador</label><input id="profileNameInput" maxlength="32" placeholder="Tu nombre"><div class="actions"><button class="primary" id="saveProfile">Guardar nombre</button></div><div id="profileMessage" class="error" role="alert"></div></section>
 <section id="home" class="hidden">
  <nav class="home-tabs" role="tablist" aria-label="Secciones principales">
@@ -306,7 +331,8 @@ function setAuthUI(){
  $("homeRoomsPanel").classList.toggle("hidden",!logged);
  updateWantedFormAccess();
  $("roomView").classList.toggle("hidden",!logged||!session);
- $("accountEmail").textContent=authUser?.email||"";
+ $("accountEmail").textContent=profileName||authUser?.user_metadata?.display_name||authUser?.email||"";
+ $("accountEmailSecondary").textContent=authUser?.email||"Sesión iniciada";
 
  if(!logged){profileName="";if(refreshTimer)clearInterval(refreshTimer);refreshTimer=null;session=null;roomState=null;}
 }
