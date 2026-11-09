@@ -164,7 +164,7 @@ function restoreRoomSession(){
  try{
   const stored=JSON.parse(localStorage.getItem(STORAGE_KEY)||"null");
   if(stored&&stored.roomId&&stored.token){
-   session=stored;$("roomCode").textContent=stored.code;$("roomTitle").textContent="Sala "+stored.code;
+   session=stored;$("inviteUrl").textContent=inviteLink(stored.code);
    $("home").classList.add("hidden");$("roomView").classList.remove("hidden");
    loadDraft();refreshRoom();if(refreshTimer)clearInterval(refreshTimer);refreshTimer=setInterval(refreshRoom,4500);
   }
