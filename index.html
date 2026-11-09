@@ -99,12 +99,19 @@ header{background:#000;border-bottom:1px solid var(--line);padding:12px 22px}
  .main-banner-image{max-height:145px}
  .account-header{width:min(100%,520px);min-width:0;flex:0 1 auto}
 }
+
+/* Ajuste fino del bloque de sesión */
+.account-header{flex-basis:285px;min-width:220px;padding:10px 12px;gap:10px;transform:translate(-12px,7px)}
+.account-header-info b{font-size:13px}
+.account-header-info small{font-size:11px}
+.account-header #signOut{min-width:0;padding:6px 9px;font-size:11px;line-height:1.2;border-radius:7px;white-space:nowrap}
+@media(max-width:760px){.account-header{transform:translateY(2px)}}
 </style>
 </head>
 <body>
 <header id="mainBanner" role="button" tabindex="0" aria-label="Volver al portal de inicio">
  <div class="header-layout">
-  <div class="header-brand"><img class="main-banner-image" src="arte/banner.png" alt="Red de Roleros"><span class="site-version">Versión 1.40.0</span></div>
+  <div class="header-brand"><img class="main-banner-image" src="arte/banner.png" alt="Red de Roleros"><span class="site-version">Versión 1.41.0</span></div>
   <section id="accountBar" class="account-header hidden"><div class="account-header-info"><b id="accountEmail"></b><small id="accountEmailSecondary">Sesión iniciada</small></div><button id="signOut" class="danger" type="button">Cerrar sesión</button></section>
  </div>
 </header>
