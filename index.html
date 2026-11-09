@@ -104,7 +104,7 @@ header{background:#000;border-bottom:1px solid var(--line);padding:12px 22px}
 <body>
 <header id="mainBanner" role="button" tabindex="0" aria-label="Volver al portal de inicio">
  <div class="header-layout">
-  <div class="header-brand"><img class="main-banner-image" src="arte/banner.png" alt="Red de Roleros"><span class="site-version">Versión 1.39.0</span></div>
+  <div class="header-brand"><img class="main-banner-image" src="arte/banner.png" alt="Red de Roleros"><span class="site-version">Versión 1.40.0</span></div>
   <section id="accountBar" class="account-header hidden"><div class="account-header-info"><b id="accountEmail"></b><small id="accountEmailSecondary">Sesión iniciada</small></div><button id="signOut" class="danger" type="button">Cerrar sesión</button></section>
  </div>
 </header>
@@ -193,10 +193,9 @@ header{background:#000;border-bottom:1px solid var(--line);padding:12px 22px}
  <div id="homeTabEvents" class="home-tab-panel hidden" role="tabpanel" aria-labelledby="tabEvents">
    <section class="panel">
     <div class="section-toggle"><div><h2>Eventos de la comunidad</h2><p>Aquí encontrarás eventos de rol organizados por comunidades y jugadores.</p><p>¿Organizas una actividad? Publica tu evento o el de tu comunidad. Una vez revisado y aprobado por la administración, aparecerá en este espacio.</p><p class="muted"><strong>Importante:</strong> Todas las actividades publicadas en esta sección deben ser revisadas y aprobadas previamente por la administración.</p></div><button class="small" id="refreshEvents" type="button">Actualizar</button></div>
-    <div id="eventsPublicMessage" class="muted" role="status" aria-live="polite"></div><div id="eventsPublicList" class="events-grid"></div>
-   </section>
-   <section class="panel">
-    <h2>Proponer un evento</h2><p>Tu propuesta quedará pendiente de revisión. Solo se mostrará públicamente cuando sea aprobada.</p><div id="eventAccessMessage" class="muted">Inicia sesión para proponer un evento.</div>
+    <button class="primary" id="toggleEventForm" type="button" aria-expanded="false" aria-controls="eventProposalForm">Proponer un evento</button>
+    <div id="eventProposalForm" class="hidden" style="margin-top:16px">
+     <p id="eventAccessMessage" class="muted">Inicia sesión para proponer un evento.</p>
     <form id="eventForm" class="event-form-grid hidden">
      <div><label for="eventTitle">Nombre del evento *</label><input id="eventTitle" maxlength="120" required></div><div><label for="eventOrganizer">Organizador o comunidad *</label><input id="eventOrganizer" maxlength="100" required></div>
      <div class="full"><label for="eventDescription">Descripción *</label><textarea id="eventDescription" maxlength="1500" required></textarea></div>
@@ -209,6 +208,11 @@ header{background:#000;border-bottom:1px solid var(--line);padding:12px 22px}
      <div class="full"><label for="eventFlyer">Enlace al flyer (imagen)</label><input id="eventFlyer" type="url" maxlength="500" placeholder="https://..."></div><div><label for="eventRegistration">Enlace de inscripción o información</label><input id="eventRegistration" type="url" maxlength="500" placeholder="https://..."></div><div><label for="eventContact">Contacto</label><input id="eventContact" maxlength="200" placeholder="Correo, Instagram, WhatsApp, etc."></div>
      <div class="full actions"><button class="primary" id="submitEvent" type="submit">Enviar a revisión</button></div><div class="full" id="eventFormMessage" role="status" aria-live="polite"></div>
     </form>
+    </div>
+   </section>
+   <section class="panel">
+    <h2>Eventos publicados</h2>
+    <div id="eventsPublicMessage" class="muted" role="status" aria-live="polite"></div><div id="eventsPublicList" class="events-grid"></div>
    </section>
    <section class="panel hidden" id="eventAdminPanel"><h2>Revisión de eventos</h2><p>Solo los administradores pueden aprobar o rechazar propuestas.</p><div id="eventAdminMessage" class="muted"></div><div id="eventAdminList"></div></section>
    <section class="panel"><h2>Mis propuestas</h2><div id="myEventsList" class="muted">Inicia sesión para consultar tus propuestas.</div></section>
@@ -473,7 +477,7 @@ async function loadEvents(){
   result.events.forEach(ev=>list.appendChild(makeEventCard(ev)));
  }catch(e){$("eventsPublicMessage").textContent="No se pudieron cargar los eventos: "+e.message}
  const form=$("eventForm");
- if(authUser){form.classList.remove("hidden");$("eventAccessMessage").textContent="Completa los datos y envía tu propuesta para revisión."; $("eventOrganizer").value=$("eventOrganizer").value||profileName}
+ if(authUser){$("eventAccessMessage").textContent="Completa los datos y envía tu propuesta para revisión."; $("eventOrganizer").value=$("eventOrganizer").value||profileName}
  else{form.classList.add("hidden");$("eventAccessMessage").textContent="Inicia sesión para proponer un evento."}
  if(!authUser){$("myEventsList").textContent="Inicia sesión para consultar tus propuestas."; $("eventAdminPanel").classList.add("hidden");return}
  try{
@@ -527,6 +531,12 @@ $("eventForm").onsubmit=async ev=>{
   await loadEvents();
  }catch(e){$("eventFormMessage").textContent="No se pudo enviar: "+e.message}
  finally{button.disabled=false}
+};
+$("toggleEventForm").onclick=()=>{
+ const wrap=$("eventProposalForm"),open=wrap.classList.contains("hidden");
+ if(!authUser){$("eventAccessMessage").textContent="Inicia sesión para proponer un evento.";wrap.classList.remove("hidden");$("toggleEventForm").setAttribute("aria-expanded","true");$("toggleEventForm").textContent="Ocultar formulario";return;}
+ wrap.classList.toggle("hidden",!open);$("toggleEventForm").setAttribute("aria-expanded",open?"true":"false");
+ $("toggleEventForm").textContent=open?"Ocultar formulario":"Proponer un evento";
 };
 $("refreshEvents").onclick=loadEvents;
 
