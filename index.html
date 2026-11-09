@@ -1097,39 +1097,44 @@ $("copyInvite").onclick=async()=>{try{await navigator.clipboard.writeText(invite
 $("startForm").onclick=startForm;$("closePinned").onclick=()=>{$("catsPinned").classList.add("hidden")};$("closeCats").onclick=closeQuestionnaire;$("questionNext").onclick=goQuestionNext;$("questionPrev").onclick=goQuestionPrev;$("chatForm").onsubmit=sendChatMessage;
 $("leaveRoom").onclick=leaveRoom;$("refreshRoom").onclick=refreshRoom;$("toggleRoomClosed").onclick=toggleRoomClosed;
 buildOptions();
-setAuthUI();
+// Mantiene oculta la interfaz de acceso hasta que Supabase termine de
+// recuperar la sesión persistida y emita INITIAL_SESSION.
+$("authPanel").classList.add("hidden");
+$("accountBar").classList.add("hidden");
 loadWantedPosts();
 loadEvents();
-sb.auth.getSession().then(async({data})=>{
- authSession=data.session;authUser=data.session?.user||null;
- if(new URLSearchParams(window.location.search).get("password_recovery")==="1"){
-  if(authSession){showPasswordRecovery();}
-  else{$("recoveryMessage").textContent="No se pudo validar el enlace. Solicita uno nuevo e inténtalo otra vez.";$("passwordRecovery").classList.remove("hidden");$("authPanel").classList.add("hidden");}
-  return;
- }
- if(authUser){
-  try{await ensureProfile();setAuthUI();await restoreRoomSession();await enterFromInviteIfPresent();await loadEvents();}
-  catch(e){setAuthUI();$("profileMessage").textContent=e.message;}
- }else setAuthUI();
-});
 sb.auth.onAuthStateChange((_event,newSession)=>{
- // La sesión inicial se procesa únicamente mediante getSession() más arriba.
- // Evita que el evento INITIAL_SESSION compita con la restauración inicial.
- if(_event==="INITIAL_SESSION")return;
- authSession=newSession;authUser=newSession?.user||null;profileName="";
- if(_event==="PASSWORD_RECOVERY"||new URLSearchParams(window.location.search).get("password_recovery")==="1"){
-  showPasswordRecovery();
+ authSession=newSession||null;
+ authUser=newSession?.user||null;
+ profileName="";
+ const isRecovery=new URLSearchParams(window.location.search).get("password_recovery")==="1";
+ if(_event==="PASSWORD_RECOVERY"||isRecovery){
+  if(authSession){showPasswordRecovery();}
+  else{
+   $("recoveryMessage").textContent="No se pudo validar el enlace. Solicita uno nuevo e inténtalo otra vez.";
+   $("passwordRecovery").classList.remove("hidden");
+   $("authPanel").classList.add("hidden");
+  }
   return;
  }
  if(!authUser){setAuthUI();return;}
  setAuthUI();
+ // No ejecutar consultas de Supabase dentro del callback de auth.
+ // Se difieren para evitar bloquear el ciclo interno de autenticación.
  setTimeout(async()=>{
-  if(!authUser||authUser.id!==newSession.user.id)return;
-  try{await ensureProfile();setAuthUI();await loadWantedPosts();await loadEvents();if(!session){await restoreRoomSession();await enterFromInviteIfPresent();}}
-  catch(e){setAuthUI();$("profileMessage").textContent=e.message;}
+  if(!authUser||authUser.id!==newSession?.user?.id)return;
+  try{
+   await ensureProfile();
+   setAuthUI();
+   await loadWantedPosts();
+   await loadEvents();
+   if(!session){await restoreRoomSession();await enterFromInviteIfPresent();}
+  }catch(e){
+   setAuthUI();
+   $("profileMessage").textContent=e?.message||"No se pudo cargar el perfil.";
+  }
  },0);
 });
-
 // Generador aleatorio auxiliar
 const tables=[
 {items:["Un individuo poderoso o influyente.","Una organización clandestina.","Una facción militar o fuerza armada.","Una criatura o monstruo.","Una especie o población hostil.","Una entidad sobrenatural.","Una autoridad política o religiosa.","Una civilización o sociedad extranjera.","Un grupo criminal o mercenario.","Una inteligencia artificial o máquina autónoma.","Una fuerza natural o fenómeno ambiental.","Una fuerza desconocida o inexplicable."]},
