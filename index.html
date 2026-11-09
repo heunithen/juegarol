@@ -1116,29 +1116,48 @@ function addAdventureSection(parent,title,items){
  }
  parent.appendChild(list);
 }
-$("generate").onclick=async()=>{
- const button=$("generate"),status=$("randomStatus"),story=$("story");
- button.disabled=true;status.textContent="Generando propuesta…";
- story.textContent="ChatGPT está preparando la premisa, los personajes y los lugares.";
- try{
-  const {data,error}=await sb.functions.invoke("generate-random-adventure",{body:{
-   genre:$("randomGenre").value,tone:$("randomTone").value,notes:$("randomNotes").value,
-   dieRoll:Math.floor(Math.random()*6)+1
-  }});
-  if(error)throw error;
-  if(!data||typeof data.premise!=="string"||!Array.isArray(data.npcs)||!Array.isArray(data.places))throw new Error(data?.error||"La respuesta recibida está incompleta.");
-  story.replaceChildren();
-  const heading=document.createElement("h3");heading.textContent="Premisa";
-  const premise=document.createElement("p");premise.textContent=data.premise;story.append(heading,premise);
-  addAdventureSection(story,"Personajes no jugadores",data.npcs);
-  addAdventureSection(story,"Lugares",data.places);
-  status.textContent="Propuesta generada.";
- }catch(error){
-  console.error("Error al generar aventura:",error);
-  story.textContent=error?.context?.error||error?.message||"No se pudo generar la propuesta. Inténtalo nuevamente.";
-  status.textContent="No se pudo completar la generación.";
- }finally{button.disabled=false;}
-};
+
+</script>
+
+<script>
+// Manejador aislado para que el generador no dependa de la inicialización de otras herramientas.
+(()=>{
+ const button=document.getElementById("generate");
+ if(!button)return;
+ button.addEventListener("click",async()=>{
+  const status=document.getElementById("randomStatus");
+  const story=document.getElementById("story");
+  const genre=document.getElementById("randomGenre");
+  const tone=document.getElementById("randomTone");
+  const notes=document.getElementById("randomNotes");
+  button.disabled=true;
+  status.textContent="Conectando con ChatGPT…";
+  story.textContent="Preparando la propuesta…";
+  try{
+   if(!window.supabase||typeof sb==="undefined"||!sb.functions)throw new Error("No se pudo inicializar la conexión con Supabase. Recarga la página.");
+   const result=await sb.functions.invoke("generate-random-adventure",{body:{genre:genre.value,tone:tone.value,notes:notes.value,dieRoll:Math.floor(Math.random()*6)+1}});
+   if(result.error)throw result.error;
+   const data=result.data;
+   if(!data||typeof data.premise!=="string"||!Array.isArray(data.npcs)||!Array.isArray(data.places))throw new Error(data?.error||"El servidor devolvió una respuesta incompleta.");
+   story.replaceChildren();
+   const add=(title,items)=>{
+    const h=document.createElement("h3");h.textContent=title;story.appendChild(h);
+    const list=document.createElement("div");list.className="random-generated-list";
+    for(const item of items){const card=document.createElement("article");card.className="random-generated-item";const name=document.createElement("strong");name.textContent=item.name;const desc=document.createElement("p");desc.textContent=item.description;card.append(name,desc);list.appendChild(card)}
+    story.appendChild(list);
+   };
+   const h=document.createElement("h3");h.textContent="Premisa";const p=document.createElement("p");p.textContent=data.premise;story.append(h,p);
+   add("Personajes no jugadores",data.npcs);add("Lugares",data.places);
+   status.textContent="Propuesta generada.";
+  }catch(error){
+   console.error("Generador ChatGPT:",error);
+   let message=error?.message||"Error desconocido.";
+   if(error?.context?.json){try{const body=await error.context.json();message=body.error||message}catch{}}
+   story.textContent="No se pudo generar la propuesta: "+message;
+   status.textContent="Error de conexión o generación.";
+  }finally{button.disabled=false;}
+ });
+})();
 </script>
 </body></html>
 <style>
