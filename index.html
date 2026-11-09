@@ -121,10 +121,10 @@ header{background:#000;border-bottom:1px solid var(--line);padding:12px 22px}
 <section id="authPanel" class="panel">
  <h2>Acceso a Red de Roleros</h2>
  <p>Inicia sesión o crea una cuenta para crear salas y participar. El generador aleatorio sigue disponible sin cuenta.</p>
- <label for="authName">Nombre de jugador (para el registro)</label><input id="authName" maxlength="32" placeholder="Tu nombre">
+ <div id="authNameField" class="hidden"><label for="authName">Nombre de jugador</label><input id="authName" maxlength="32" autocomplete="nickname" placeholder="El nombre que verán los demás"></div>
  <label for="authEmail">Correo electrónico</label><input id="authEmail" type="email" autocomplete="email" placeholder="nombre@correo.com">
- <label for="authPassword">Contraseña</label><input id="authPassword" type="password" autocomplete="current-password" minlength="8" placeholder="Mínimo 8 caracteres">
- <div class="actions"><button class="primary" id="signIn">Iniciar sesión</button><button id="signUp">Crear cuenta</button><button id="googleSignIn">Continuar con Google</button></div>
+ <label for="authPassword">Contraseña</label><input id="authPassword" type="password" autocomplete="current-password" minlength="8" placeholder="Tu contraseña">
+ <div class="actions"><button class="primary" id="signIn">Iniciar sesión</button><button id="signUp">Crear cuenta</button><button id="cancelSignUp" class="hidden" type="button">Volver</button><button id="googleSignIn">Continuar con Google</button></div>
  <button type="button" id="forgotPassword" class="small" style="margin-top:10px">Olvidé mi contraseña</button>
  <div id="authMessage" class="muted" aria-live="polite"></div>
 </section>
@@ -448,15 +448,10 @@ async function ensureProfile(){
  if(error)throw error;
  const existing=(data?.display_name||"").trim();
  if(existing){profileName=existing;return existing;}
- const fallback=(authUser.user_metadata?.display_name||"").trim().slice(0,32);
- if(fallback){
-  const {error:saveError}=await sb.from("cats_profiles").upsert({id:authUser.id,display_name:fallback},{onConflict:"id"});
-  if(saveError)throw saveError;
-  profileName=fallback;
- }else{
-  profileName="";
-  $("profileNameInput").value="";
- }
+ const fallback=(authUser.user_metadata?.display_name||authUser.email?.split("@")[0]||"Jugador").trim().slice(0,32);
+ const {error:saveError}=await sb.from("cats_profiles").upsert({id:authUser.id,display_name:fallback},{onConflict:"id"});
+ if(saveError)throw saveError;
+ profileName=fallback;
  setAuthUI();
  return profileName;
 }
@@ -473,22 +468,39 @@ async function saveProfile(){
  }catch(e){$("profileMessage").textContent="No se pudo guardar el perfil: "+e.message;}
  finally{$("saveProfile").disabled=false;}
 }
+let signUpMode=false;
+function setSignUpMode(enabled){
+ signUpMode=enabled;
+ $("authNameField").classList.toggle("hidden",!enabled);
+ $("signIn").classList.toggle("hidden",enabled);
+ $("signUp").classList.toggle("primary",enabled);
+ $("cancelSignUp").classList.toggle("hidden",!enabled);
+ $("forgotPassword").classList.toggle("hidden",enabled);
+ $("authPassword").autocomplete=enabled?"new-password":"current-password";
+ $("authPassword").placeholder=enabled?"Crea una contraseña de al menos 8 caracteres":"Tu contraseña";
+ $("authMessage").textContent=enabled?"Completa estos datos para crear tu cuenta.":"";
+}
 async function signUp(){
  const email=$("authEmail").value.trim(),password=$("authPassword").value,name=$("authName").value.trim();
- if(!name){$("authMessage").textContent="Escribe tu nombre para crear la cuenta.";return;}
+ if(!email){$("authMessage").textContent="Escribe tu correo electrónico.";return;}
+ if(!name){$("authMessage").textContent="Escribe tu nombre de jugador.";return;}
  if(password.length<8){$("authMessage").textContent="La contraseña debe tener al menos 8 caracteres.";return;}
- $("authMessage").textContent="Creando cuenta...";
- const {data,error}=await sb.auth.signUp({email,password,options:{data:{display_name:name}}});
- if(error){$("authMessage").textContent=error.message;return;}
- if(data.session){
-  authSession=data.session;authUser=data.user;
-  const {error:profileError}=await sb.from("cats_profiles").upsert({id:authUser.id,display_name:name},{onConflict:"id"});
-  if(profileError){$("authMessage").textContent="Cuenta creada, pero no se pudo guardar el perfil: "+profileError.message;return;}
-  profileName=name;$("authMessage").textContent="Cuenta creada.";
-  setAuthUI();await enterFromInviteIfPresent();
- }else{
-  $("authMessage").textContent="Cuenta creada. Revisa tu correo para confirmar la dirección y luego inicia sesión.";
- }
+ $("signUp").disabled=true;$("authMessage").textContent="Creando cuenta...";
+ try{
+  const {data,error}=await sb.auth.signUp({email,password,options:{data:{display_name:name}}});
+  if(error)throw error;
+  if(data.session){
+   authSession=data.session;authUser=data.user;
+   const {error:profileError}=await sb.from("cats_profiles").upsert({id:authUser.id,display_name:name},{onConflict:"id"});
+   if(profileError)throw profileError;
+   profileName=name;$("authMessage").textContent="Cuenta creada.";
+   setAuthUI();await enterFromInviteIfPresent();
+  }else{
+   $("authMessage").textContent="Cuenta creada. Revisa tu correo para confirmar la dirección. Después podrás entrar solo con tu correo y contraseña.";
+   setSignUpMode(false);
+  }
+ }catch(e){$("authMessage").textContent="No se pudo crear la cuenta: "+(e?.message||"Error desconocido");}
+ finally{$("signUp").disabled=false;}
 }
 async function signOut(){
  if(session){try{await api("leave",{roomId:session.roomId,token:session.token});}catch{}}
@@ -499,7 +511,7 @@ async function signOut(){
  setAuthUI();
 }
 async function restoreRoomSession(){await loadMyRooms()}
-$("signIn").onclick=signIn;$("signUp").onclick=signUp;$("googleSignIn").onclick=signInWithGoogle;$("forgotPassword").onclick=sendPasswordRecovery;$("saveNewPassword").onclick=saveNewPassword;$("signOut").onclick=signOut;$("saveProfile").onclick=saveProfile;
+$("signIn").onclick=signIn;$("signUp").onclick=()=>{if(!signUpMode)setSignUpMode(true);else signUp();};$("cancelSignUp").onclick=()=>setSignUpMode(false);$("googleSignIn").onclick=signInWithGoogle;$("forgotPassword").onclick=sendPasswordRecovery;$("saveNewPassword").onclick=saveNewPassword;$("signOut").onclick=signOut;$("saveProfile").onclick=saveProfile;
 
 async function publicApi(action,data={}){
  const headers={"Content-Type":"application/json","apikey":SUPABASE_KEY};
