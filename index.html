@@ -154,15 +154,13 @@ header{background:#000;border-bottom:1px solid var(--line);padding:12px 22px}
   <div class="actions"><button class="primary" id="createRoom">Ocupar C.A.T.S.</button></div><div class="join-room-box"><label for="roomCodeInput">Entrar a C.A.T.S. con código</label><div class="actions"><input id="roomCodeInput" maxlength="6" autocomplete="off" placeholder="Código de 6 caracteres" aria-label="Código de C.A.T.S."><button id="joinRoomCode" type="button">Unirse</button></div></div>
  </section>
  <section class="panel" id="randomTools">
-  <div><h2>Generador de aventuras con ChatGPT</h2><p>Define el género y el tono para crear una premisa abierta, cuatro personajes no jugadores y cuatro lugares. Las ideas son un punto de partida: el grupo decide cómo continúa la historia.</p></div>
+  <div><h2>Generador de premisas aleatorias</h2><p>Elige un género y un tono antes de lanzar el dado. El género adapta las cuatro tablas de la premisa; el tono es solo decorativo y no modifica los resultados.</p></div>
   <div class="form-grid" style="margin-top:14px">
-   <label>Género<select id="randomGenre"><option>Fantasía medieval</option><option>Fantasía oscura</option><option>Ciencia ficción</option><option>Terror</option><option>Misterio</option><option>Investigación</option><option>Aventura</option><option>Western</option><option>Postapocalíptico</option><option>Horror cósmico</option><option>Comedia</option><option>Otro / mezcla</option></select></label>
-   <label>Tono<select id="randomTone"><option>Heroico</option><option>Épico</option><option>Sombrío</option><option>Oscuro</option><option>Misterioso</option><option>Humorístico</option><option>Dramático</option><option>Aventurero</option><option>Supervivencia</option></select></label>
+   <label for="randomGenre">Género<select id="randomGenre"><option>Fantasía medieval</option><option>Fantasía oscura</option><option>Ciencia ficción</option><option>Terror</option><option>Misterio</option><option>Investigación</option><option>Aventura</option><option>Western</option><option>Postapocalíptico</option><option>Horror cósmico</option><option>Comedia</option><option>Otro / mezcla</option></select></label>
+   <label for="randomTone">Tono<select id="randomTone"><option>Heroico</option><option>Épico</option><option>Sombrío</option><option>Oscuro</option><option>Misterioso</option><option>Humorístico</option><option>Dramático</option><option>Aventurero</option><option>Supervivencia</option></select></label>
   </div>
-  <label for="randomNotes">Indicaciones adicionales (opcional)</label>
-  <textarea id="randomNotes" rows="3" maxlength="1200" placeholder="Ej.: una ciudad construida sobre un leviatán dormido; evitar viajes en el tiempo..."></textarea>
-  <div class="random-result" style="margin-top:14px"><div id="story" class="story">Configura el género y el tono y pulsa el botón para generar una propuesta.</div></div>
-  <div class="actions"><button class="primary" id="generate" type="button">Generar con ChatGPT</button><span id="randomStatus" class="muted" role="status" aria-live="polite"></span></div>
+  <div class="random-result" style="margin-top:14px"><div id="story" class="story">Selecciona el género y el tono. Después, pulsa el dado para generar una premisa.</div></div>
+  <div class="actions"><button class="primary" id="generate" type="button" aria-label="Lanzar dado y generar premisa" title="Generar premisa aleatoria" style="font-size:24px;min-width:54px">⚅</button></div>
  </section>
  <div id="homeError" class="error" role="alert"></div>
  </div>
@@ -1104,78 +1102,94 @@ sb.auth.onAuthStateChange((_event,newSession)=>{
 initializePublicSite().catch(error=>{setAuthUI();showError("homeError","No se pudo cargar el sitio: "+(error?.message||"Error desconocido"));authInitialized=true;});
 $("adminAccess").onclick=()=>{adminLoginOpen=true;$("home").classList.add("hidden");$("authPanel").classList.remove("hidden");$("authMessage").textContent="";};
 $("cancelAdminAccess").onclick=()=>{adminLoginOpen=false;$("authPanel").classList.add("hidden");$("home").classList.remove("hidden");};
-// Generador de aventuras con ChatGPT mediante la Edge Function de Supabase.
-function addAdventureSection(parent,title,items){
- const heading=document.createElement("h3");heading.textContent=title;parent.appendChild(heading);
- const list=document.createElement("div");list.className="random-generated-list";
- for(const item of items){
-  const card=document.createElement("article");card.className="random-generated-item";
-  const name=document.createElement("strong");name.textContent=item.name;
-  const description=document.createElement("p");description.textContent=item.description;
-  card.append(name,description);list.appendChild(card);
- }
- parent.appendChild(list);
+// Generador de premisas aleatorias: conserva la estructura de las cuatro tablas originales.
+const originalTables=[
+ ["Un individuo poderoso o influyente.","Una organización clandestina.","Una facción militar o fuerza armada.","Una criatura o monstruo.","Una especie o población hostil.","Una entidad sobrenatural.","Una autoridad política o religiosa.","Una civilización o sociedad extranjera.","Un grupo criminal o mercenario.","Una inteligencia artificial o máquina autónoma.","Una fuerza natural o fenómeno ambiental.","Una fuerza desconocida o inexplicable."],
+ ["Obtener algo que no posee.","Recuperar algo que perdió.","Vengarse de alguien.","Destruir o eliminar algo.","Imponer su voluntad sobre otros.","Proteger algo o a alguien.","Escapar de una situación o amenaza.","Cambiar el orden establecido.","Descubrir un secreto o conocimiento.","Conseguir reconocimiento, autoridad o legitimidad.","Expandir su influencia o territorio.","Evitar que algo o alguien alcance su objetivo."],
+ ["Una persona específica.","Un grupo de personas o una comunidad.","Un objeto valioso o irreemplazable.","Un arma o herramienta especial.","Un lugar o territorio.","Un recurso natural o material escaso.","Una fuente de energía o poder.","Un conocimiento o secreto.","Un documento, registro o prueba.","Una criatura o ser extraordinario.","Una organización o institución.","Una alianza o acuerdo con alguien."],
+ ["Provocar una catástrofe o destrucción masiva.","Desencadenar una guerra o conflicto armado.","Derrocar un gobierno o autoridad.","Someter a una población o civilización.","Reorganizar el equilibrio de poder entre distintas facciones.","Liberar una amenaza desconocida.","Transformar permanentemente un lugar o entorno.","Provocar el colapso económico de una región.","Obligar a una población a abandonar su hogar.","Alterar las leyes naturales o la realidad.","Desatar una rebelión, persecución o conflicto social.","Cambiar radicalmente el futuro de una sociedad."]
+];
+const genreTables={
+ "Fantasía medieval":[
+ ["Un monarca o señor feudal.","Una orden de caballería.","Un ejército invasor.","Un dragón o bestia legendaria."],
+ ["Reclamar un trono.","Recuperar una reliquia perdida.","Vengar una traición.","Proteger un reino amenazado."],
+ ["Un heredero legítimo.","Una aldea fronteriza.","Una corona encantada.","Un castillo disputado."],
+ ["Desatar una guerra entre reinos.","Derribar una dinastía.","Despertar a una criatura ancestral.","Romper un antiguo pacto mágico."]
+ ],
+ "Fantasía oscura":[
+ ["Un señor inmortal.","Un culto secreto.","Una hueste de muertos vivientes.","Una entidad demoníaca."],
+ ["Romper una maldición heredada.","Recuperar un alma robada.","Vengar una atrocidad.","Evitar que la corrupción se extienda."],
+ ["Un niño marcado por una profecía.","Una aldea condenada.","Un grimorio prohibido.","Un territorio contaminado."],
+ ["Desatar una plaga sobrenatural.","Entregar una región a fuerzas oscuras.","Resucitar a un tirano.","Corromper una tierra para siempre."]
+ ],
+ "Ciencia ficción":[
+ ["Un magnate de megacorporación.","Una red clandestina de colonos.","Una fuerza militar interestelar.","Una inteligencia artificial autónoma."],
+ ["Robar tecnología experimental.","Recuperar datos desaparecidos.","Desactivar una máquina peligrosa.","Proteger a una tripulación."],
+ ["Un científico desaparecido.","Una colonia aislada.","Un núcleo de energía.","Un prototipo de arma."],
+ ["Provocar un colapso planetario.","Iniciar una guerra entre sistemas.","Derribar un gobierno colonial.","Liberar una inteligencia artificial hostil."]
+ ],
+ "Terror":[
+ ["Un vecino con un secreto inhumano.","Una sociedad cerrada.","Una criatura que acecha de noche.","Una presencia sobrenatural."],
+ ["Sobrevivir a la persecución.","Recuperar a alguien desaparecido.","Destruir el origen de la amenaza.","Escapar de un lugar aislado."],
+ ["Un testigo que sabe demasiado.","Un grupo de supervivientes.","Un objeto maldito.","Un edificio abandonado."],
+ ["Desatar una matanza.","Extender el terror a una localidad.","Liberar algo encerrado.","Hacer que nadie pueda escapar."]
+ ],
+ "Misterio":[
+ ["Un aristócrata de pasado dudoso.","Una sociedad de benefactores.","Un círculo de conspiradores.","Una figura que aparece en varios lugares."],
+ ["Obtener una respuesta oculta.","Recuperar una pieza robada.","Destruir pruebas comprometedoras.","Evitar que se descubra una identidad."],
+ ["Un testigo clave.","Una comunidad llena de secretos.","Una joya desaparecida.","Un libro de cuentas alterado."],
+ ["Provocar un escándalo público.","Desencadenar acusaciones.","Arruinar la vida de un inocente.","Revelar una conspiración mayor."]
+ ],
+ "Investigación":[
+ ["Un funcionario con información reservada.","Una agencia de investigación.","Una unidad policial o militar.","Una red de contrabandistas."],
+ ["Encontrar al responsable.","Recuperar evidencia sustraída.","Desmantelar una operación.","Proteger a un testigo."],
+ ["Un testigo protegido.","Una comunidad bajo sospecha.","Un objeto de la escena del crimen.","Un archivo clasificado."],
+ ["Provocar una crisis institucional.","Desatar una guerra entre organizaciones.","Derribar a una autoridad corrupta.","Desatar una persecución generalizada."]
+ ],
+ "Aventura":[
+ ["Un explorador famoso.","Una compañía de buscadores.","Una expedición armada.","Un rival que busca el mismo tesoro."],
+ ["Encontrar un destino legendario.","Recuperar un tesoro perdido.","Destruir un obstáculo imposible.","Proteger a los compañeros de viaje."],
+ ["Un guía experimentado.","Una caravana o expedición.","Un mapa incompleto.","Una región inexplorada."],
+ ["Desatar una catástrofe natural.","Iniciar una disputa territorial.","Liberar una criatura antigua.","Cambiar una ruta comercial para siempre."]
+ ],
+ "Western":[
+ ["Un terrateniente poderoso.","Una banda de forajidos.","Una compañía ferroviaria armada.","Un agente de la ley corrupto."],
+ ["Conseguir una recompensa.","Recuperar ganado robado.","Vengarse de una emboscada.","Proteger a una familia amenazada."],
+ ["Un testigo del último asalto.","Un pueblo fronterizo.","Una caja fuerte con dinero.","Una mina disputada."],
+ ["Provocar una guerra entre bandas.","Desencadenar una disputa territorial.","Expulsar a los habitantes de sus tierras.","Convertir la frontera en tierra sin ley."]
+ ],
+ "Postapocalíptico":[
+ ["Un jefe de asentamiento.","Una red de saqueadores.","Una milicia de carretera.","Una bestia mutada."],
+ ["Conseguir agua o alimento.","Recuperar medicinas perdidas.","Destruir una fuente de contaminación.","Proteger un refugio."],
+ ["Un médico indispensable.","Un asentamiento aislado.","Un depósito de combustible.","Una reserva de agua."],
+ ["Provocar una nueva catástrofe.","Desatar una guerra por recursos.","Someter a los supervivientes.","Obligar a miles a abandonar su hogar."]
+ ],
+ "Horror cósmico":[
+ ["Un académico obsesionado.","Una secta clandestina.","Una criatura llegada del vacío.","Una inteligencia incomprensible."],
+ ["Descifrar una señal imposible.","Recuperar un artefacto alienígena.","Destruir un portal.","Evitar que algo despierte."],
+ ["Una persona que oyó la señal.","Un pueblo apartado.","Un fragmento de meteorito.","Un manuscrito anterior a la humanidad."],
+ ["Provocar una ruptura de la realidad.","Desencadenar un conflicto entre cultos.","Liberar una presencia exterior.","Cambiar las leyes de la naturaleza."]
+ ],
+ "Comedia":[
+ ["Un noble incompetente.","Una asociación absurda.","Una guardia mal organizada.","Un inventor con ideas desastrosas."],
+ ["Conseguir algo ridículamente específico.","Recuperar un objeto extraviado.","Destruir una máquina fuera de control.","Proteger un secreto vergonzoso."],
+ ["Una persona que entendió todo mal.","Un pueblo lleno de personajes raros.","Un trofeo sin valor aparente.","Una receta imposible."],
+ ["Provocar un desastre por accidente.","Desencadenar una pelea multitudinaria.","Someter a todos mediante una regla absurda.","Cambiar el destino por un malentendido."]
+ ]
+};
+function rollAll(){
+ const genre=$("randomGenre").value,tone=$("randomTone").value;
+ const tables=genreTables[genre]||originalTables;
+ const values=tables.map(table=>table[Math.floor(Math.random()*table.length)]);
+ const story=$("story");story.replaceChildren();
+ const style=document.createElement("p");style.className="muted";style.textContent="Género: "+genre+" · Tono: "+tone;
+ const premise=document.createElement("p");premise.textContent="El conflicto gira en torno a "+values[0]+". El objetivo es "+values[1]+". Para alcanzarlo, hace falta "+values[2]+". Si se consigue, podría "+values[3]+".";
+ story.append(style,premise);
 }
-
+$("generate").onclick=rollAll;
 </script>
 
-<script>
-(()=>{
- const status=()=>document.getElementById("randomStatus");
- const story=()=>document.getElementById("story");
- const setStatus=(message)=>{const node=status();if(node)node.textContent=message;};
- // Este texto confirma visualmente que el código nuevo sí se cargó en el navegador.
- setStatus("Generador listo. Pulsa «Generar con ChatGPT».");
- document.addEventListener("click",async(event)=>{
-  const button=event.target instanceof Element?event.target.closest("#generate"):null;
-  if(!button||button.disabled)return;
-  event.preventDefault();
-  const output=story();
-  const genre=document.getElementById("randomGenre");
-  const tone=document.getElementById("randomTone");
-  const notes=document.getElementById("randomNotes");
-  if(!output||!genre||!tone||!notes){setStatus("Error: faltan elementos del generador en la página.");return;}
-  button.disabled=true;
-  setStatus("Clic recibido. Conectando con el servidor…");
-  output.textContent="Preparando la propuesta…";
-  try{
-   if(!window.supabase||typeof sb==="undefined"||!sb.functions)throw new Error("No se inicializó Supabase.");
-   setStatus("Solicitud enviada. Esperando respuesta de ChatGPT…");
-   const result=await sb.functions.invoke("generate-random-adventure",{body:{genre:genre.value,tone:tone.value,notes:notes.value,dieRoll:Math.floor(Math.random()*6)+1}});
-   if(result.error){
-    let message=result.error.message||"Error al llamar a la función.";
-    const context=result.error.context;
-    if(context&&typeof context.json==="function"){try{const body=await context.json();message=[body?.error,body?.detail,body?.api_status?("HTTP "+body.api_status):"",body?.api_type,body?.api_code,body?.api_param?("parámetro: "+body.api_param):""].filter(Boolean).join(" — ")||message;}catch{}}
-    throw new Error(message);
-   }
-   const data=result.data;
-   if(!data||typeof data.premise!=="string"||!Array.isArray(data.npcs)||!Array.isArray(data.places))throw new Error(data?.error||"El servidor devolvió una respuesta incompleta.");
-   output.replaceChildren();
-   const add=(title,items)=>{
-    const heading=document.createElement("h3");heading.textContent=title;output.appendChild(heading);
-    const list=document.createElement("div");list.className="random-generated-list";
-    for(const item of items){
-     const card=document.createElement("article");card.className="random-generated-item";
-     const name=document.createElement("strong");name.textContent=item.name||"Sin nombre";
-     const description=document.createElement("p");description.textContent=item.description||"";
-     card.append(name,description);list.appendChild(card);
-    }
-    output.appendChild(list);
-   };
-   const heading=document.createElement("h3");heading.textContent="Premisa";
-   const premise=document.createElement("p");premise.textContent=data.premise;
-   output.append(heading,premise);
-   add("Personajes no jugadores",data.npcs);
-   add("Lugares",data.places);
-   setStatus("Propuesta generada correctamente.");
-  }catch(error){
-   console.error("Generador ChatGPT:",error);
-   output.textContent="No se pudo generar la propuesta: "+(error?.message||"Error desconocido.");
-   setStatus("La solicitud falló. El detalle aparece sobre este mensaje.");
-  }finally{button.disabled=false;}
- },true);
-})();
-</script>
+
 </body></html>
 <style>
 /* La sesión queda al final de todo el contenido del portal. */
@@ -1194,5 +1208,10 @@ function addAdventureSection(parent,title,items){
 </style>
 
 <style>
-#randomTools .form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}#randomTools label{display:block;margin:8px 0;color:var(--muted);font-size:13px}#randomTools select,#randomTools textarea{width:100%;margin-top:5px;background:#171c23;color:var(--text);border:1px solid var(--line);border-radius:8px;padding:10px;font:inherit}#randomTools textarea{resize:vertical}#randomTools .random-generated-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:10px 0 18px}#randomTools .random-generated-item{padding:11px;background:#191e26;border:1px solid var(--line);border-radius:9px}#randomTools .random-generated-item strong{color:var(--gold)}#randomTools .random-generated-item p{margin:5px 0 0;font-size:13px;color:var(--muted)}#randomTools #story h3{color:var(--gold);margin:15px 0 5px}#randomTools #story>p{margin:5px 0 12px}#randomTools #generate:disabled{opacity:.6;cursor:wait}@media(max-width:600px){#randomTools .form-grid,#randomTools .random-generated-list{grid-template-columns:1fr}}
+#randomTools .form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+#randomTools label{display:block;margin:8px 0;color:var(--muted);font-size:13px}
+#randomTools select{width:100%;margin-top:5px;background:#171c23;color:var(--text);border:1px solid var(--line);border-radius:8px;padding:10px;font:inherit}
+#randomTools #story>p{margin:5px 0 12px}
+#randomTools #story .muted{font-size:12px;color:var(--muted)}
+@media(max-width:600px){#randomTools .form-grid{grid-template-columns:1fr}}
 </style>
